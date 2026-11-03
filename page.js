@@ -3,6 +3,7 @@
 // and pointing at him makes him look at you. Pressing a platform (or him) makes him reach out.
 // "Who am I?" opens the bio, a few pages long, and he faces you while you read it.
 // "Hear me out?" opens a box with Spotify's player in it, and he faces you while you listen.
+// On the 8-bit page every press makes a small sound, like an old game.
 (() => {
   const sitter = document.querySelector('.sitter');
   const dialog = document.querySelector('.bio');
@@ -10,6 +11,54 @@
   const calm = matchMedia('(prefers-reduced-motion: reduce)').matches;
   const beat = 60000 / (Number(document.body.dataset.bpm) || 100);
   const wobble = 'wobble' in document.body.dataset && !calm;
+  const chime = 'sounds' in document.body.dataset ? chimes() : () => {};
+
+  // The sounds are made by the browser on the spot, the way old consoles made them (a pulse wave, a note
+  // at a time), so there is nothing to download. They only ever follow a press, and an iPhone on silent
+  // stays silent. Each tune is a list of notes: [semitones from A440, length in ms].
+  function chimes() {
+    const TUNES = {
+      go:    [[10, 35], [17, 35], [22, 80]],                      // a platform or a link: up and away
+      who:   [[3, 45], [7, 45], [10, 45], [15, 100]],             // the bio opens
+      hear:  [[-2, 55], [2, 55], [5, 55], [10, 55], [14, 130]],   // the player opens
+      close: [[15, 40], [10, 40], [3, 80]],                       // a box closes
+      next:  [[12, 45]],                                          // the bio's next page
+      back:  [[7, 45]],                                           // the page before
+    };
+    const VOLUME = 0.07;
+    let ctx = null, wave = null;
+    return name => {
+      try {
+        if (!ctx) ctx = new (window.AudioContext || window.webkitAudioContext)();
+        if (ctx.state === 'suspended') ctx.resume();
+        if (!wave) {
+          // A pulse wave a quarter of the time up: the thin, bright tone of the old consoles
+          const real = new Float32Array(32), imag = new Float32Array(32);
+          for (let n = 1; n < 32; n++) {
+            real[n] = Math.sin(2 * Math.PI * n * 0.25) / (Math.PI * n);
+            imag[n] = (1 - Math.cos(2 * Math.PI * n * 0.25)) / (Math.PI * n);
+          }
+          wave = ctx.createPeriodicWave(real, imag);
+        }
+        let t = ctx.currentTime + 0.01;
+        for (const [semitones, ms] of TUNES[name]) {
+          const length = ms / 1000;
+          const osc = ctx.createOscillator(), gain = ctx.createGain();
+          osc.setPeriodicWave(wave);
+          osc.frequency.value = 440 * 2 ** (semitones / 12);
+          // Each note fades in and out over a few milliseconds, or the speaker clicks
+          gain.gain.setValueAtTime(0, t);
+          gain.gain.linearRampToValueAtTime(VOLUME, t + 0.003);
+          gain.gain.setValueAtTime(VOLUME, t + length * 0.6);
+          gain.gain.linearRampToValueAtTime(0, t + length);
+          osc.connect(gain).connect(ctx.destination);
+          osc.start(t);
+          osc.stop(t + length + 0.01);
+          t += length;
+        }
+      } catch { /* no sound on this browser: the page works the same */ }
+    };
+  }
 
   // In beats. Facing you holds longest; the reach comes once per loop.
   const LOOP = [['front', 2], ['left', 1], ['front', 1], ['right', 1], ['front', 2],
@@ -69,6 +118,7 @@
   document.querySelectorAll('.go').forEach(a => {
     a.addEventListener('pointerdown', press);
     a.addEventListener('click', e => {
+      chime('go');
       if (e.metaKey || e.ctrlKey || e.shiftKey || e.altKey) return;  // opened in another tab
       // He keeps reaching while the page leaves. If it never does (the app opened instead), he carries on.
       leaving = true;
@@ -153,14 +203,16 @@
   }
 
   document.querySelector('.who').addEventListener('click', () => {
+    chime('who');
     seen.clear();
     if (tag) tag.textContent = '???';
     dialog.showModal();
     hold('front');
     turnTo(0);
   });
-  next.addEventListener('click', () => turnTo(current + 1));
-  back.addEventListener('click', () => turnTo(current - 1));
+  next.addEventListener('click', () => { chime('next'); turnTo(current + 1); });
+  back.addEventListener('click', () => { chime('back'); turnTo(current - 1); });
+  dialog.querySelectorAll('.pages a').forEach(a => a.addEventListener('click', () => chime('go')));
   // Both boxes. Where a press starts, and with what: a text selection dragged past the edge is not a tap outside,
   // and a mouse click on the text is left for selecting words, so only a finger turns the page by tapping it.
   // The browser counts the clicks of a double click (detail 2 and up): those are ignored too.
@@ -181,10 +233,14 @@
   dialog.addEventListener('click', e => {
     if (e.target === dialog || !typed || e.target.closest('a, button')) return;
     if (typing) finishTyping();
-    else if (lastPointer !== 'mouse' && current < pages.length - 1 && getSelection().isCollapsed) turnTo(current + 1);
+    else if (lastPointer !== 'mouse' && current < pages.length - 1 && getSelection().isCollapsed) {
+      chime('next');
+      turnTo(current + 1);
+    }
   });
   dialog.addEventListener('keydown', () => { if (typing) finishTyping(); });
   dialog.addEventListener('close', () => {
+    chime('close');
     if (typing) finishTyping();
     settle();
   });
@@ -207,6 +263,7 @@
     }
   }
   document.querySelector('.hear').addEventListener('click', () => {
+    chime('hear');
     player.showModal();
     player.scrollTop = 0;
     hold('front');
@@ -220,6 +277,7 @@
     setTimeout(() => { if (frame) frame.style.pointerEvents = ''; }, 500);
   });
   player.addEventListener('close', () => {
+    chime('close');
     sync();
     settle();
   });

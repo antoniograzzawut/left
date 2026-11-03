@@ -41,6 +41,10 @@ from the PDF afterwards can still be read in its shadow.
 the LEFT. artist page, so it follows Spotify by itself. To show an album or a
 playlist instead, ask Claude.
 
+**Sounds.** On the 8-bit page every press makes a small sound, like an old
+game. To turn them off, open `index.html`, find `<body data-bpm="120" data-wobble data-sounds>`
+and delete ` data-sounds` (with the space before it). The studio page has no sounds.
+
 **Photos.** Ask Claude. They are cropped, lined up and converted, so a raw photo
 uploaded over an old one will not sit right.
 
