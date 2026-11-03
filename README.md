@@ -37,7 +37,7 @@ never carry the phone number or the personal email. Delete them in Canva before
 exporting: Canva also draws the shadow of a text as a picture, so a text removed
 from the PDF afterwards can still be read in its shadow.
 
-**The player.** "Hear me?" opens Spotify's own player with the top tracks of
+**The player.** "Hear me out?" opens Spotify's own player with the top tracks of
 the LEFT. artist page, so it follows Spotify by itself. To show an album or a
 playlist instead, ask Claude.
 

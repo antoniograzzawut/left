@@ -2,7 +2,7 @@
 // The photos loop on their own, like a GIF. With a mouse, pointing at a platform makes him look at it
 // and pointing at him makes him look at you. Pressing a platform (or him) makes him reach out.
 // "Who am I?" opens the bio, a few pages long, and he faces you while you read it.
-// "Hear me?" opens a box with Spotify's player in it, and he faces you while you listen.
+// "Hear me out?" opens a box with Spotify's player in it, and he faces you while you listen.
 (() => {
   const sitter = document.querySelector('.sitter');
   const dialog = document.querySelector('.bio');
@@ -189,7 +189,7 @@
     settle();
   });
 
-  // "Hear me?": Spotify's own player, which waits in the page as a <template> and loads nothing until it is
+  // "Hear me out?": Spotify's own player, which waits in the page as a <template> and loads nothing until it is
   // put in. It is in the page only while its box is open: taking it out is what stops the music, so closing
   // the box or leaving the page stops it, while switching to another tab or app leaves it playing. The music
   // itself only ever starts from the visitor's own tap on the player's play button.

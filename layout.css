@@ -10,7 +10,7 @@ body {
   -webkit-font-smoothing: antialiased;
 }
 
-/* Phone: the platforms zigzag above and below him, and "Hear me?" floats over his head */
+/* Phone: the platforms zigzag above and below him, and "Hear me out?" floats over his head */
 .stage {
   position: relative;
   min-height: 100vh;
@@ -33,7 +33,7 @@ body {
     calc(12px + env(safe-area-inset-bottom))
     calc(var(--gutter) + env(safe-area-inset-left));
 }
-/* Short upright screens: the photo gives up the room "Hear me?" takes, so "Who am I?" stays on the first screen */
+/* Short upright screens: the photo gives up the room "Hear me out?" takes, so "Who am I?" stays on the first screen */
 @media (orientation: portrait) and (max-height: 527px) {
   .stage { grid-template-rows: auto auto auto minmax(198px, 1fr) auto auto auto; }
 }
@@ -126,7 +126,7 @@ body {
 .next[hidden], .back[hidden] { display: none; }
 
 /* Laptop, and phones held sideways: him in the middle, everything else scattered on both sides,
-   "Who am I?" on one side of his head and "Hear me?" on the other */
+   "Who am I?" on one side of his head and "Hear me out?" on the other */
 @media (min-width: 900px), (orientation: landscape) and (max-height: 540px) {
   .stage {
     height: 100vh;
