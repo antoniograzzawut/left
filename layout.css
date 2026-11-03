@@ -10,17 +10,18 @@ body {
   -webkit-font-smoothing: antialiased;
 }
 
-/* Phone: the platforms zigzag above and below him */
+/* Phone: the platforms zigzag above and below him, and "Hear me?" floats over his head */
 .stage {
   position: relative;
   min-height: 100vh;
   min-height: 100svh;
   display: grid;
   grid-template-columns: 1fr 1fr;
-  grid-template-rows: auto auto minmax(250px, 1fr) auto auto auto;
+  grid-template-rows: auto auto auto minmax(250px, 1fr) auto auto auto;
   grid-template-areas:
     "logo    spotify"
     "apple   apple"
+    "hear    hear"
     "photo   photo"
     "youtube youtube"
     "tidal   deezer"
@@ -31,6 +32,10 @@ body {
     calc(var(--gutter) + env(safe-area-inset-right))
     calc(12px + env(safe-area-inset-bottom))
     calc(var(--gutter) + env(safe-area-inset-left));
+}
+/* Short upright screens: the photo gives up the room "Hear me?" takes, so "Who am I?" stays on the first screen */
+@media (orientation: portrait) and (max-height: 527px) {
+  .stage { grid-template-rows: auto auto auto minmax(198px, 1fr) auto auto auto; }
 }
 
 .mark { grid-area: logo; justify-self: start; margin: 0; line-height: 0; }
@@ -70,6 +75,7 @@ body {
 .youtube { grid-area: youtube; justify-self: center; left: 14%; }
 .tidal   { grid-area: tidal;   justify-self: end;    left: -6%; }
 .deezer  { grid-area: deezer;  justify-self: start;  left: 10%; }
+.hear    { grid-area: hear;    justify-self: center; position: relative; }
 .who     { grid-area: who;     justify-self: start; align-self: end; }
 .credit  { grid-area: credit;  justify-self: end;   align-self: end; text-align: right; margin: 0; }
 
@@ -81,7 +87,8 @@ body {
   white-space: nowrap;
   -webkit-tap-highlight-color: transparent;
 }
-.who {
+.who,
+.hear {
   margin: 0;
   padding: 0;
   border: 0;
@@ -91,16 +98,35 @@ body {
   -webkit-tap-highlight-color: transparent;
 }
 
+/* The player: Spotify's own, put in only while its box is open (page.js). Until it has drawn itself,
+   the words behind it show through. */
+.deck { display: grid; }
+.deck > * { grid-area: 1 / 1; }
+.deck iframe {
+  position: relative;  /* drawn over "Loading", which a blinking word would otherwise be */
+  display: block;
+  width: 100%;
+  height: 352px;
+  border: 0;
+}
+.wait { place-self: center; margin: 0; }
+/* On a short screen, Spotify's compact player: same songs, one row of buttons */
+@media (max-height: 559px) {
+  .deck iframe { height: 152px; }
+}
+
 /* The bio's pages lie on top of each other, so the box keeps the size of the longest one */
 .pages { display: grid; }
 .pages > * { grid-area: 1 / 1; }
 .page:not(.current) { visibility: hidden; }
-.page:focus { outline: none; }
+.page:focus,
+.player:focus { outline: none; }
 .turn { display: flex; align-items: center; }
 .next { margin-left: auto; }
 .next[hidden], .back[hidden] { display: none; }
 
-/* Laptop, and phones held sideways: him in the middle, everything else scattered on both sides */
+/* Laptop, and phones held sideways: him in the middle, everything else scattered on both sides,
+   "Who am I?" on one side of his head and "Hear me?" on the other */
 @media (min-width: 900px), (orientation: landscape) and (max-height: 540px) {
   .stage {
     height: 100vh;
@@ -110,7 +136,7 @@ body {
     grid-template-rows: repeat(6, minmax(0, 1fr));
     grid-template-areas:
       "logo    photo spotify"
-      "who     photo ."
+      "who     photo hear"
       "who     photo apple"
       "youtube photo ."
       ".       photo tidal"
@@ -126,6 +152,7 @@ body {
   .platforms li { left: 0; }
   .spotify { justify-self: start; margin-left: 14%; }
   .who     { justify-self: end;   align-self: center; margin-right: 6%; }
+  .hear    { justify-self: start; margin-left: 4%; }
   .apple   { justify-self: start; margin-left: max(0px, min(34%, 100% - 9.5em)); }
   .youtube { justify-self: start; margin: 0 0 0 12%; }
   .tidal   { justify-self: start; margin-left: 6%; }

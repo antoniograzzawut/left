@@ -1,20 +1,21 @@
 # LEFT. link page
 
 The page in the Instagram bio of [@antonio.left](https://www.instagram.com/antonio.left/):
-the streaming platforms, a short bio, and photos by Guilherme Cabral.
+the streaming platforms, Spotify's player, a short bio, and photos by Guilherme Cabral.
 
-Live at https://antoniograzzawut.github.io/left/
+Live at https://antonioleft.com (the old address, antoniograzzawut.github.io/left, forwards there)
 
 | File | What |
 | --- | --- |
 | `index.html` | The 8-bit version, at the main address |
-| `studio.html` | The studio version, at https://antoniograzzawut.github.io/left/studio.html |
+| `studio.html` | The studio version, at https://antonioleft.com/studio.html |
 | `layout.css` | Where everything sits, shared by both |
-| `page.js` | The photo loop and the bio box, shared by both |
+| `page.js` | The photo loop, the bio box and the player's box, shared by both |
 | `antonio-graca-bio.pdf` | The bio behind "about me": the CV/BIO without the phone number and personal email |
 | `bio.html` | How Android phones see that PDF: they cannot open one inside Instagram, so this page draws it |
 | `vendor/pdfjs/` | The tool `bio.html` draws the PDF with (pdf.js 5.7.284 by Mozilla, free to use) |
 | `img/` | The photos, the 8-bit sprites and the logo |
+| `CNAME` | The address antonioleft.com. GitHub wrote it; leave it as it is |
 
 ## Changing it
 
@@ -35,6 +36,10 @@ download it, and every old version stays readable in the history, so it must
 never carry the phone number or the personal email. Delete them in Canva before
 exporting: Canva also draws the shadow of a text as a picture, so a text removed
 from the PDF afterwards can still be read in its shadow.
+
+**The player.** "Hear me?" opens Spotify's own player with the top tracks of
+the LEFT. artist page, so it follows Spotify by itself. To show an album or a
+playlist instead, ask Claude.
 
 **Photos.** Ask Claude. They are cropped, lined up and converted, so a raw photo
 uploaded over an old one will not sit right.

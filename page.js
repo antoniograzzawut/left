@@ -2,9 +2,11 @@
 // The photos loop on their own, like a GIF. With a mouse, pointing at a platform makes him look at it
 // and pointing at him makes him look at you. Pressing a platform (or him) makes him reach out.
 // "Who am I?" opens the bio, a few pages long, and he faces you while you read it.
+// "Hear me?" opens a box with Spotify's player in it, and he faces you while you listen.
 (() => {
   const sitter = document.querySelector('.sitter');
   const dialog = document.querySelector('.bio');
+  const player = document.querySelector('.player');
   const calm = matchMedia('(prefers-reduced-motion: reduce)').matches;
   const beat = 60000 / (Number(document.body.dataset.bpm) || 100);
   const wobble = 'wobble' in document.body.dataset && !calm;
@@ -46,14 +48,14 @@
 
   // Once nothing is pressed: face whatever the mouse is on, or go back to looping
   function settle() {
-    if (leaving || pressed || dialog.open) return;
+    if (leaving || pressed || dialog.open || player.open) return;
     if (over) return hold(over === sitter ? 'front' : sideOf(over));
     held = false;
     if (calm) show('front');
     play();
   }
 
-  [sitter, ...document.querySelectorAll('.go, .who')].forEach(el => {
+  [sitter, ...document.querySelectorAll('.go, .who, .hear')].forEach(el => {
     el.addEventListener('pointerenter', e => { if (e.pointerType === 'mouse') { over = el; settle(); } });
     el.addEventListener('pointerleave', e => { if (e.pointerType === 'mouse') { over = null; settle(); } });
   });
@@ -159,23 +161,25 @@
   });
   next.addEventListener('click', () => turnTo(current + 1));
   back.addEventListener('click', () => turnTo(current - 1));
-  // Where a press starts, and with what: a text selection dragged past the edge is not a tap outside,
-  // and a mouse click on the text is left for selecting words, so only a finger turns the page by tapping it
-  dialog.addEventListener('pointerdown', e => {
-    lastPointer = e.pointerType;
-    downOnBackdrop = e.target === dialog;
-  });
+  // Both boxes. Where a press starts, and with what: a text selection dragged past the edge is not a tap outside,
+  // and a mouse click on the text is left for selecting words, so only a finger turns the page by tapping it.
   // The browser counts the clicks of a double click (detail 2 and up): those are ignored too.
   // Clicks from the keyboard have no count (detail 0), so they always go through
+  [dialog, player].forEach(box => {
+    box.addEventListener('pointerdown', e => {
+      lastPointer = e.pointerType;
+      downOnBackdrop = e.target === box;
+    });
+    box.addEventListener('click', e => {
+      if (e.detail > 1 || (e.detail && performance.now() < quietUntil)) {
+        e.preventDefault();
+        e.stopImmediatePropagation();
+      }
+    }, true);
+    box.addEventListener('click', e => { if (e.target === box && downOnBackdrop) box.close(); });  // a tap outside the box
+  });
   dialog.addEventListener('click', e => {
-    if (e.detail > 1 || (e.detail && performance.now() < quietUntil)) {
-      e.preventDefault();
-      e.stopImmediatePropagation();
-    }
-  }, true);
-  dialog.addEventListener('click', e => {
-    if (e.target === dialog) return downOnBackdrop && dialog.close();  // a tap outside the box
-    if (!typed || e.target.closest('a, button')) return;
+    if (e.target === dialog || !typed || e.target.closest('a, button')) return;
     if (typing) finishTyping();
     else if (lastPointer !== 'mouse' && current < pages.length - 1 && getSelection().isCollapsed) turnTo(current + 1);
   });
@@ -185,11 +189,47 @@
     settle();
   });
 
+  // "Hear me?": Spotify's own player, which waits in the page as a <template> and loads nothing until it is
+  // put in. It is in the page only while its box is open: taking it out is what stops the music, so closing
+  // the box or leaving the page stops it, while switching to another tab or app leaves it playing. The music
+  // itself only ever starts from the visitor's own tap on the player's play button.
+  const deck = player.querySelector('.deck');
+  const embed = deck.querySelector('template');
+  let frame = null;
+  function sync(gone) {
+    const wanted = player.open && !gone;
+    if (wanted && !frame) {
+      frame = embed.content.firstElementChild.cloneNode(true);
+      deck.append(frame);
+    } else if (!wanted && frame) {
+      frame.remove();
+      frame = null;
+    }
+  }
+  document.querySelector('.hear').addEventListener('click', () => {
+    player.showModal();
+    player.scrollTop = 0;
+    hold('front');
+    hush();
+    sync();
+    // The focus goes to the box itself, as in the bio: on Close, a held Enter key would shut it and open it again
+    player.focus();
+    // A tap on the player never reaches this page, so the quiet moment is kept on the player itself:
+    // the second tap of a double tap cannot press play by accident
+    frame.style.pointerEvents = 'none';
+    setTimeout(() => { if (frame) frame.style.pointerEvents = ''; }, 500);
+  });
+  player.addEventListener('close', () => {
+    sync();
+    settle();
+  });
+  addEventListener('pagehide', () => sync(true));
+
   // Every frame has to arrive before the loop starts, so a slow connection never shows an empty frame
   Promise.all([...sitter.querySelectorAll('img')].map(img => img.decode()))
     .then(() => { loaded = true; settle(); }, () => {});
 
-  // Coming back with the browser's back button: start over, facing you (and still facing you if the bio is open)
+  // Coming back with the browser's back button: start over, facing you (and still facing you if a box is open)
   addEventListener('pageshow', e => {
     if (!e.persisted) return;
     leaving = pressed = held = false;
@@ -197,6 +237,7 @@
     stop();
     step = 0;
     show('front');
+    sync();
     settle();
   });
   document.addEventListener('visibilitychange', () => {

@@ -118,8 +118,57 @@
     color: var(--indigo);
   }
 
+  /* "Hear me?": a speech bubble over his head, the way people talk in old games. The note bobs to the beat,
+     and a press pushes the bubble in like a button */
+  .hear {
+    display: inline-flex;
+    align-items: center;
+    gap: .3em;
+    min-height: 40px;
+    margin-bottom: 12px;
+    padding: 3px 12px 0 10px;
+    border: 3px solid var(--ink);
+    background: var(--paper);
+    color: var(--ink);
+    font: 400 clamp(24px, 7vw, 30px)/.9 var(--arcade);
+    letter-spacing: .02em;
+    text-transform: uppercase;
+    filter: drop-shadow(3px 3px 0 var(--indigo));
+    transition: transform .2s steps(2), filter .2s steps(2);
+  }
+  .hear::before {
+    content: "";
+    flex: none;
+    width: 16px;
+    height: 12px;
+    margin-top: -3px;
+    background: var(--red);
+    -webkit-mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 8 6' shape-rendering='crispEdges'%3E%3Cpath d='M2 0h6v4H7V2H3v2H2zM0 4h3v2H0zM5 4h3v2H5z'/%3E%3C/svg%3E") center / contain no-repeat;
+            mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 8 6' shape-rendering='crispEdges'%3E%3Cpath d='M2 0h6v4H7V2H3v2H2zM0 4h3v2H0zM5 4h3v2H5z'/%3E%3C/svg%3E") center / contain no-repeat;
+    animation: bob 1s steps(1) infinite;
+  }
+  /* The tail points down at his head (the margin under the bubble keeps it off the photo);
+     its first row lies on the border and opens it */
+  .hear::after {
+    content: "";
+    position: absolute;
+    top: 100%;
+    right: 50%;
+    width: 15px;
+    height: 15px;
+    background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 5 5' shape-rendering='crispEdges'%3E%3Cpath fill='%23FCE9E0' d='M1 0h3v3H3V2H2V1H1z'/%3E%3Cpath d='M0 0h1v1H0zM4 0h1v5H4zM1 1h1v1H1zM2 2h1v1H2zM3 3h1v1H3z'/%3E%3C/svg%3E") 0 0 / 100% 100%;
+  }
+  .hear:hover,
+  .hear:focus-visible,
+  .hear:active {
+    color: var(--red);
+    transform: translate(2px, 2px);
+    filter: drop-shadow(1px 1px 0 var(--indigo));
+  }
+
   .go:focus-visible,
   .who:focus-visible,
+  .hear:focus-visible,
   .close:focus-visible,
   .pages a:focus-visible,
   .next:focus-visible,
@@ -129,17 +178,19 @@
   }
 
   /* Things appear in steps, like a game booting */
-  .mark, .who, .platforms li, .credit { animation: boot .4s steps(2) both; }
+  .mark, .who, .hear, .platforms li, .credit { animation: boot .4s steps(2) both; }
   .platforms .spotify { animation-delay: .15s; }
   .platforms .apple   { animation-delay: .25s; }
   .platforms .youtube { animation-delay: .35s; }
   .platforms .tidal   { animation-delay: .45s; }
   .platforms .deezer  { animation-delay: .55s; }
+  .hear               { animation-delay: .62s; }
   .who                { animation-delay: .7s; }
   .credit             { animation-delay: .8s; }
 
-  /* The bio: a text box from an old role-playing game */
-  .bio {
+  /* The bio, and the player: a text box from an old role-playing game */
+  .bio,
+  .player {
     width: min(100% - 2 * var(--gutter), 640px);
     max-width: none;
     margin: auto auto calc(var(--gutter) + env(safe-area-inset-bottom));
@@ -148,8 +199,10 @@
     background: none;
     color: var(--ink);
   }
-  .bio::backdrop { background: rgb(252 233 224 / .6); }
-  .bio[open] { animation: pop .24s steps(3) both; }
+  .bio::backdrop,
+  .player::backdrop { background: rgb(252 233 224 / .6); }
+  .bio[open],
+  .player[open] { animation: pop .24s steps(3) both; }
   .sheet {
     position: relative;
     margin-top: 16px;
@@ -243,7 +296,22 @@
   .next:hover,
   .back:hover { color: var(--red); }
 
-  .bio form { margin: 0; }
+  /* In the player's box the speaker is LEFT., and the player sits on a black screen, like a game inside the box.
+     Spotify draws its own rounded corners; the black around them keeps the screen square. */
+  .player .sheet { padding: 22px 12px 12px; }
+  /* The box may come down to its margin, so on the shortest screens the player still fits without scrolling */
+  .player { max-height: calc(100% - var(--gutter) - env(safe-area-inset-bottom)); }
+  .deck { background: var(--ink); }
+  .wait {
+    color: var(--paper);
+    font: 400 14px/1 var(--pixel);
+    letter-spacing: .08em;
+    text-transform: uppercase;
+    animation: blink 1s steps(1) infinite;
+  }
+
+  .bio form,
+  .player form { margin: 0; }
   .close {
     position: absolute;
     top: -15px;
@@ -280,13 +348,29 @@
       font-size: clamp(52px, 6vw, 110px);
       text-shadow: 3px 3px 0 var(--indigo);
     }
+    .hear {
+      min-height: 0;
+      margin-bottom: 0;
+      padding: 6px 14px 3px 12px;
+      font-size: clamp(22px, 2.3vw, 40px);
+    }
+    /* Here he is to the left of the bubble: the tail points at him from its top corner */
+    .hear::after {
+      top: -3px;
+      right: 100%;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 5 5' shape-rendering='crispEdges'%3E%3Cpath fill='%23FCE9E0' d='M2 1h3v3H4V3H3V2H2z'/%3E%3Cpath d='M0 0h5v1H0zM1 1h1v1H1zM2 2h1v1H2zM3 3h1v1H3zM4 4h1v1H4z'/%3E%3C/svg%3E");
+    }
     .sheet { padding: 30px 28px 8px; }
+    .player .sheet { padding: 26px 16px 16px; }
     .pages p { font-size: 25px; }
   }
 
   @keyframes boot {
     from { opacity: 0; }
     to   { opacity: 1; }
+  }
+  @keyframes bob {
+    50% { transform: translateY(-2px); }
   }
   @keyframes pop {
     from { opacity: 0; transform: scale(.94); }
@@ -322,6 +406,7 @@
       </ul>
     </nav>
 
+    <button class="hear" type="button">Hear me?</button>
     <button class="who" type="button">Who am I?</button>
     <p class="credit">Photos<br>Guilherme Cabral</p>
   </main>
@@ -345,6 +430,19 @@
       <div class="turn">
         <button class="back" type="button" hidden>Back</button>
         <button class="next" type="button">Next</button>
+      </div>
+      <form method="dialog"><button class="close" aria-label="Close">X</button></form>
+    </div>
+  </dialog>
+
+  <dialog class="player" aria-label="LEFT. on Spotify" tabindex="-1">
+    <div class="sheet">
+      <p class="tag" aria-hidden="true">LEFT.</p>
+      <div class="deck">
+        <p class="wait" aria-hidden="true">Loading</p>
+        <!-- Spotify's code for the artist page, with the dark colours (theme=0). Nothing in a template loads:
+             page.js puts it in when the box opens and takes it out when the box closes -->
+        <template><iframe title="Spotify Embed: LEFT." width="100%" height="352" allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture" allowfullscreen src="https://open.spotify.com/embed/artist/2rsw8pxtVfU3LiTIT0CYUb?utm_source=oembed&amp;theme=0"></iframe></template>
       </div>
       <form method="dialog"><button class="close" aria-label="Close">X</button></form>
     </div>
