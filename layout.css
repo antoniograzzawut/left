@@ -1,0 +1,133 @@
+/* Shared by both versions: where everything sits. Each page adds its own look on top. */
+
+*, *::before, *::after { box-sizing: border-box; }
+html, body { margin: 0; }
+
+body {
+  min-height: 100vh;
+  min-height: 100svh;
+  overflow-x: hidden;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* Phone: the platforms zigzag above and below him */
+.stage {
+  position: relative;
+  min-height: 100vh;
+  min-height: 100svh;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  grid-template-rows: auto auto minmax(250px, 1fr) auto auto auto;
+  grid-template-areas:
+    "logo    spotify"
+    "apple   apple"
+    "photo   photo"
+    "youtube youtube"
+    "tidal   deezer"
+    "who     credit";
+  align-items: center;
+  padding:
+    calc(10px + env(safe-area-inset-top))
+    calc(var(--gutter) + env(safe-area-inset-right))
+    calc(12px + env(safe-area-inset-bottom))
+    calc(var(--gutter) + env(safe-area-inset-left));
+}
+
+.mark { grid-area: logo; justify-self: start; margin: 0; line-height: 0; }
+.mark img { display: block; height: auto; }
+
+/* Four frames stacked, one visible at a time */
+.sitter {
+  grid-area: photo;
+  align-self: stretch;
+  position: relative;
+  margin: 4px calc(-1 * var(--gutter));
+  touch-action: pan-y;
+  -webkit-user-select: none;
+          user-select: none;
+}
+.sitter img {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  opacity: 0;
+  -webkit-user-drag: none;
+}
+.sitter[data-look="front"] .front,
+.sitter[data-look="left"]  .left,
+.sitter[data-look="right"] .right,
+.sitter[data-look="reach"] .reach { opacity: 1; }
+
+/* The list stays a list for screen readers; on screen each platform takes its own spot,
+   a little to one side of the middle, so they zigzag close around him */
+.platforms, .platforms ul { display: contents; }
+.platforms li { list-style: none; position: relative; }
+
+/* Spotify never reaches the 8-bit logo on a narrow phone: 128px wide, plus its shadow and a gap */
+.spotify { grid-area: spotify; justify-self: start;  left: max(-14%, var(--gutter) + 138px - 50vw); }
+.apple   { grid-area: apple;   justify-self: center; left: -12%; }
+.youtube { grid-area: youtube; justify-self: center; left: 14%; }
+.tidal   { grid-area: tidal;   justify-self: end;    left: -6%; }
+.deezer  { grid-area: deezer;  justify-self: start;  left: 10%; }
+.who     { grid-area: who;     justify-self: start; align-self: end; }
+.credit  { grid-area: credit;  justify-self: end;   align-self: end; text-align: right; margin: 0; }
+
+.go {
+  display: inline-flex;
+  align-items: center;
+  min-height: 40px;
+  text-decoration: none;
+  white-space: nowrap;
+  -webkit-tap-highlight-color: transparent;
+}
+.who {
+  margin: 0;
+  padding: 0;
+  border: 0;
+  background: none;
+  white-space: nowrap;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+}
+
+/* The bio's pages lie on top of each other, so the box keeps the size of the longest one */
+.pages { display: grid; }
+.pages > * { grid-area: 1 / 1; }
+.page:not(.current) { visibility: hidden; }
+.page:focus { outline: none; }
+.turn { display: flex; align-items: center; }
+.next { margin-left: auto; }
+.next[hidden], .back[hidden] { display: none; }
+
+/* Laptop, and phones held sideways: him in the middle, everything else scattered on both sides */
+@media (min-width: 900px), (orientation: landscape) and (max-height: 540px) {
+  .stage {
+    height: 100vh;
+    height: 100svh;
+    min-height: 0;
+    grid-template-columns: 1fr minmax(0, min(76svh, 46vw)) 1fr;
+    grid-template-rows: repeat(6, minmax(0, 1fr));
+    grid-template-areas:
+      "logo    photo spotify"
+      "who     photo ."
+      "who     photo apple"
+      "youtube photo ."
+      ".       photo tidal"
+      "deezer  photo credit";
+    padding:
+      var(--gutter)
+      calc(var(--gutter) + env(safe-area-inset-right))
+      var(--gutter)
+      calc(var(--gutter) + env(safe-area-inset-left));
+  }
+  .mark    { align-self: start; }
+  .sitter  { margin: calc(-1 * var(--gutter)) 0; }
+  .platforms li { left: 0; }
+  .spotify { justify-self: start; margin-left: 14%; }
+  .who     { justify-self: end;   align-self: center; margin-right: 6%; }
+  .apple   { justify-self: start; margin-left: max(0px, min(34%, 100% - 9.5em)); }
+  .youtube { justify-self: start; margin: 0 0 0 12%; }
+  .tidal   { justify-self: start; margin-left: 6%; }
+  .deezer  { justify-self: end;   margin-right: 20%; }
+}

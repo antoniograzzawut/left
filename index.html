@@ -1,0 +1,357 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>LEFT.</title>
+<meta name="description" content="Listen to LEFT. on Spotify, Apple Music, YouTube, Tidal and Deezer.">
+<meta property="og:title" content="LEFT.">
+<meta property="og:description" content="Spotify, Apple Music, YouTube, Tidal, Deezer.">
+<meta property="og:type" content="website">
+<meta name="theme-color" content="#FCE9E0">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 8 8' shape-rendering='crispEdges'%3E%3Cpath fill='%23D94E49' d='M2 1h4v1h1v4H6v1H2V6H1V2h1z'/%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Jersey+10&family=Silkscreen&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="layout.css">
+<style>
+  :root {
+    /* The four inks of the LIMBO 8-bit logo, printed on warm paper */
+    --paper: #FCE9E0;
+    --ink: #000000;
+    --indigo: #6750B8;
+    --red: #D94E49;
+
+    --gutter: clamp(16px, 4vw, 56px);
+    --arcade: "Jersey 10", "Arial Narrow", sans-serif;
+    --pixel: "Silkscreen", "Courier New", monospace;
+    color-scheme: light;
+  }
+
+  body {
+    background: var(--paper);
+    color: var(--ink);
+    font-family: var(--pixel);
+  }
+
+  /* The sheet darkens a little towards the edges, like paper left in the sun */
+  body::before {
+    content: "";
+    position: fixed;
+    inset: 0;
+    z-index: -1;
+    background: radial-gradient(130% 100% at 50% 35%, transparent 55%, rgb(169 59 65 / .10));
+  }
+
+  /* Paper tooth over everything, pixels included */
+  .grain {
+    position: fixed;
+    inset: 0;
+    pointer-events: none;
+    z-index: 5;
+    opacity: .24;
+    mix-blend-mode: multiply;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='260' height='260'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.7' numOctaves='3' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 .42 0 0 0 0 .2 0 0 0 0 .22 0 0 0 .55 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  }
+
+  /* Two inks slightly out of register, the way a risograph prints */
+  .mark img {
+    width: 128px;
+    image-rendering: pixelated;
+    filter: drop-shadow(2px 2px 0 var(--red));
+  }
+
+  .sitter img {
+    object-fit: contain;
+    object-position: 50% 100%;
+    image-rendering: pixelated;
+    translate: var(--jx, 0) var(--jy, 0);
+  }
+
+  .go {
+    gap: .55em;
+    color: var(--ink);
+    font-size: 22px;
+    letter-spacing: .02em;
+    line-height: 1;
+    text-transform: uppercase;
+  }
+  /* A game-menu cursor in front of each platform; it steps forward when you pick one */
+  .go::before {
+    content: "";
+    flex: none;
+    width: .45em;
+    height: .75em;
+    background: var(--indigo);
+    -webkit-mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 3 5' shape-rendering='crispEdges'%3E%3Cpath d='M0 0h1v1h1v1h1v1H2v1H1v1H0z'/%3E%3C/svg%3E") center / contain no-repeat;
+            mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 3 5' shape-rendering='crispEdges'%3E%3Cpath d='M0 0h1v1h1v1h1v1H2v1H1v1H0z'/%3E%3C/svg%3E") center / contain no-repeat;
+    transition: transform .2s steps(2);
+  }
+  .go:hover,
+  .go:focus-visible,
+  .go:active { color: var(--red); }
+  .go:hover::before,
+  .go:focus-visible::before,
+  .go:active::before {
+    background: var(--red);
+    transform: translateX(4px);
+  }
+
+  .who {
+    font-family: var(--arcade);
+    font-size: clamp(40px, 12vw, 54px);
+    line-height: .9;
+    letter-spacing: .02em;
+    text-transform: uppercase;
+    color: var(--ink);
+    text-shadow: 2px 2px 0 var(--indigo);
+  }
+  .who:hover,
+  .who:active { color: var(--red); }
+
+  .credit {
+    padding-bottom: .3em;
+    font-size: 12px;
+    letter-spacing: .02em;
+    line-height: 1.45;
+    text-transform: uppercase;
+    color: var(--indigo);
+  }
+
+  .go:focus-visible,
+  .who:focus-visible,
+  .close:focus-visible,
+  .pages a:focus-visible,
+  .next:focus-visible,
+  .back:focus-visible {
+    outline: 3px solid var(--indigo);
+    outline-offset: 3px;
+  }
+
+  /* Things appear in steps, like a game booting */
+  .mark, .who, .platforms li, .credit { animation: boot .4s steps(2) both; }
+  .platforms .spotify { animation-delay: .15s; }
+  .platforms .apple   { animation-delay: .25s; }
+  .platforms .youtube { animation-delay: .35s; }
+  .platforms .tidal   { animation-delay: .45s; }
+  .platforms .deezer  { animation-delay: .55s; }
+  .who                { animation-delay: .7s; }
+  .credit             { animation-delay: .8s; }
+
+  /* The bio: a text box from an old role-playing game */
+  .bio {
+    width: min(100% - 2 * var(--gutter), 640px);
+    max-width: none;
+    margin: auto auto calc(var(--gutter) + env(safe-area-inset-bottom));
+    padding: 0 5px 5px 0;
+    border: 0;
+    background: none;
+    color: var(--ink);
+  }
+  .bio::backdrop { background: rgb(252 233 224 / .6); }
+  .bio[open] { animation: pop .24s steps(3) both; }
+  .sheet {
+    position: relative;
+    margin-top: 16px;
+    padding: 26px 20px 6px;
+    background: var(--paper);
+    border: 3px solid var(--ink);
+    box-shadow: 5px 5px 0 var(--indigo);
+  }
+  .tag {
+    position: absolute;
+    top: -15px;
+    left: 14px;
+    margin: 0;
+    padding: 6px 10px 5px;
+    background: var(--ink);
+    color: var(--paper);
+    font-size: 14px;
+    line-height: 1;
+    letter-spacing: .08em;
+  }
+  .pages p {
+    margin: 0 0 .5em;
+    font-family: var(--arcade);
+    font-size: clamp(19px, 6.4vw, 22px);
+    line-height: 1.25;
+    letter-spacing: .02em;
+  }
+  .pages p:last-child { margin-bottom: 0; }
+  /* The address itself, for anyone without a mail app: one click selects all of it */
+  .pages .mail {
+    margin-top: -.3em;
+    font-size: 18px;
+    color: var(--indigo);
+    -webkit-user-select: all;
+            user-select: all;
+  }
+  /* The words that lead somewhere get a red line, and light up like a menu option when picked */
+  .pages a { color: inherit; }
+  .page a,
+  .typed a > :not(.rest) {
+    text-decoration-line: underline;
+    text-decoration-color: var(--red);
+    text-decoration-thickness: 2px;
+    text-underline-offset: 3px;
+  }
+  .page a:hover {
+    background: var(--red);
+    color: var(--paper);
+    text-decoration-line: none;
+  }
+  /* While a page types itself out, the copy on top shows only the letters typed so far */
+  .typed { pointer-events: none; }
+  .typed .rest { color: transparent; }
+  .typing .page.current {
+    opacity: 0;
+    pointer-events: none;
+  }
+
+  /* Turning the page, under the text. The arrow blinks while there is more to read. */
+  .turn {
+    min-height: 44px;
+    margin: 6px -8px 0;
+  }
+  .next,
+  .back {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    min-height: 44px;
+    padding: 0 8px;
+    border: 0;
+    background: none;
+    color: var(--ink);
+    font: 400 14px/1 var(--pixel);
+    letter-spacing: .06em;
+    text-transform: uppercase;
+    cursor: pointer;
+    -webkit-tap-highlight-color: transparent;
+  }
+  .next::after,
+  .back::before {
+    content: "";
+    width: 10px;
+    height: 6px;
+    background: currentColor;
+    -webkit-mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 5 3' shape-rendering='crispEdges'%3E%3Cpath d='M0 0h5v1H4v1H3v1H2V2H1V1H0z'/%3E%3C/svg%3E") center / contain no-repeat;
+            mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 5 3' shape-rendering='crispEdges'%3E%3Cpath d='M0 0h5v1H4v1H3v1H2V2H1V1H0z'/%3E%3C/svg%3E") center / contain no-repeat;
+  }
+  .next::after { animation: blink 1s steps(1) infinite; }
+  .back::before { transform: scaleY(-1); }
+  .next:hover,
+  .back:hover { color: var(--red); }
+
+  .bio form { margin: 0; }
+  .close {
+    position: absolute;
+    top: -15px;
+    right: 14px;
+    min-width: 30px;
+    padding: 6px 9px 5px;
+    border: 0;
+    background: var(--ink);
+    color: var(--paper);
+    font: 400 14px/1 var(--pixel);
+    cursor: pointer;
+  }
+  .close::after {
+    /* a bigger invisible target for thumbs */
+    content: "";
+    position: absolute;
+    inset: -8px;
+  }
+  .close:hover { background: var(--red); }
+
+  /* Laptop, and phones held sideways */
+  @media (min-width: 900px), (orientation: landscape) and (max-height: 540px) {
+    .mark img {
+      width: 192px;
+      filter: drop-shadow(3px 3px 0 var(--red));
+    }
+    .sitter img { object-position: 50% 0; }
+    .go {
+      min-height: 0;
+      padding: .4em 0;
+      font-size: clamp(16px, 1.4vw, 22px);
+    }
+    .who {
+      font-size: clamp(52px, 6vw, 110px);
+      text-shadow: 3px 3px 0 var(--indigo);
+    }
+    .sheet { padding: 30px 28px 8px; }
+    .pages p { font-size: 25px; }
+  }
+
+  @keyframes boot {
+    from { opacity: 0; }
+    to   { opacity: 1; }
+  }
+  @keyframes pop {
+    from { opacity: 0; transform: scale(.94); }
+    to   { opacity: 1; transform: none; }
+  }
+  @keyframes blink {
+    50% { opacity: 0; }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after { animation: none !important; transition: none !important; }
+  }
+</style>
+</head>
+<body data-bpm="120" data-wobble>
+  <main class="stage">
+    <h1 class="mark"><img src="img/8bit/left-logo.png" width="64" height="15" alt="LEFT."></h1>
+
+    <figure class="sitter" data-look="front">
+      <img class="front" src="img/8bit/front.png" width="96" height="120" alt="António Graça, LEFT., in pixels, looking at the camera, then turning from side to side" fetchpriority="high">
+      <img class="left" src="img/8bit/look-left.png" width="96" height="120" alt="">
+      <img class="right" src="img/8bit/look-right.png" width="96" height="120" alt="">
+      <img class="reach" src="img/8bit/reach.png" width="96" height="120" alt="">
+    </figure>
+
+    <nav class="platforms" aria-label="Listen to LEFT.">
+      <ul>
+        <li class="spotify"><a class="go" href="https://open.spotify.com/artist/2rsw8pxtVfU3LiTIT0CYUb">Spotify</a></li>
+        <li class="apple"><a class="go" href="https://music.apple.com/pt/artist/left/1497647481">Apple Music</a></li>
+        <li class="youtube"><a class="go" href="https://www.youtube.com/@LEFTmp3">YouTube</a></li>
+        <li class="tidal"><a class="go" href="https://tidal.com/artist/7157557">Tidal</a></li>
+        <li class="deezer"><a class="go" href="https://www.deezer.com/artist/6707607">Deezer</a></li>
+      </ul>
+    </nav>
+
+    <button class="who" type="button">Who am I?</button>
+    <p class="credit">Photos<br>Guilherme Cabral</p>
+  </main>
+
+  <dialog class="bio" aria-label="Who am I?">
+    <div class="sheet">
+      <p class="tag" aria-hidden="true" data-name="ANTÓNIO">???</p>
+      <div class="pages">
+        <div class="page current" tabindex="-1">
+          <p>Depends on the side. One writes songs as <a href="https://open.spotify.com/artist/2rsw8pxtVfU3LiTIT0CYUb">LEFT</a> or <a href="https://open.spotify.com/artist/1TWqzkKPlhxidBTNhCaUJD">Antony Left</a>. One produces music for <a href="https://open.spotify.com/playlist/7C4hf9pHA0TGvfXg3eBZmK">various national and international artists</a>. One co-owns a <a href="https://open.spotify.com/artist/1BRFw2SgH5VM5P0FLmFp3z">collaborative label</a>. One does clowning, improv theatre and contact improvisation. One hosts creative retreats.</p>
+          <p>All of them are António Graça, from Lisbon, to the world.</p>
+        </div>
+        <div class="page" tabindex="-1">
+          <p>You want to see some of my <a href="https://www.youtube.com/@LEFTmp3/videos">videos</a>?</p>
+          <p>You want to know more <a href="antonio-graca-bio.pdf">about me</a>?</p>
+          <p>You want to <a href="mailto:left.music.info@gmail.com">get in touch</a>?</p>
+          <p class="mail">left.music.info@gmail.com</p>
+        </div>
+        <div class="typed" aria-hidden="true"></div>
+      </div>
+      <div class="turn">
+        <button class="back" type="button" hidden>Back</button>
+        <button class="next" type="button">Next</button>
+      </div>
+      <form method="dialog"><button class="close" aria-label="Close">X</button></form>
+    </div>
+  </dialog>
+
+  <div class="grain" aria-hidden="true"></div>
+
+  <script src="page.js"></script>
+</body>
+</html>

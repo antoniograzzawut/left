@@ -1,0 +1,154 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>António Graça, CV and bio</title>
+<meta name="robots" content="noindex">
+<meta name="theme-color" content="#121212">
+<style>
+  /* Only for the built-in browsers of Android apps such as Instagram, which cannot open a PDF:
+     this page draws the same PDF, so the bio stays one file (antonio-graca-bio.pdf) */
+  :root {
+    --night: #121212;
+    --slide: #1C1C1C;
+    --ink: #EDEDED;
+    --soft: #A3A3A3;
+    color-scheme: dark;
+  }
+  *, *::before, *::after { box-sizing: border-box; }
+  html, body { margin: 0; }
+  body {
+    min-height: 100vh;
+    background: var(--night);
+    color: var(--ink);
+    font: 15px/1.4 system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  }
+  header {
+    position: sticky;
+    top: 0;
+    z-index: 1;
+    display: flex;
+    justify-content: space-between;
+    padding:
+      env(safe-area-inset-top)
+      calc(6px + env(safe-area-inset-right))
+      0
+      calc(6px + env(safe-area-inset-left));
+    background: rgb(18 18 18 / .92);
+  }
+  header a {
+    display: inline-flex;
+    align-items: center;
+    min-height: 48px;
+    padding: 0 10px;
+    color: var(--ink);
+    text-decoration: none;
+  }
+  .slides {
+    display: grid;
+    gap: 10px;
+    padding: 4px env(safe-area-inset-right) calc(24px + env(safe-area-inset-bottom)) env(safe-area-inset-left);
+  }
+  .slide {
+    position: relative;
+    aspect-ratio: 16 / 9;
+    background: var(--slide);
+  }
+  .slide canvas {
+    display: block;
+    width: 100%;
+    height: 100%;
+  }
+  .slide a { position: absolute; }
+  .slide a:focus-visible { outline: 2px solid var(--ink); outline-offset: 2px; }
+  .status {
+    margin: 0;
+    padding: 48px 16px;
+    color: var(--soft);
+    text-align: center;
+  }
+  .status a { color: var(--ink); }
+</style>
+</head>
+<body>
+  <header>
+    <a class="back" href="./">&larr; Back</a>
+    <a href="antonio-graca-bio.pdf" download>Download the PDF</a>
+  </header>
+  <main class="slides" aria-busy="true">
+    <p class="status" role="status">Loading the bio&hellip;</p>
+  </main>
+
+  <script>
+    // Back to the page the bio was opened from, as the phone's back button would
+    document.querySelector('.back').addEventListener('click', e => {
+      if (history.length > 1) { e.preventDefault(); history.back(); }
+    });
+  </script>
+  <script nomodule>
+    document.querySelector('.status').innerHTML = '<a href="antonio-graca-bio.pdf">Open the PDF</a>';
+  </script>
+  <script type="module">
+    const slides = document.querySelector('.slides');
+    const status = slides.querySelector('.status');
+
+    // A link's name for screen readers: where it goes, without the https://www. and Spotify's tracking tag
+    const where = url => url.replace(/^https?:\/\/(www\.)?/, '').replace(/\?si=[^&#]*$/, '').replace(/\/$/, '');
+
+    try {
+      // Loaded here, inside the try, so a missing or broken file ends in the message below, never in an endless "Loading"
+      const pdfjs = await import('./vendor/pdfjs/pdf.min.mjs');
+      pdfjs.GlobalWorkerOptions.workerSrc = new URL('vendor/pdfjs/pdf.worker.min.mjs', location.href).href;
+      const task = pdfjs.getDocument({ url: 'antonio-graca-bio.pdf', isEvalSupported: false });
+      task.onProgress = ({ loaded, total }) => {
+        if (total) status.textContent = `Loading the bio… ${Math.min(99, Math.round(loaded / total * 100))}%`;
+      };
+      const pdf = await task.promise;
+      task.onProgress = null;
+      status.remove();
+
+      for (let n = 1; n <= pdf.numPages; n++) {
+        const page = await pdf.getPage(n);
+        const size = page.getViewport({ scale: 1 });
+        const slide = document.createElement('section');
+        slide.className = 'slide';
+        slide.style.aspectRatio = `${size.width} / ${size.height}`;
+        slides.append(slide);
+
+        // Drawn at twice the screen's sharpness, so pinching to read the small print stays crisp
+        const scale = Math.min(slide.clientWidth * devicePixelRatio * 2, 3000) / size.width;
+        const viewport = page.getViewport({ scale });
+        const canvas = document.createElement('canvas');
+        canvas.width = Math.floor(viewport.width);
+        canvas.height = Math.floor(viewport.height);
+        canvas.setAttribute('role', 'img');
+        canvas.setAttribute('aria-label', `Page ${n} of ${pdf.numPages}`);
+        slide.append(canvas);
+        await page.render({ canvas, viewport }).promise;
+
+        // The PDF's own links, laid over the drawing where they sit on the page
+        for (const note of await page.getAnnotations()) {
+          if (note.subtype !== 'Link' || !note.url) continue;
+          const [x1, y1, x2, y2] = size.convertToViewportRectangle(note.rect);
+          const link = document.createElement('a');
+          link.href = note.url;
+          link.setAttribute('aria-label', where(note.url));
+          Object.assign(link.style, {
+            left: `${Math.min(x1, x2) / size.width * 100}%`,
+            top: `${Math.min(y1, y2) / size.height * 100}%`,
+            width: `${Math.abs(x2 - x1) / size.width * 100}%`,
+            height: `${Math.abs(y2 - y1) / size.height * 100}%`,
+          });
+          slide.append(link);
+        }
+      }
+      slides.removeAttribute('aria-busy');
+    } catch (error) {
+      status.innerHTML = 'The bio cannot be shown here. <a href="antonio-graca-bio.pdf">Open the PDF</a>';
+      slides.append(status);  // back on the page, under any slides already drawn
+      slides.removeAttribute('aria-busy');
+    }
+  </script>
+</body>
+</html>
