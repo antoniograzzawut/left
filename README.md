@@ -62,7 +62,11 @@ comes out black on white, on three pages, with the links still working.
 **LIMBO.** The words, the English, the calls and their choices, and the credits
 are all in `limbo/album.js`: each line of a song is the Portuguese, then ` | `,
 then the English. The sound is one MP3 per track in `limbo/audio/`, named by its
-number; the README in that folder says how to add them.
+number, plus `title.mp3`, the album's intro in 8 bits that loops on the title
+screen. The game is played in the dark, and each track has its own look (its
+`vibe` in `album.js`): its colours and the scene behind its words, drawn in
+`limbo/index.html`. The calls share the green of an old phone, and the end opens
+into the white void of the album's cover. Its pictures are in `limbo/img/`.
 
 **Photos.** Ask Claude. They are cropped, lined up and converted, so a raw photo
 uploaded over an old one will not sit right.

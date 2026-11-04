@@ -2,7 +2,8 @@
 // The album is a path: the Intro, then five phone calls. Each call ends in a choice between two songs, and every
 // path ends on "Limbo (fim)", so there are 32 ways through. The words, translations, choices and credits are in
 // album.js. Track 7's sound is audio/07.mp3, and so on; while a track's sound is not there yet, the game shows its
-// words and goes on when you tap Continue.
+// words and goes on when you tap Continue. It is played in the dark, and each part of the album has its own look
+// (its vibe in album.js, drawn in index.html). The title screen loops the album's intro in 8 bits.
 (() => {
   const album = window.LIMBO;
   const byN = new Map(album.tracks.map(t => [t.n, t]));
@@ -16,7 +17,9 @@
     pt: {
       by: 'um álbum-jogo de LEFT.',
       how: 'Cinco chamadas. Cada uma acaba numa escolha entre duas canções. Há 32 caminhos.',
-      start: 'Começar', spotify: 'Ouvir o álbum no Spotify', track: 'Faixa', call: 'Chamada',
+      start: 'Jogar', musicOn: 'Música: ligada', musicOff: 'Música: desligada', phones: 'Melhor com auscultadores',
+      cover: 'A capa de LIMBO: António a flutuar num vazio branco, iluminado de vermelho',
+      spotify: 'Ouvir o álbum no Spotify', track: 'Faixa', call: 'Chamada',
       incoming: 'Chamada recebida', answer: 'Atender', onLine: 'Na linha', choose: 'Escolhe',
       next: 'Continuar', skip: 'Saltar', play: 'Tocar', pause: 'Pausa', where: 'Onde vai a faixa',
       soon: 'O áudio ainda não está aqui. Por agora, lê.', credits: 'Ficha técnica', end: 'Fim',
@@ -25,7 +28,9 @@
     en: {
       by: 'a game-album by LEFT.',
       how: 'Five phone calls. Each one ends in a choice between two songs. There are 32 ways through.',
-      start: 'Start', spotify: 'Listen to the album on Spotify', track: 'Track', call: 'Call',
+      start: 'Play', musicOn: 'Music: on', musicOff: 'Music: off', phones: 'Best with headphones',
+      cover: 'The cover of LIMBO: António floating in a white void, lit red',
+      spotify: 'Listen to the album on Spotify', track: 'Track', call: 'Call',
       incoming: 'Incoming call', answer: 'Answer', onLine: 'On the line', choose: 'Choose',
       next: 'Continue', skip: 'Skip', play: 'Play', pause: 'Pause', where: 'Position in the track',
       soon: 'The audio isn’t here yet. For now, read along.', credits: 'Credits', end: 'The end',
@@ -45,6 +50,8 @@
   const pathList = document.querySelector('.path');
   const restart = document.querySelector('.restart');
   const live = document.querySelector('.sr');
+  const scene = document.querySelector('.scene');
+  const themeColor = document.querySelector('meta[name="theme-color"]');
   let lang = savedLang();
   let path = [];     // the song picked after each call
   let screen = 'title';
@@ -63,7 +70,7 @@
   };
   const mmss = s => `${Math.floor(s / 60)}:${String(Math.floor(s % 60)).padStart(2, '0')}`;
 
-  const SPRITE = look => `<img class="him" src="../img/8bit/${look}.png" width="96" height="120" alt="">`;
+  const SPRITE = look => `<img class="him" src="img/${look}.png" width="96" height="120" alt="">`;
   const ICON = {
     play: '<svg viewBox="0 0 7 7" shape-rendering="crispEdges" aria-hidden="true"><path fill="currentColor" d="M1 0h1v1h1v1h1v1h1v1H4v1H3v1H2v1H1z"/></svg>',
     pause: '<svg viewBox="0 0 7 7" shape-rendering="crispEdges" aria-hidden="true"><path fill="currentColor" d="M1 0h2v7H1zM4 0h2v7H4z"/></svg>',
@@ -93,9 +100,20 @@
     setTimeout(() => { live.textContent = message; }, 60);
   }
 
-  function render(name, html, focus) {
+  // Each screen in its look: the colours change in a few steps and the scene behind comes in
+  function setVibe(vibe) {
+    if (body.dataset.vibe === vibe) return;
+    body.dataset.vibe = vibe;
+    scene.classList.remove('in');
+    void scene.offsetWidth;
+    scene.classList.add('in');
+    themeColor.content = getComputedStyle(body).getPropertyValue('--paper').trim();
+  }
+
+  function render(name, html, focus, vibe = 'night') {
     screen = name;
     body.dataset.screen = name;
+    setVibe(vibe);
     game.innerHTML = `<section class="screen ${name}">${html}</section>`;
     restart.hidden = name === 'title';
     paintPath();
@@ -266,6 +284,7 @@
     }
     const tone = semitones => 440 * 2 ** (semitones / 12);
     return {
+      context: () => (up() ? ctx : null),
       go: () => notes([[tone(10), 35], [tone(17), 35], [tone(22), 80]], 0.07),
       pick: () => notes([[tone(3), 45], [tone(7), 45], [tone(10), 45], [tone(15), 100]], 0.07),
       // An old phone: two notes trading fast, a pause, again; it gives up after six rings
@@ -283,7 +302,55 @@
     };
   })();
 
+  // ---- The title music: the album's intro in 8 bits (16.29 s), looping without a gap ----
+  const chiptune = (() => {
+    const LOOP = 16.2857;
+    let data = null, buffer = null, source = null, gain = null, on = true;
+    fetch('audio/title.mp3').then(r => (r.ok ? r.arrayBuffer() : null)).then(b => { data = b; }, () => {});
+    async function play() {
+      const ctx = sfx.context();
+      if (!ctx || !on || source) return;
+      // On an iPhone set to silent, heard like the album itself is
+      try { if (navigator.audioSession) navigator.audioSession.type = 'playback'; } catch {}
+      try {
+        if (!buffer) {
+          if (!data) return;
+          buffer = await ctx.decodeAudioData(data.slice(0));
+        }
+        if (source || !on) return;
+        // An MP3 starts with a few silent milliseconds: the loop starts at the first sound
+        const first = buffer.getChannelData(0).findIndex(v => Math.abs(v) > 0.002);
+        const start = Math.max(0, first) / buffer.sampleRate;
+        source = ctx.createBufferSource();
+        source.buffer = buffer;
+        source.loop = true;
+        source.loopStart = start;
+        source.loopEnd = Math.min(buffer.duration, start + LOOP);
+        gain = ctx.createGain();
+        gain.gain.value = 0.5;
+        source.connect(gain).connect(ctx.destination);
+        source.start(0, start);
+      } catch { /* no title music on this browser */ }
+    }
+    function stop(fade = 0.6) {
+      if (!source) return;
+      const ctx = sfx.context(), s = source, g = gain;
+      source = gain = null;
+      try {
+        g.gain.setValueAtTime(g.gain.value, ctx.currentTime);
+        g.gain.linearRampToValueAtTime(0, ctx.currentTime + fade);
+        s.stop(ctx.currentTime + fade + 0.05);
+      } catch {}
+    }
+    return {
+      play, stop,
+      toggle() { on = !on; if (on) play(); else stop(0.2); return on; },
+      get on() { return on; },
+    };
+  })();
+
   // ---- The screens ----
+  // The title screen: PRESS START first (a browser plays sound only after a tap), then the music and the menu
   function title() {
     at = 0;
     onEnd = null;
@@ -291,10 +358,29 @@
       <h1 class="limbo">LIMBO</h1>
       <p class="by">${say('by')}</p>
       ${SPRITE('front')}
-      <p class="how">${say('how')}</p>
-      <button class="big start" type="button">${say('start')}</button>
-      <p class="small"><a href="${esc(album.spotify)}">${say('spotify')}</a></p>`, false);
-    game.querySelector('.start').addEventListener('click', () => { sfx.go(); begin(); });
+      <button class="big press" type="button">Press start</button>
+      <div class="menu" hidden>
+        <p class="how">${say('how')}</p>
+        <button class="big start" type="button">${say('start')}</button>
+        <button class="music" type="button" aria-pressed="${chiptune.on}">${say(chiptune.on ? 'musicOn' : 'musicOff')}</button>
+        <p class="small">${say('phones')}</p>
+        <p class="small"><a href="${esc(album.spotify)}">${say('spotify')}</a></p>
+      </div>`, false, 'night');
+    const press = game.querySelector('.press'), menu = game.querySelector('.menu');
+    press.addEventListener('click', () => {
+      sfx.go();
+      chiptune.play();
+      press.hidden = true;
+      menu.hidden = false;
+      menu.querySelector('.start').focus({ preventScroll: true });
+    });
+    menu.querySelector('.start').addEventListener('click', () => { chiptune.stop(); sfx.go(); begin(); });
+    const music = menu.querySelector('.music');
+    music.addEventListener('click', () => {
+      const on = chiptune.toggle();
+      music.setAttribute('aria-pressed', String(on));
+      music.innerHTML = say(on ? 'musicOn' : 'musicOff');
+    });
   }
 
   function begin() {
@@ -312,7 +398,7 @@
         ${deckHTML(true)}
         ${wordsHTML(t)}
         ${creditsHTML(t)}
-      </div>`);
+      </div>`, null, t.vibe);
     hookDeck();
     listen(n, () => {
       const next = n === 1 ? calls[0].n : nextAfter(n);
@@ -328,7 +414,7 @@
       <div class="calling ringing">${SPRITE('look-right')}${PHONE}</div>
       <h2>${say('call')} ${t.call}/5</h2>
       <p class="incoming">${say('incoming')}</p>
-      <button class="big answer" type="button">${say('answer')}</button>`, '.answer');
+      <button class="big answer" type="button">${say('answer')}</button>`, '.answer', 'lcd');
     sfx.ring();
     announce(`${TEXT[lang].incoming}: ${TEXT[lang].call} ${t.call}/5`);
     game.querySelector('.answer').addEventListener('click', () => { sfx.hush(); sfx.go(); call(n); });
@@ -349,7 +435,7 @@
           ${t.options.map(o => `<button class="pick" type="button" data-to="${o.to}"><span>${tr(o.pt, o.en)}</span></button>`).join('')}
         </div>
         ${creditsHTML(t)}
-      </div>`);
+      </div>`, null, 'lcd');
     hookDeck();
     game.querySelectorAll('.pick').forEach(button => button.addEventListener('click', () => {
       sfx.pick();
@@ -372,7 +458,7 @@
     const t = byN.get(LAST);
     at = LAST;
     render('end', `
-      ${SPRITE('reach')}
+      <img class="cover" src="img/cover.webp" width="720" height="720" alt="${esc(TEXT[lang].cover)}">
       <h2>${say('end')}</h2>
       <div class="box">
         <p class="tag">${say('track')} ${LAST} · ${esc(t.title)}</p>
@@ -383,7 +469,7 @@
         ${creditsHTML(t)}
       </div>
       <button class="big again" type="button">${say('again')}</button>
-      <p class="small"><a href="${esc(album.spotify)}">${say('spotify')}</a></p>`);
+      <p class="small"><a href="${esc(album.spotify)}">${say('spotify')}</a></p>`, null, 'void');
     hookDeck();
     game.querySelector('.again').addEventListener('click', () => { audio.pause(); sfx.go(); begin(); });
     listen(LAST, null);
@@ -407,7 +493,7 @@
   }
 
   restart.innerHTML = say('restart');
-  restart.addEventListener('click', () => { audio.pause(); sfx.hush(); title(); });
+  restart.addEventListener('click', () => { audio.pause(); sfx.hush(); chiptune.stop(0.2); title(); });
   document.querySelectorAll('.langs button').forEach(b => b.addEventListener('click', () => setLang(b.dataset.lang)));
   setLang(lang);
   title();

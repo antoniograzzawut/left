@@ -1,12 +1,13 @@
 // LIMBO (2024), the game-album by LEFT.: its words, the calls and their choices, and who made each track.
 // To change a line: each one is the Portuguese, then " | ", then the English. An empty line starts a new verse.
+// vibe is the look of a track's screen (its colours and its scene), defined in index.html.
 // The words come from "LIMBO - Letras", "LIMBO - Tracklist" and "Limbo - Ficha técnica" in Google Drive,
 // and "Volto a ti - Letra" (2023). The English is Claude's translation, for António to check.
 window.LIMBO = {
   spotify: 'https://open.spotify.com/album/6DkuX5UAticvTx5NxEFVH5',
   tracks: [
     {
-      n: 1, title: 'Intro', en: 'Intro',
+      n: 1, title: 'Intro', en: 'Intro', vibe: 'night',
       words: `
 Bem-vindo ao jogo que não vais poder ganhar | Welcome to the game you won’t be able to win
 O fim é certo como é certo começar | The end is as certain as the start
@@ -24,7 +25,7 @@ Começar | As the start
       credits: 'Produção: LEFT. · Música e letra: António Graça · Interpretação, instrumentos e vozes: LEFT. · Mistura: LEFT. · Master: Michael Ferreira',
     },
     {
-      n: 2, title: 'Level 1', en: 'Level 1', call: 1, voice: 'L-ALI',
+      n: 2, title: 'Level 1', en: 'Level 1', call: 1, voice: 'L-ALI', vibe: 'lcd',
       question: ['Tens estado em baixo? Vais levantar a cabeça e seguir em frente? Ou bater com a cabeça em tudo?',
                  'You’ve been feeling down? Are you going to lift your head and move on? Or bang your head against everything?'],
       options: [
@@ -34,7 +35,7 @@ Começar | As the start
       credits: 'Produção: LEFT., Guire · Música e letra: António Graça · Voz: L-ALI · Mistura: LEFT. · Master: Michael Ferreira',
     },
     {
-      n: 3, title: 'Siga', en: 'Keep going',
+      n: 3, title: 'Siga', en: 'Keep going', vibe: 'sunrise',
       words: `
 Deitado na cama a pensar no fim | Lying in bed, thinking about the end
 Se no meu velório vão chorar por mim | Whether at my wake they’ll cry for me
@@ -83,7 +84,7 @@ Se só tens uma vida então siga | If you only have one life, then keep going
       credits: 'Produção: Luar, LEFT. · Música e letra: António Graça · Interpretação: LEFT. · Guitarras, baixo e teclas: Luar · Bateria: Francisco Santos · Vozes: LEFT., Helena Silva, Mikkel Solnado, Luar · Mistura e master: Michael Ferreira',
     },
     {
-      n: 4, title: 'Violento (ft. L-Ali)', en: 'Violent',
+      n: 4, title: 'Violento (ft. L-Ali)', en: 'Violent', vibe: 'riot',
       words: `
 Violento, não dormi nada | Violent, I didn’t sleep at all
 Tou violento, saí de casa | I’m violent, I left the house
@@ -162,7 +163,7 @@ Sou eu no final | Is me, in the end
       credits: 'Produção: LEFT. · Música e letra: António Graça, Hélder, Rossana · Interpretação: LEFT., L-Ali, Rossana · Sintetizadores e beat: LEFT. · Vozes: LEFT., L-Ali, Rossana · Mistura e master: Michael Ferreira',
     },
     {
-      n: 5, title: 'Level 2', en: 'Level 2', call: 2, voice: 'Ana Mariano',
+      n: 5, title: 'Level 2', en: 'Level 2', call: 2, voice: 'Ana Mariano', vibe: 'lcd',
       question: ['Isto não está a correr muito bem. Queres acabar?',
                  'This isn’t going very well. Do you want to end it?'],
       options: [
@@ -172,7 +173,7 @@ Sou eu no final | Is me, in the end
       credits: 'Produção: LEFT., Guire · Música e letra: António Graça · Voz: Ana Mariano · Mistura: LEFT. · Master: Michael Ferreira',
     },
     {
-      n: 6, title: 'Pulso (ft. Jüra)', en: 'Pulse',
+      n: 6, title: 'Pulso (ft. Jüra)', en: 'Pulse', vibe: 'heart',
       words: `
 Quero morrer ao teu lado | I want to die by your side
 Bebo o teu veneno por ti | I drink your poison for you
@@ -261,7 +262,7 @@ Enterrado | Buried
       credits: 'Produção: LEFT., YANAGUI, Kidonov · Música e letra: António Graça, Jüra · Interpretação: LEFT., Jüra · Teclados: YANAGUI · Baixo: LEFT. · Beat: LEFT., Kidonov · Vozes: LEFT., Jüra · Mistura e master: Michael Ferreira',
     },
     {
-      n: 7, title: 'Volto a ti', en: 'I come back to you',
+      n: 7, title: 'Volto a ti', en: 'I come back to you', vibe: 'sepia',
       words: `
 Feitas as contas | All things considered
 Já conto em ficar | I’m already counting on staying
@@ -314,7 +315,7 @@ Não volto a ti | I won’t come back to you
       credits: 'Produção: LEFT., Luar · Música e letra: António Graça · Interpretação: LEFT. · Guitarras: LEFT., Luar · Cordas: Luar · Vozes: LEFT., Luar, Helena Silva · Mistura e master: Michael Ferreira',
     },
     {
-      n: 8, title: 'Level 3', en: 'Level 3', call: 3, voice: 'Miguel Garcia',
+      n: 8, title: 'Level 3', en: 'Level 3', call: 3, voice: 'Miguel Garcia', vibe: 'lcd',
       question: ['Puto, estou farto. Bora sair de Lisboa e viajar? Ou preferes só ir dançar a algum lado?',
                  'Kid, I’m fed up. Let’s get out of Lisbon and travel? Or would you rather just go dancing somewhere?'],
       options: [
@@ -324,7 +325,7 @@ Não volto a ti | I won’t come back to you
       credits: 'Produção: LEFT., Guire · Música e letra: António Graça · Voz: Miguel Garcia · Mistura: LEFT. · Master: Michael Ferreira',
     },
     {
-      n: 9, title: 'A1 Norte', en: 'A1 North',
+      n: 9, title: 'A1 Norte', en: 'A1 North', vibe: 'road',
       words: `
 Bora pra cima passar uma temporada | Let’s head up north for a while
 Eu levo o meu Nissan | I’ll take my Nissan
@@ -385,7 +386,7 @@ A1 Norte | A1 North
       credits: 'Produção: LEFT. · Música e letra: António Graça · Interpretação: LEFT. · Guitarras: LEFT., miguele · Cordas e bateria: LEFT. · Vozes: LEFT., Inês Apenas · Mistura e master: Michael Ferreira',
     },
     {
-      n: 10, title: 'Dançar', en: 'To dance',
+      n: 10, title: 'Dançar', en: 'To dance', vibe: 'club',
       words: `
 Saio e faz calor na rua | I go out and it’s hot in the street
 Dá pra ver a lua | You can see the moon
@@ -434,7 +435,7 @@ A pairar por cima do Tejo | Hanging over the Tagus
       credits: 'Produção: LEFT. · Música e letra: António Graça · Interpretação: LEFT. · Bateria, sintetizadores, baixo e vozes: LEFT. · Mistura: LEFT. · Master: Michael Ferreira',
     },
     {
-      n: 11, title: 'Level 4', en: 'Level 4', call: 4, voice: 'Luar',
+      n: 11, title: 'Level 4', en: 'Level 4', call: 4, voice: 'Luar', vibe: 'lcd',
       question: ['O que é que tu queres afinal? Queres mais? Ou queres só ficar satisfeito com o que tens?',
                  'So what is it you want? Do you want more? Or do you just want to be happy with what you have?'],
       options: [
@@ -444,7 +445,7 @@ A pairar por cima do Tejo | Hanging over the Tagus
       credits: 'Produção: LEFT. · Música e letra: António Graça · Voz: Luar · Mistura: LEFT. · Master: Michael Ferreira',
     },
     {
-      n: 12, title: 'Quero mais', en: 'I want more',
+      n: 12, title: 'Quero mais', en: 'I want more', vibe: 'gold',
       words: `
 Nasci malcriado | I was born a brat
 Emprestado aos meus pais | On loan to my parents
@@ -492,7 +493,7 @@ Eu quero mais | I want more
       credits: 'Produção: LEFT., Luar · Música e letra: António Graça · Interpretação: LEFT. · Guitarras: LEFT., Luar · Sopros, bateria e vozes: LEFT. · Mistura e master: Michael Ferreira',
     },
     {
-      n: 13, title: 'Silêncio', en: 'Silence',
+      n: 13, title: 'Silêncio', en: 'Silence', vibe: 'quiet',
       words: `
 Estar só | To be alone
 Em silêncio | In silence
@@ -509,7 +510,7 @@ Sem tempo | Without time
       credits: 'Produção: LEFT. · Música e letra: António Graça · Interpretação: LEFT. · Guitarras, cordas, bateria e vozes: LEFT. · Mistura: LEFT. · Master: Michael Ferreira',
     },
     {
-      n: 14, title: 'Level 5', en: 'Level 5', call: 5, voice: 'Manuela Maciel',
+      n: 14, title: 'Level 5', en: 'Level 5', call: 5, voice: 'Manuela Maciel', vibe: 'lcd',
       question: ['Quando te vais abaixo, tens que assumir que não estás bem, e aceitar-te por isso. Ou então chora só, filho, chora.',
                  'When you hit bottom, you have to admit you’re not okay, and accept yourself for it. Or else just cry, son, cry.'],
       options: [
@@ -519,7 +520,7 @@ Sem tempo | Without time
       credits: 'Produção: LEFT. · Música e letra: António Graça · Voz: Manuela Maciel · Mistura: LEFT. · Master: Michael Ferreira',
     },
     {
-      n: 15, title: 'Não estou bem', en: 'I’m not okay',
+      n: 15, title: 'Não estou bem', en: 'I’m not okay', vibe: 'overcast',
       words: `
 Não vou mentir | I won’t lie
 Eu não estou bem | I’m not okay
@@ -581,7 +582,7 @@ Vou só aceitar-me assim | I’ll just accept myself as I am
       credits: 'Produção: LEFT. · Música e letra: António Graça · Interpretação: LEFT. · Guitarras e cordas: LEFT. · Piano: YANAGUI · Bateria: Alex Mey · Vozes: LEFT., Coro Infantil de Santo Amaro de Oeiras · Mistura e master: Michael Ferreira',
     },
     {
-      n: 16, title: 'Chora', en: 'Cry',
+      n: 16, title: 'Chora', en: 'Cry', vibe: 'tears',
       words: `
 (Há tanto tempo que não choro) | (It’s been so long since I cried)
 
@@ -641,7 +642,7 @@ Que a vida vai | For life goes by
       credits: 'Produção: LEFT. · Música e letra: António Graça · Interpretação: LEFT. · Piano, bateria e vozes: LEFT. · Mistura: LEFT. · Master: Michael Ferreira',
     },
     {
-      n: 17, title: 'Limbo (fim)', en: 'Limbo (the end)',
+      n: 17, title: 'Limbo (fim)', en: 'Limbo (the end)', vibe: 'void',
       credits: 'Produção: LEFT. · Música e letra: António Graça · Vozes: LEFT. · Mistura: LEFT. · Master: Michael Ferreira',
     },
   ],

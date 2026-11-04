@@ -21,6 +21,7 @@ The game plays the album from this folder: the 17 tracks as MP3 files (M4A works
 | `15.mp3` | Não estou bem |
 | `16.mp3` | Chora |
 | `17.mp3` | Limbo (fim) |
+| `title.mp3` | The intro in 8 bits, looping on the title screen (LIMBO_INTRO_CHIPTUNE in Drive) |
 
 **Adding them.** Rename the files as above. Open this folder on GitHub, press "Add file",
 then "Upload files", drop them in, and press "Commit changes". The game finds them on its
