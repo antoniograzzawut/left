@@ -17,7 +17,7 @@
     pt: {
       by: 'um álbum-jogo de LEFT.',
       how: 'Cinco chamadas. Cada uma acaba numa escolha entre duas canções. Há 32 caminhos.',
-      start: 'Jogar', musicOn: 'Música: ligada', musicOff: 'Música: desligada', phones: 'Melhor com auscultadores',
+      start: 'Jogar', chooseLang: 'Em que língua queres jogar?', musicOn: 'Música: ligada', musicOff: 'Música: desligada', phones: 'Melhor com auscultadores',
       cover: 'A capa de LIMBO: António a flutuar num vazio branco, iluminado de vermelho',
       spotify: 'Ouvir o álbum no Spotify', track: 'Faixa', call: 'Chamada',
       incoming: 'Chamada recebida', answer: 'Atender', onLine: 'Na linha', choose: 'Escolhe',
@@ -28,7 +28,7 @@
     en: {
       by: 'a game-album by LEFT.',
       how: 'Five phone calls. Each one ends in a choice between two songs. There are 32 ways through.',
-      start: 'Play', musicOn: 'Music: on', musicOff: 'Music: off', phones: 'Best with headphones',
+      start: 'Play', chooseLang: 'Which language do you want to play in?', musicOn: 'Music: on', musicOff: 'Music: off', phones: 'Best with headphones',
       cover: 'The cover of LIMBO: António floating in a white void, lit red',
       spotify: 'Listen to the album on Spotify', track: 'Track', call: 'Call',
       incoming: 'Incoming call', answer: 'Answer', onLine: 'On the line', choose: 'Choose',
@@ -60,6 +60,8 @@
   const esc = s => String(s).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' })[c]);
   // Words of the page itself come in both languages, and the one chosen shows
   const say = key => `<span class="ui-pt">${esc(TEXT.pt[key])}</span><span class="ui-en" lang="en">${esc(TEXT.en[key])}</span>`;
+  // Before the language is chosen: the Portuguese, and the English under it
+  const both = key => `${esc(TEXT.pt[key])}<span class="also" lang="en">${esc(TEXT.en[key])}</span>`;
   // Words of the album are always in Portuguese, with the English under them when English is on
   const tr = (pt, en) => `${esc(pt)}${en && en !== pt ? `<span class="en" lang="en">${esc(en)}</span>` : ''}`;
   // A track's name as a heading: a guest artist in smaller letters under it, then the English
@@ -403,15 +405,19 @@
     onEnd = null;
     render('title', `
       <h1 class="limbo">LIMBO</h1>
-      <p class="by">${say('by')}</p>
+      <p class="by">${both('by')}</p>
       ${SPRITE('front')}
       <button class="big press" type="button">Press start</button>
       <div class="menu" hidden>
-        <p class="how">${say('how')}</p>
-        <button class="big start" type="button">${say('start')}</button>
-        <button class="music" type="button" aria-pressed="${chiptune.on}">${say(chiptune.on ? 'musicOn' : 'musicOff')}</button>
-        <p class="small">${say('phones')}</p>
-        <p class="small"><a href="${esc(album.spotify)}">${say('spotify')}</a></p>
+        <p class="how">${both('how')}</p>
+        <p class="ask">${both('chooseLang')}</p>
+        <div class="tongues">
+          <button class="big start" type="button" data-lang="pt" lang="pt">Português</button>
+          <button class="big start" type="button" data-lang="en" lang="en">English</button>
+        </div>
+        <button class="music" type="button" aria-pressed="${chiptune.on}">${both(chiptune.on ? 'musicOn' : 'musicOff')}</button>
+        <p class="small">${both('phones')}</p>
+        <p class="small"><a href="${esc(album.spotify)}">${both('spotify')}</a></p>
       </div>`, false, 'night');
     const press = game.querySelector('.press'), menu = game.querySelector('.menu');
     press.addEventListener('click', () => {
@@ -419,14 +425,19 @@
       chiptune.play();
       press.hidden = true;
       menu.hidden = false;
-      menu.querySelector('.start').focus({ preventScroll: true });
+      menu.querySelector(`.start[data-lang="${lang}"]`).focus({ preventScroll: true });
     });
-    menu.querySelector('.start').addEventListener('click', () => { chiptune.stop(); sfx.go(); begin(); });
+    menu.querySelectorAll('.start').forEach(button => button.addEventListener('click', () => {
+      setLang(button.dataset.lang);
+      chiptune.stop();
+      sfx.go();
+      begin();
+    }));
     const music = menu.querySelector('.music');
     music.addEventListener('click', () => {
       const on = chiptune.toggle();
       music.setAttribute('aria-pressed', String(on));
-      music.innerHTML = say(on ? 'musicOn' : 'musicOff');
+      music.innerHTML = both(on ? 'musicOn' : 'musicOff');
     });
   }
 

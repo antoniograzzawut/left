@@ -139,6 +139,14 @@
     color: var(--indigo); cursor: pointer;
   }
   .music:hover { color: var(--red); }
+  /* Until a language is chosen, the title screen says everything twice: the English under the Portuguese */
+  .also { display: block; margin-top: 3px; color: var(--indigo); font-size: .85em; }
+  .small .also, .music .also { display: inline; margin: 0 0 0 .5em; font-size: 1em; }
+  .small .also::before, .music .also::before { content: "· "; }
+  .ask { font: 400 clamp(18px, 5vw, 21px)/1.25 var(--arcade); letter-spacing: .02em; }
+  .tongues { display: flex; flex-wrap: wrap; justify-content: center; gap: 14px; }
+  .tongues .start { min-width: 8.6em; }
+  [data-screen="title"] .langs { visibility: hidden; }
   .by { font-size: 14px; letter-spacing: .06em; text-transform: uppercase; color: var(--indigo); }
   .how { max-width: 30em; font: 400 clamp(19px, 5.4vw, 22px)/1.25 var(--arcade); letter-spacing: .02em; }
   .small { font-size: 12px; letter-spacing: .04em; text-transform: uppercase; }
