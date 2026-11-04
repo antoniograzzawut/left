@@ -5,13 +5,45 @@
 // and "Volto a ti - Letra" (2023). The English is Claude's translation, for António to check.
 window.LIMBO = {
   spotify: 'https://open.spotify.com/album/6DkuX5UAticvTx5NxEFVH5',
-  // The 8-bit versions, a bonus that opens at the end of the game. Siga's is also the title screen's music.
+  // The 8-bit versions: a bonus that opens at the end of the game, and what the secret 8-bit mode plays in place
+  // of these songs (n is the track). Siga's is also the title screen's music.
   bonus: [
-    { title: 'Siga', src: 'audio/title.mp3' },
-    { title: 'Pulso', src: 'audio/8bit-pulso.mp3' },
-    { title: 'A1 Norte', src: 'audio/8bit-a1-norte.mp3' },
-    { title: 'Quero mais', src: 'audio/8bit-quero-mais.mp3' },
+    { n: 3, title: 'Siga', src: 'audio/title.mp3' },
+    { n: 6, title: 'Pulso', src: 'audio/8bit-pulso.mp3' },
+    { n: 9, title: 'A1 Norte', src: 'audio/8bit-a1-norte.mp3' },
+    { n: 12, title: 'Quero mais', src: 'audio/8bit-quero-mais.mp3' },
   ],
+
+  // The name of your ending, from your choices: the second call says who you are, the third where, and the other
+  // three give a trait each. Each is [Portuguese, English]; 2 x 2 x 2 x 2 x 2 = 32, one for each way through.
+  ending: {
+    who: { 7: ['O Ex', 'The Ex'], 6: ['O Romântico', 'The Romantic'] },
+    where: { 9: ['da Estrada', 'on the Road'], 10: ['da Pista', 'on the Dancefloor'] },
+    traits: {
+      3: ['Otimista', 'Optimist'], 4: ['Furioso', 'Furious'],
+      12: ['Insaciável', 'Insatiable'], 13: ['Zen', 'Zen'],
+      15: ['Honesto', 'Honest'], 16: ['Lavado em lágrimas', 'Cried it out'],
+    },
+  },
+
+  // What the game says when a song is skipped: one for each, and a few for the rest. [Portuguese, English]
+  skips: {
+    1: ['Já conheces as regras, é?', 'Already know the rules, huh?'],
+    3: ['Siga, então.', 'Moving on, then.'],
+    4: ['Calma, calma.', 'Easy, easy.'],
+    6: ['Saltaste o Pulso? Que frieza.', 'Skipped Pulso? Cold.'],
+    7: ['Afinal não voltaste.', 'Didn’t come back after all.'],
+    9: ['Saíste na primeira saída.', 'Took the first exit.'],
+    10: ['Já a sair da pista?', 'Leaving the dancefloor already?'],
+    12: ['Afinal querias menos.', 'Wanted less after all.'],
+    13: ['Saltar o Silêncio. Justo.', 'Skipping Silence. Fair.'],
+    15: ['Fugir também é resposta.', 'Running away is an answer too.'],
+    16: ['Nem uma lágrima?', 'Not even one tear?'],
+    any: [
+      ['Saltaste? Ele ouviu isso.', 'Skipped? He heard that.'],
+      ['Uau. Nem o refrão.', 'Wow. Not even the chorus.'],
+    ],
+  },
   tracks: [
     {
       n: 1, title: 'Intro', en: 'Intro', vibe: 'night',
@@ -42,7 +74,7 @@ Começar | As the start
       credits: 'Produção: LEFT., Guire · Música e letra: António Graça · Voz: L-ALI · Mistura: LEFT. · Master: Michael Ferreira',
     },
     {
-      n: 3, title: 'Siga', en: 'Keep going', vibe: 'sunrise',
+      n: 3, title: 'Siga', en: 'Keep going', vibe: 'sunrise', from: 2.6,  // the track opens with 3 s of silence
       words: `
 Deitado na cama a pensar no fim | Lying in bed, thinking about the end
 Se no meu velório vão chorar por mim | Whether at my wake they’ll cry for me

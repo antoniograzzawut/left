@@ -23,7 +23,13 @@
       incoming: 'Chamada recebida', answer: 'Atender', onLine: 'Na linha', choose: 'Escolhe',
       next: 'Continuar', skip: 'Saltar', play: 'Tocar', pause: 'Pausa', where: 'Onde vai a faixa',
       soon: 'O áudio ainda não está aqui. Por agora, lê.', credits: 'Ficha técnica', end: 'Fim',
-      bonus: 'Bónus 8-bit, desbloqueado', path: 'O teu caminho', oneOf: 'Um dos 32 caminhos de LIMBO.', again: 'Jogar outra vez', restart: 'Recomeçar',
+      bonus: 'Bónus 8-bit, desbloqueado', path: 'O teu caminho', oneOf: 'Um dos 32 caminhos de LIMBO.',
+      decline: 'Recusar', caller: 'Quem liga', hungUp: 'Desligaste-lhe na cara.', cont: 'Continuar?',
+      backToCall: 'Sim, voltar à chamada', fate: 'O destino escolheu por ti.', hold: 'Parar o relógio', held: 'Relógio parado',
+      secret: 'Segredo: da próxima vez, toca nele cinco vezes seguidas.',
+      yourEnd: 'O teu final', share: 'Partilhar', copied: 'Copiado. Cola onde quiseres.',
+      shareText: 'Joguei LIMBO de LEFT. e saiu-me', shareAsk: 'E a ti?',
+      eightOn: 'Modo 8-bit: ligado', eightOff: 'Modo 8-bit: desligado', again: 'Jogar outra vez', restart: 'Recomeçar',
     },
     en: {
       by: 'a game-album by LEFT.',
@@ -34,7 +40,13 @@
       incoming: 'Incoming call', answer: 'Answer', onLine: 'On the line', choose: 'Choose',
       next: 'Continue', skip: 'Skip', play: 'Play', pause: 'Pause', where: 'Position in the track',
       soon: 'The audio isn’t here yet. For now, read along.', credits: 'Credits', end: 'The end',
-      bonus: '8-bit bonus, unlocked', path: 'Your path', oneOf: 'One of LIMBO’s 32 paths.', again: 'Play again', restart: 'Start over',
+      bonus: '8-bit bonus, unlocked', path: 'Your path', oneOf: 'One of LIMBO’s 32 paths.',
+      decline: 'Decline', caller: 'Caller', hungUp: 'You hung up on them.', cont: 'Continue?',
+      backToCall: 'Yes, back to the call', fate: 'Fate chose for you.', hold: 'Stop the clock', held: 'Clock stopped',
+      secret: 'Secret: next time, tap him five times in a row.',
+      yourEnd: 'Your ending', share: 'Share', copied: 'Copied. Paste it anywhere.',
+      shareText: 'I played LIMBO by LEFT. and got', shareAsk: 'What about you?',
+      eightOn: '8-bit mode: on', eightOff: '8-bit mode: off', again: 'Play again', restart: 'Start over',
     },
   };
   // The credits are written in Portuguese; in English only the roles change
@@ -100,6 +112,22 @@
     `<details class="credits"><summary>${say('credits')}</summary>
       <p><span class="ui-pt">${esc(t.credits)}</span><span class="ui-en" lang="en">${esc(creditsEN(t.credits))}</span></p></details>`;
 
+  const toastEl = document.createElement('p');
+  toastEl.className = 'toast';
+  toastEl.setAttribute('aria-hidden', 'true');
+  document.body.append(toastEl);
+  let toastTimer = null;
+  function toast([pt, en], ms = 3200) {
+    toastEl.innerHTML = `<span class="ui-pt">${esc(pt)}</span><span class="ui-en" lang="en">${esc(en)}</span>`;
+    toastEl.classList.remove('show');
+    void toastEl.offsetWidth;
+    toastEl.classList.add('show');
+    clearTimeout(toastTimer);
+    toastTimer = setTimeout(() => toastEl.classList.remove('show'), ms);
+    announce(lang === 'en' ? en : pt);
+  }
+  const both2 = key => [TEXT.pt[key], TEXT.en[key]];
+
   function announce(message) {
     live.textContent = '';
     setTimeout(() => { live.textContent = message; }, 60);
@@ -116,6 +144,9 @@
   }
 
   function render(name, html, focus, vibe = 'night') {
+    stopClock();
+    clearInterval(overTimer);
+    buzz(false);
     screen = name;
     body.dataset.screen = name;
     setVibe(vibe);
@@ -158,10 +189,19 @@
     media(n);
     load(n, 0);
   }
+  // In the secret 8-bit mode a song with an 8-bit version plays that; otherwise the track, from where it starts
+  const chipFor = n => (eight ? (album.bonus || []).find(b => b.n === n) : null);
+  function sourceFor(n, k) {
+    const chip = chipFor(n);
+    if (chip) return { src: chip.src, last: true };
+    const from = byN.get(n)?.from;
+    return { src: file(n, KINDS[k]) + (from ? `#t=${from}` : ''), last: false };
+  }
   function load(n, k) {
     const mine = ++attempt;
-    kind = k;
-    audio.src = file(n, KINDS[k]);
+    const source = sourceFor(n, k);
+    kind = source.last ? KINDS.length - 1 : k;
+    audio.src = source.src;
     paint();
     const p = audio.play();
     if (p) p.then(paint, err => {
@@ -216,9 +256,23 @@
       if (isFinite(audio.duration)) audio.currentTime = seek.value / 1000 * audio.duration;
     });
     seek.addEventListener('change', () => { seeking = false; });
-    deck.querySelector('.skip').addEventListener('click', () => { audio.pause(); finish(); });
+    deck.querySelector('.skip').addEventListener('click', () => {
+      const early = !isFinite(audio.duration) || audio.currentTime < audio.duration * 0.6;
+      audio.pause();
+      if (screen === 'song' && !missing && early) {
+        const line = skipLine(at);
+        if (line) toast(line);
+      }
+      finish();
+    });
     deck.querySelector('.go-on')?.addEventListener('click', () => { sfx.go(); finish(); });
     paint();
+  }
+  // What he says when a song is skipped: its own line most of the time, or one of the lines for any song
+  function skipLine(n) {
+    const lines = album.skips || {}, any = lines.any || [];
+    if (lines[n] && (Math.random() < 0.7 || !any.length)) return lines[n];
+    return any.length ? any[Math.floor(Math.random() * any.length)] : null;
   }
   function paint() {
     const deck = game.querySelector('.deck');
@@ -240,7 +294,8 @@
   // On the lock screen and in the phone's music controls
   function media(n) {
     if (!('mediaSession' in navigator) || !window.MediaMetadata) return;
-    try { navigator.mediaSession.metadata = new MediaMetadata({ title: byN.get(n).title, artist: 'LEFT.', album: 'LIMBO' }); } catch {}
+    const title = byN.get(n).title + (chipFor(n) ? ' (8-bit)' : '');
+    try { navigator.mediaSession.metadata = new MediaMetadata({ title, artist: 'LEFT.', album: 'LIMBO' }); } catch {}
   }
   if ('mediaSession' in navigator) {
     try {
@@ -260,11 +315,12 @@
   addEventListener('wheel', () => { scrolledAt = performance.now(); }, { passive: true });
   addEventListener('touchmove', () => { scrolledAt = performance.now(); }, { passive: true });
   function startFollow(n) {
-    const times = timesFor(n);
+    const times = chipFor(n) ? null : timesFor(n);
     const box = game.querySelector('.words');
     const lines = box ? [...box.querySelectorAll('.line')] : [];
     follow = times && times.length && lines.length ? { box, lines, times, now: -2 } : null;
-    if (follow) box.classList.add('timed');
+    if (box) box.classList.toggle('timed', !!follow);
+    if (!follow) lines.forEach(el => el.classList.remove('sung', 'now'));
   }
   function paintLines() {
     if (!follow || !follow.box.isConnected) return;
@@ -336,6 +392,8 @@
       context: () => (up() ? ctx : null),
       go: () => notes([[tone(10), 35], [tone(17), 35], [tone(22), 80]], 0.07),
       pick: () => notes([[tone(3), 45], [tone(7), 45], [tone(10), 45], [tone(15), 100]], 0.07),
+      over: () => notes([[tone(3), 180], [tone(2), 180], [tone(1), 180], [tone(0), 520]], 0.08),
+      tick: () => notes([[tone(24), 25]], 0.05),
       // An old phone: two notes trading fast, a pause, again; it gives up after six rings
       ring() {
         clearInterval(timer);
@@ -473,10 +531,16 @@
       <div class="calling ringing">${SPRITE('look-right')}${PHONE}</div>
       <h2>${say('call')} ${t.call}/5</h2>
       <p class="incoming">${say('incoming')}</p>
-      <button class="big answer" type="button">${say('answer')}</button>`, '.answer', 'lcd');
+      <p class="caller"><small>${say('caller')}</small><span>${esc(t.voice)}</span></p>
+      <div class="answers">
+        <button class="big answer" type="button">${say('answer')}</button>
+        <button class="big decline" type="button">${say('decline')}</button>
+      </div>`, '.answer', 'lcd');
     sfx.ring();
-    announce(`${TEXT[lang].incoming}: ${TEXT[lang].call} ${t.call}/5`);
-    game.querySelector('.answer').addEventListener('click', () => { sfx.hush(); sfx.go(); call(n); });
+    buzz(true);
+    announce(`${TEXT[lang].incoming}: ${TEXT[lang].call} ${t.call}/5, ${t.voice}`);
+    game.querySelector('.answer').addEventListener('click', () => { sfx.hush(); buzz(false); sfx.go(); call(n); });
+    game.querySelector('.decline').addEventListener('click', () => { sfx.hush(); buzz(false); gameOver(n); });
   }
 
   function call(n) {
@@ -491,16 +555,31 @@
         ${deckHTML(false)}
         <div class="choices" hidden>
           <p>${say('choose')}</p>
+          ${clockOn() ? `<div class="clock" style="--left: 1">
+            <span class="secs" aria-hidden="true">${CHOOSE_IN}</span>
+            <button class="hold" type="button">${say('hold')}</button>
+          </div>` : ''}
           ${t.options.map(o => `<button class="pick" type="button" data-to="${o.to}"><span>${tr(o.pt, o.en)}</span></button>`).join('')}
         </div>
         ${creditsHTML(t)}
       </div>`, null, 'lcd');
     hookDeck();
     game.querySelectorAll('.pick').forEach(button => button.addEventListener('click', () => {
+      const fated = button.dataset.fated === '1';
       sfx.pick();
       path.push(Number(button.dataset.to));
       song(Number(button.dataset.to));
+      if (fated) toast(both2('fate'));
     }));
+    game.querySelector('.hold')?.addEventListener('click', e => {
+      const hold = e.currentTarget;
+      noClock = true;
+      stopClock();
+      hold.closest('.clock').classList.add('held');
+      hold.innerHTML = say('held');
+      hold.disabled = true;
+      game.querySelector('.pick')?.focus({ preventScroll: true });
+    });
     listen(n, showChoices);
   }
 
@@ -508,6 +587,7 @@
     const box = game.querySelector('.choices');
     if (!box || !box.hidden) return;
     box.hidden = false;
+    startClock(box);
     announce(TEXT[lang].choose);
     box.querySelector('.pick').focus({ preventScroll: true });
     box.scrollIntoView({ block: 'nearest', behavior: calm ? 'auto' : 'smooth' });
@@ -516,6 +596,7 @@
   function finale() {
     const t = byN.get(LAST);
     at = LAST;
+    const name = endingName(path);
     render('end', `
       <img class="cover" src="img/cover.webp" width="720" height="720" alt="${esc(TEXT[lang].cover)}">
       <h2>${say('end')}</h2>
@@ -524,11 +605,18 @@
         ${deckHTML(false)}
         <p class="line-who">${say('path')}</p>
         <ol class="trail">${path.map(n => `<li><span>${tr(byN.get(n).title, byN.get(n).en)}</span></li>`).join('')}</ol>
+        <div class="card">
+          <p class="line-who">${say('yourEnd')}</p>
+          <p class="ending"><span class="ui-pt">${esc(name.pt)}</span><span class="ui-en" lang="en">${esc(name.en)}</span></p>
+          <ul class="traits">${name.traits.map(([pt, en]) => `<li><span class="ui-pt">${esc(pt)}</span><span class="ui-en" lang="en">${esc(en)}</span></li>`).join('')}</ul>
+          <button class="big share" type="button">${say('share')}</button>
+        </div>
         <p class="one">${say('oneOf')}</p>
         <div class="bonus">
           <p class="line-who">${say('bonus')}</p>
           <div class="tapes">${(album.bonus || []).map(b =>
             `<button class="tape" type="button" aria-pressed="false" data-src="${esc(b.src)}">${ICON.play}<span>${esc(b.title)}</span></button>`).join('')}</div>
+          <p class="one">${say('secret')}</p>
         </div>
         ${creditsHTML(t)}
       </div>
@@ -536,9 +624,133 @@
       <p class="small"><a href="${esc(album.spotify)}">${say('spotify')}</a></p>`, null, 'void');
     hookDeck();
     hookTapes();
+    game.querySelector('.share').addEventListener('click', () => shareEnding(name));
     game.querySelector('.again').addEventListener('click', () => { audio.pause(); tape.pause(); sfx.go(); begin(); });
     listen(LAST, null);
   }
+
+  // ---- Declining a call: GAME OVER, and nine seconds to continue, or back to the title ----
+  let overTimer = null;
+  function gameOver(n) {
+    at = n;
+    render('over', `
+      ${SPRITE('reach')}
+      <h2 class="over-title">Game over</h2>
+      <p class="said">${say('hungUp')}</p>
+      <p class="cont">${say('cont')} <span class="count">9</span></p>
+      <button class="big back-to-call" type="button">${say('backToCall')}</button>`, '.back-to-call', 'over');
+    sfx.over();
+    announce(`Game over. ${TEXT[lang].hungUp} ${TEXT[lang].cont}`);
+    let left = 9;
+    const count = game.querySelector('.count');
+    overTimer = setInterval(() => {
+      left -= 1;
+      if (left < 0) { clearInterval(overTimer); title(); return; }
+      count.textContent = left;
+      sfx.tick();
+    }, 1000);
+    game.querySelector('.back-to-call').addEventListener('click', () => { clearInterval(overTimer); sfx.go(); ring(n); });
+  }
+
+  // ---- The clock on a choice: ten seconds, then fate picks one. "Stop the clock" stops it, and every clock
+  // after it, for anyone who wants the time; with less motion asked for (the phone's settings) there is none ----
+  const CHOOSE_IN = 10;
+  let clock = null, noClock = false;
+  const clockOn = () => !calm && !noClock;
+  function stopClock() { if (clock) { clearInterval(clock); clock = null; } }
+  function startClock(box) {
+    stopClock();
+    const bar = box.querySelector('.clock');
+    if (!bar) return;
+    let tenths = CHOOSE_IN * 10;
+    clock = setInterval(() => {
+      tenths -= 1;
+      bar.style.setProperty('--left', String(Math.ceil(tenths / 5) / (CHOOSE_IN * 2)));  // in 20 steps
+      if (tenths % 10 === 0) {
+        bar.querySelector('.secs').textContent = tenths / 10;
+        bar.classList.toggle('late', tenths <= 30);
+        if (tenths > 0 && tenths <= 30) sfx.tick();
+      }
+      if (tenths <= 0) {
+        stopClock();
+        const picks = [...box.querySelectorAll('.pick')];
+        const pick = picks[Math.floor(Math.random() * picks.length)];
+        pick.dataset.fated = '1';
+        pick.click();
+      }
+    }, 100);
+  }
+
+  // ---- A phone that rings also buzzes, where the phone can (Android); six rings, like the sound ----
+  let buzzTimer = null, buzzing = false;
+  function buzz(on) {
+    if (!navigator.vibrate || (!on && !buzzing)) return;
+    clearInterval(buzzTimer);
+    buzzing = on;
+    try {
+      if (!on) { navigator.vibrate(0); return; }
+      let rings = 0;
+      const once = () => { if (++rings > 6) { clearInterval(buzzTimer); return; } navigator.vibrate([500, 250, 500]); };
+      once();
+      buzzTimer = setInterval(once, 1800);
+    } catch {}
+  }
+
+  // ---- Your ending's name, from your five choices (album.js), and a way to share it ----
+  function endingName(picks) {
+    const e = album.ending || {};
+    const who = (e.who || {})[picks[1]] || ['', ''], where = (e.where || {})[picks[2]] || ['', ''];
+    return {
+      pt: `${who[0]} ${where[0]}`.trim(),
+      en: `${who[1]} ${where[1]}`.trim(),
+      traits: [picks[0], picks[3], picks[4]].map(n => (e.traits || {})[n]).filter(Boolean),
+    };
+  }
+  async function shareEnding(name) {
+    const en = lang === 'en';
+    const text = `${TEXT[lang].shareText} “${en ? name.en : name.pt}” (${name.traits.map(t => t[en ? 1 : 0]).join(' · ')}). ${TEXT[lang].shareAsk}`;
+    const url = 'https://antonioleft.com/limbo/';
+    sfx.go();
+    if (navigator.share) {
+      try { await navigator.share({ title: 'LIMBO · LEFT.', text, url }); return; } catch (err) { if (err.name === 'AbortError') return; }
+    }
+    try { await navigator.clipboard.writeText(`${text} ${url}`); toast(both2('copied')); } catch { toast([`${text} ${url}`, `${text} ${url}`], 6000); }
+  }
+
+  // ---- The secret 8-bit mode: five quick taps on him, or ↑ ↑ ↓ ↓ ← → ← → B A on a keyboard.
+  // Songs with an 8-bit version play that instead, and everything turns a little more 8-bit ----
+  let eight = false;
+  try { eight = sessionStorage.getItem('limbo-8bit') === '1'; } catch {}
+  body.classList.toggle('eightbit', eight);
+  function setEight(on) {
+    eight = on;
+    body.classList.toggle('eightbit', on);
+    try { sessionStorage.setItem('limbo-8bit', on ? '1' : '0'); } catch {}
+    sfx.pick();
+    toast(both2(on ? 'eightOn' : 'eightOff'));
+    if (screen === 'song' && (album.bonus || []).some(b => b.n === at)) {
+      startFollow(at);
+      listen(at, onEnd);
+    }
+  }
+  let taps = [];
+  game.addEventListener('click', e => {
+    const him = e.target.closest('.him');
+    if (!him) return;
+    const now = performance.now();
+    taps = taps.filter(t => now - t < 2000);
+    taps.push(now);
+    him.classList.add('poke');
+    setTimeout(() => him.classList.remove('poke'), 160);
+    if (taps.length >= 5) { taps = []; setEight(!eight); } else sfx.tick();
+  });
+  const KONAMI = ['ArrowUp', 'ArrowUp', 'ArrowDown', 'ArrowDown', 'ArrowLeft', 'ArrowRight', 'ArrowLeft', 'ArrowRight', 'b', 'a'];
+  let konami = 0;
+  addEventListener('keydown', e => {
+    const key = e.key.length === 1 ? e.key.toLowerCase() : e.key;
+    konami = key === KONAMI[konami] ? konami + 1 : key === 'ArrowUp' ? (konami === 2 ? 2 : 1) : 0;
+    if (konami === KONAMI.length) { konami = 0; setEight(!eight); }
+  });
 
   // ---- The 8-bit bonus at the end: one version at a time, each played through once ----
   const tape = new Audio();

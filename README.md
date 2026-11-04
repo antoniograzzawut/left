@@ -70,6 +70,17 @@ into the white void of the album's cover. Its pictures are in `limbo/img/`. At t
 bonus opens: the chiptune versions of Siga, Pulso, A1 Norte and Quero mais, listed
 under `bonus` in `album.js`.
 
+**LIMBO's little games.** While the phone rings it shows who is calling, and on Android
+phones it also vibrates. "Recusar" (decline) means GAME OVER, with nine seconds to go back
+to the call before the game returns to the title. After each call there are ten seconds to
+choose, or fate picks one; "Parar o relógio" stops the clock for the rest of the game, and
+phones set to reduce motion get no clock at all. Skipping a song early gets a cheeky line:
+they are under `skips` in `album.js`. At the end, the path gets a name ("O Ex da Estrada")
+and three traits, from `ending` in `album.js`, with a button to share it. And a secret:
+five quick taps on him (or ↑ ↑ ↓ ↓ ← → ← → B A on a keyboard) turns on an 8-bit mode, where
+Siga, Pulso, A1 Norte and Quero mais play their 8-bit versions instead; the end screen
+hints at it. Siga starts 2.6 seconds in, after its silence (`from` in `album.js`).
+
 **LIMBO's lyrics in time with the music.** Open https://antonioleft.com/limbo/sync.html
 (on a phone or a laptop), pick a song, and tap the big button, or press space, the
 moment each line starts; "Undo" goes back a line. A song timed this way already lights
