@@ -8,12 +8,12 @@ Live at https://antonioleft.com (the old address, antoniograzzawut.github.io/lef
 | File | What |
 | --- | --- |
 | `index.html` | The 8-bit version, at the main address |
-| `studio.html` | The studio version, at https://antonioleft.com/studio.html |
+| `studio.html` | The studio version, at https://antonioleft.com/studio.html. Set aside on 4 Nov 2026: left as it was, not kept up to date |
 | `layout.css` | Where everything sits, shared by both |
-| `page.js` | The photo loop, the bio box, the player's box and the 8-bit sounds, shared by both |
+| `page.js` | The photo loop, the bio box, the player's box, the 8-bit sounds and the LIMBO sticker |
 | `portfolio/` | The portfolio for residencies and open calls, at https://antonioleft.com/portfolio/: the CV/BIO as a web page, with its photos in `portfolio/img/` |
 | `limbo/` | LIMBO as a game, at https://antonioleft.com/limbo/: five calls, a choice after each, the lyrics with English under them. Its sound goes in `limbo/audio/` |
-| `antonio-graca-bio.pdf` | The bio behind "about me": the CV/BIO without the phone number and personal email |
+| `antonio-graca-bio.pdf` | The CV/BIO, linked from the portfolio, without the phone number and personal email |
 | `bio.html` | How Android phones see that PDF: they cannot open one inside Instagram, so this page draws it |
 | `vendor/pdfjs/` | The tool `bio.html` draws the PDF with (pdf.js 5.7.284 by Mozilla, free to use) |
 | `img/` | The photos, the 8-bit sprites and the logo |
@@ -44,8 +44,14 @@ the LEFT. artist page, so it follows Spotify by itself. To show an album or a
 playlist instead, ask Claude.
 
 **Sounds.** On the 8-bit page every press makes a small sound, like an old
-game. To turn them off, open `index.html`, find `<body data-bpm="120" data-wobble data-sounds>`
+game, and when the mouse makes him turn, a swoosh from that side (browsers only
+allow it after the first click on the page). To turn them off, open `index.html`, find `<body data-bpm="120" data-wobble data-sounds>`
 and delete ` data-sounds` (with the space before it). The studio page has no sounds.
+
+**The LIMBO sticker.** On the 8-bit page, three seconds after it opens, a sticker
+saying "Play LIMBO now!" lands on the photo and leads to the game; its X takes it off
+until the tab is closed. To take it away for good, delete the lines from
+`<div class="sticker">` to the `</div>` under them in `index.html`.
 
 **The portfolio.** Its words are in `portfolio/index.html`, changed the same way
 as the link page, and each one is written only once. They come from the CV/BIO

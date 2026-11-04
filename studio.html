@@ -256,6 +256,8 @@
     text-decoration-thickness: 2px;
     white-space: nowrap;
   }
+  /* except a long one, which would run out of the box on a narrow phone */
+  .pages .ask a.long { white-space: normal; }
   .pages a:hover { color: var(--pigment); }
   /* A page slides in a little as it turns */
   .page.current { animation: turn .4s cubic-bezier(.2, .7, .2, 1); }
@@ -464,7 +466,7 @@
         </div>
         <div class="page" tabindex="-1">
           <p class="ask">You want to see some of my <a href="https://www.youtube.com/@LEFTmp3/videos">videos</a>?</p>
-          <p class="ask">You want to know more <a href="antonio-graca-bio.pdf">about me</a>?</p>
+          <p class="ask">You want to <a class="long" href="portfolio/">learn more about my shenanigans</a>?</p>
           <p class="ask">You want to <a href="mailto:left.music.info@gmail.com">get in touch</a>?</p>
           <p class="mail">left.music.info@gmail.com</p>
         </div>

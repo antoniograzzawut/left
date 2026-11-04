@@ -1,6 +1,7 @@
 // Shared by both versions of the page.
 // The photos loop on their own, like a GIF. With a mouse, pointing at a platform makes him look at it
-// and pointing at him makes him look at you. Pressing a platform (or him) makes him reach out.
+// and pointing at him makes him look at you, with a swoosh on the 8-bit page. Pressing a platform, the LIMBO
+// sticker or him makes him reach out.
 // "Who am I?" opens the bio, a few pages long, and he faces you while you read it.
 // "Hear me out?" opens a box with Spotify's player in it, and he faces you while you listen.
 // On the 8-bit page every press makes a small sound, like an old game.
@@ -11,11 +12,11 @@
   const calm = matchMedia('(prefers-reduced-motion: reduce)').matches;
   const beat = 60000 / (Number(document.body.dataset.bpm) || 100);
   const wobble = 'wobble' in document.body.dataset && !calm;
-  const chime = 'sounds' in document.body.dataset ? chimes() : () => {};
+  const chime = 'sounds' in document.body.dataset ? chimes() : Object.assign(() => {}, { swoosh() {}, wake() {} });
 
   // The sounds are made by the browser on the spot, the way old consoles made them (a pulse wave, a note
-  // at a time), so there is nothing to download. They only ever follow a press, and an iPhone on silent
-  // stays silent. Each tune is a list of notes: [semitones from A440, length in ms].
+  // at a time), so there is nothing to download. They only ever follow a press or the mouse, and an iPhone
+  // on silent stays silent. Each tune is a list of notes: [semitones from A440, length in ms].
   function chimes() {
     const TUNES = {
       go:    [[10, 35], [17, 35], [22, 80]],                      // a platform or a link: up and away
@@ -26,8 +27,8 @@
       back:  [[7, 45]],                                           // the page before
     };
     const VOLUME = 0.07;
-    let ctx = null, wave = null;
-    return name => {
+    let ctx = null, wave = null, hiss = null;
+    const tune = name => {
       try {
         if (!ctx) ctx = new (window.AudioContext || window.webkitAudioContext)();
         if (ctx.state === 'suspended') ctx.resume();
@@ -58,6 +59,51 @@
         }
       } catch { /* no sound on this browser: the page works the same */ }
     };
+    // A browser lets a page make sound only after a click or a key on it: the first one wakes the sound up,
+    // and until then the mouse turns him in silence
+    tune.wake = () => {
+      try {
+        if (!ctx) ctx = new (window.AudioContext || window.webkitAudioContext)();
+        if (ctx.state === 'suspended') ctx.resume();
+      } catch {}
+    };
+    // When the mouse makes him turn: a swoosh of grainy 8-bit noise rising in pitch, heard from the side he turns to
+    tune.swoosh = look => {
+      try {
+        if (!ctx || ctx.state !== 'running') return;
+        if (!hiss) {
+          // noise that holds each value for 8 samples: the coarse hiss of an old console
+          const size = Math.round(ctx.sampleRate * 0.3);
+          hiss = ctx.createBuffer(1, size, ctx.sampleRate);
+          const data = hiss.getChannelData(0);
+          for (let i = 0, v = 0; i < size; i++) {
+            if (i % 8 === 0) v = Math.random() * 2 - 1;
+            data[i] = v;
+          }
+        }
+        const t = ctx.currentTime + 0.005, length = 0.16;
+        const noise = ctx.createBufferSource(), gain = ctx.createGain();
+        noise.buffer = hiss;
+        noise.playbackRate.setValueAtTime(0.35, t);
+        noise.playbackRate.exponentialRampToValueAtTime(1.6, t + length);
+        gain.gain.setValueAtTime(0, t);
+        gain.gain.linearRampToValueAtTime(VOLUME * 0.8, t + 0.03);
+        gain.gain.linearRampToValueAtTime(0, t + length);
+        let out = noise.connect(gain);
+        if (ctx.createStereoPanner && (look === 'left' || look === 'right')) {
+          const pan = ctx.createStereoPanner();
+          pan.pan.value = look === 'left' ? -0.6 : 0.6;
+          out = out.connect(pan);
+        }
+        out.connect(ctx.destination);
+        noise.start(t);
+        noise.stop(t + length + 0.02);
+      } catch {}
+    };
+    addEventListener('pointerdown', e => { if (e.pointerType === 'mouse') tune.wake(); }, true);
+    addEventListener('keydown', tune.wake, true);
+    addEventListener('click', tune.wake, true);
+    return tune;
   }
 
   // In beats. Facing you holds longest; the reach comes once per loop.
@@ -104,8 +150,14 @@
     play();
   }
 
-  [sitter, ...document.querySelectorAll('.go, .who, .hear')].forEach(el => {
-    el.addEventListener('pointerenter', e => { if (e.pointerType === 'mouse') { over = el; settle(); } });
+  [sitter, ...document.querySelectorAll('.go, .who, .hear, .sticker')].forEach(el => {
+    el.addEventListener('pointerenter', e => {
+      if (e.pointerType !== 'mouse') return;
+      over = el;
+      const was = sitter.dataset.look;
+      settle();
+      if (sitter.dataset.look !== was) chime.swoosh(sitter.dataset.look);
+    });
     el.addEventListener('pointerleave', e => { if (e.pointerType === 'mouse') { over = null; settle(); } });
   });
 
@@ -115,7 +167,7 @@
   addEventListener('pointerup', letGo);
   addEventListener('pointercancel', letGo);
 
-  document.querySelectorAll('.go').forEach(a => {
+  document.querySelectorAll('.go, .sticker-link').forEach(a => {
     a.addEventListener('pointerdown', press);
     a.addEventListener('click', e => {
       chime('go');
@@ -126,6 +178,19 @@
       setTimeout(() => { leaving = false; settle(); }, 3000);
     });
   });
+
+  // The LIMBO sticker on the 8-bit page: its X takes it off for as long as the tab stays open
+  const sticker = document.querySelector('.sticker');
+  if (sticker) {
+    try { if (sessionStorage.getItem('sticker-off')) sticker.hidden = true; } catch {}
+    sticker.querySelector('.sticker-x').addEventListener('click', e => {
+      chime('close');
+      sticker.hidden = true;
+      try { sessionStorage.setItem('sticker-off', '1'); } catch {}
+      if (over === sticker) { over = null; settle(); }
+      if (!e.detail) document.querySelector('.who').focus();  // closed from the keyboard: the focus moves on
+    });
+  }
 
   // On Android the built-in browser of apps such as Instagram cannot open a PDF, and older phones only
   // download it: there "about me" opens bio.html, a page that draws the same PDF
