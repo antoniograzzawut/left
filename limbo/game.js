@@ -376,7 +376,7 @@
         source.loopStart = start;
         source.loopEnd = Math.min(buffer.duration, start + LOOP);
         gain = ctx.createGain();
-        gain.gain.value = 0.5;
+        gain.gain.value = 0.9;  // the chiptune is quieter than the album: close to full, so the Intro isn't a jump
         source.connect(gain).connect(ctx.destination);
         source.start(0, start);
       } catch { /* no title music on this browser */ }
