@@ -124,23 +124,34 @@
   const audio = new Audio();
   audio.preload = 'auto';
   let onEnd = null, missing = false, seeking = false;
-  const file = n => `audio/${String(n).padStart(2, '0')}.mp3`;
+  // Each track is an MP3, or an M4A (what a Mac makes on its own); the MP3 is tried first
+  const KINDS = ['mp3', 'm4a'];
+  const file = (n, kind) => `audio/${String(n).padStart(2, '0')}.${kind}`;
+  let attempt = 0, handled = 0, kind = 0;
 
   function listen(n, then) {
     onEnd = then;
     missing = false;
-    audio.src = file(n);
-    paint();
     media(n);
+    load(n, 0);
+  }
+  function load(n, k) {
+    const mine = ++attempt;
+    kind = k;
+    audio.src = file(n, KINDS[k]);
+    paint();
     const p = audio.play();
     if (p) p.then(paint, err => {
-      if (err.name === 'NotSupportedError') gone(n);
+      if (err.name === 'NotSupportedError') failed(n, mine);
       else paint();  // the browser waits for a tap on Play, or another track was asked for first
     });
   }
-  // The file isn't there (yet): the words stay, and the game goes on without it
-  function gone(n) {
-    if (n !== at || missing) return;
+  // That file isn't there: the other kind is tried, and with neither (yet) the words stay
+  // and the game goes on without the sound
+  function failed(n, which) {
+    if (n !== at || which !== attempt || handled === which || missing) return;
+    handled = which;
+    if (kind + 1 < KINDS.length) return load(n, kind + 1);
     missing = true;
     paint();
     if (screen === 'call') finish();
@@ -151,7 +162,7 @@
     paint();
     if (then) then();
   }
-  audio.addEventListener('error', () => { if (audio.src === new URL(file(at), location.href).href) gone(at); });
+  audio.addEventListener('error', () => failed(at, attempt));
   audio.addEventListener('ended', finish);
   audio.addEventListener('play', paint);
   audio.addEventListener('pause', paint);

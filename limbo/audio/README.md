@@ -1,6 +1,6 @@
 # LIMBO's sound
 
-The game plays the album from this folder: the 17 tracks as MP3 files, each named by its number.
+The game plays the album from this folder: the 17 tracks as MP3 files (M4A works too), each named by its number.
 
 | File | Track |
 | --- | --- |
