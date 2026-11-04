@@ -1,0 +1,476 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>António Graça · LEFT. · Artist CV / bio</title>
+<meta name="description" content="António Graça, LEFT.: Portuguese artist and producer based in Lisbon. Music, live looping and improvisation, theatre and dance.">
+<link rel="canonical" href="https://antonioleft.com/portfolio/">
+<meta property="og:type" content="profile">
+<meta property="og:title" content="António Graça · LEFT.">
+<meta property="og:description" content="Portuguese artist and producer based in Lisbon. Music, live looping and improvisation, theatre and dance.">
+<meta property="og:url" content="https://antonioleft.com/portfolio/">
+<meta property="og:image" content="https://antonioleft.com/portfolio/img/share.jpg">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="theme-color" content="#181818">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Ccircle cx='8' cy='8' r='6' fill='%23FBCD1F'/%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Archivo:ital,wght@0,400;0,600;1,400&family=League+Gothic&family=League+Spartan:wght@700&display=swap" rel="stylesheet">
+<style>
+  /* The look of his CV/BIO PDF: its black, the white of its big LEFT., tall condensed titles
+     over wide photos, and the yellow of his jacket for what can be pressed */
+  :root {
+    --bg: #181818;
+    --ink: #F1EBF2;
+    --text: #DCD5DD;
+    --soft: #A9A2AB;
+    --line: rgba(241, 235, 242, .16);
+    --yellow: #FBCD1F;
+    --dark: #181818;
+    --gutter: clamp(16px, 4vw, 56px);
+    --title: "League Gothic", "Arial Narrow", sans-serif;
+    --name: "League Spartan", "Futura", "Avenir Next", sans-serif;
+    --body: "Archivo", "Helvetica Neue", Arial, sans-serif;
+    color-scheme: dark;
+  }
+
+  *, *::before, *::after { box-sizing: border-box; }
+  html { -webkit-text-size-adjust: 100%; text-size-adjust: 100%; }
+  @media (prefers-reduced-motion: no-preference) { html { scroll-behavior: smooth; } }
+  body {
+    margin: 0;
+    background: var(--bg);
+    color: var(--text);
+    font: 400 16px/1.6 var(--body);
+    -webkit-font-smoothing: antialiased;
+  }
+  h1, h2, h3, p, ul, figure { margin: 0; }
+  ul { padding: 0; list-style: none; }
+  img { display: block; max-width: 100%; }
+  i { font-style: italic; }
+  a { color: var(--ink); text-decoration-thickness: 1px; text-underline-offset: .22em; }
+  a:hover { color: var(--yellow); }
+  :focus-visible { outline: 2px solid var(--yellow); outline-offset: 3px; }
+
+  .skip {
+    position: absolute; z-index: 5; left: var(--gutter); top: -60px;
+    padding: 8px 14px; background: var(--ink); color: var(--dark); font-weight: 600;
+  }
+  .skip:focus { top: 12px; }
+
+  /* The cover, as on the first page of the PDF: him in the smoke, his name, and LEFT. very big.
+     Upright screens get a tall crop of the same photo, with the name at the top and LEFT. at the bottom */
+  .hero {
+    position: relative;
+    display: grid;
+    height: 88vh;
+    height: 88svh;
+    min-height: 460px;
+    overflow: hidden;
+    color: var(--ink);
+  }
+  .hero picture { position: absolute; inset: 0; }
+  .hero img { width: 100%; height: 100%; object-fit: cover; object-position: 60% 40%; }
+  /* the photo fades into the page at the bottom */
+  .hero::after {
+    content: "";
+    position: absolute; left: 0; right: 0; bottom: 0; height: 28%;
+    background: linear-gradient(rgba(24, 24, 24, 0), var(--bg));
+  }
+  .hero-in {
+    position: relative; z-index: 1;
+    display: grid;
+    grid-template-rows: 1fr auto;
+    padding:
+      calc(var(--gutter) + env(safe-area-inset-top))
+      calc(var(--gutter) + env(safe-area-inset-right))
+      calc(var(--gutter) * .8)
+      calc(var(--gutter) + env(safe-area-inset-left));
+  }
+  .hero h1 {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    font-weight: 400;
+  }
+  .who { font: 700 clamp(19px, 5.4vw, 26px)/.95 var(--name); letter-spacing: -.01em; }
+  .who::before {
+    content: "artist cv / bio";
+    content: "artist cv / bio" / "";
+    display: block;
+    margin-bottom: .3em;
+    font: 400 .82em/1.2 var(--body);
+    letter-spacing: 0;
+  }
+  .left {
+    display: block;
+    margin: 0 0 -.06em -.03em;
+    font: 400 min(52vw, 34vh)/.8 var(--title);
+    font-size: min(52vw, 34svh);
+    text-transform: uppercase;
+  }
+  .role {
+    margin-top: 10px;
+    font-size: 13px;
+    letter-spacing: .08em;
+    line-height: 1.4;
+    text-transform: uppercase;
+  }
+  @media (orientation: landscape) {
+    .hero { height: min(100vh, 66.7vw); height: min(100svh, 66.7vw); min-height: 300px; }
+    .hero img { object-position: 70% 40%; }
+    .hero-in { grid-template-rows: 1fr auto 1fr; align-items: center; }
+    .hero h1 {
+      grid-row: 2;
+      flex-direction: row;
+      justify-content: flex-start;
+      align-items: center;
+      gap: clamp(20px, 3.6vw, 56px);
+    }
+    .who { font-size: clamp(16px, 1.9vw, 28px); }
+    .left { font-size: min(25vw, 50vh); font-size: min(25vw, 50svh); }
+    .role { grid-row: 3; align-self: end; }
+  }
+
+  /* Below the cover: on a laptop, the PDF's corner (artist cv / bio, his name) stays on the left with the sections
+     under it; on a phone the sections are a row of links */
+  .layout { width: min(100% - 2 * var(--gutter), 1240px); margin: 0 auto; }
+  .side { padding: 20px 0 4px; border-bottom: 1px solid var(--line); }
+  .sig, .side .pdf { display: none; }
+  .side ul { display: flex; flex-wrap: wrap; gap: 4px 20px; }
+  .side a { display: inline-block; padding: 6px 0; font-size: 14px; font-weight: 600; text-decoration: none; }
+  .side a:hover { text-decoration: underline; }
+  @media (min-width: 960px) {
+    .layout {
+      display: grid;
+      grid-template-columns: 172px minmax(0, 1fr);
+      gap: clamp(32px, 5vw, 80px);
+    }
+    .side {
+      position: sticky; top: 0;
+      align-self: start;
+      padding: 40px 0 0;
+      border: 0;
+    }
+    .sig {
+      display: block;
+      margin-bottom: 28px;
+      font: 400 15px/1.2 var(--body);
+      color: var(--ink);
+    }
+    .sig b { display: block; margin-top: 4px; font: 700 19px/.95 var(--name); }
+    .side ul { display: block; border-top: 1px solid var(--line); }
+    .side li { border-bottom: 1px solid var(--line); }
+    .side a { display: block; padding: 9px 0; }
+    .side .pdf { display: block; margin-top: 18px; font-size: 13px; font-weight: 400; color: var(--soft); text-decoration: underline; }
+  }
+
+  main > * { padding-top: clamp(48px, 8vw, 104px); }
+  main > :first-child { padding-top: 36px; }
+  [id] { scroll-margin-top: 16px; }
+
+  /* What a jury should see first */
+  .facts { display: grid; grid-template-columns: 1fr 1fr; gap: 28px 20px; }
+  .facts li { padding-top: 12px; border-top: 1px solid var(--line); font-size: 14px; line-height: 1.45; color: var(--soft); }
+  .facts b { display: block; margin-bottom: 6px; font: 400 clamp(46px, 6vw, 68px)/.85 var(--title); color: var(--ink); text-transform: uppercase; }
+  @media (min-width: 760px) { .facts { grid-template-columns: repeat(4, 1fr); } }
+
+  /* The wide photos with the section's name over them, as in the PDF. Like the cover, each photo fades into
+     the page at the bottom, so the name stays readable on any photo */
+  .shot { position: relative; overflow: hidden; aspect-ratio: 16 / 9; background: #2B2B2B; }
+  .shot img { width: 100%; height: 100%; object-fit: cover; }
+  .shot::after {
+    content: "";
+    position: absolute; inset: 0;
+    background: linear-gradient(rgba(24, 24, 24, 0) 35%, rgba(24, 24, 24, .5) 62%, rgba(24, 24, 24, .9));
+  }
+  @media (min-width: 720px) { .shot { aspect-ratio: 16 / 5; } }
+  h2 {
+    font: 400 clamp(56px, 18vw, 112px)/.8 var(--title);
+    text-transform: uppercase;
+    white-space: nowrap;
+    color: var(--ink);
+  }
+  .shot h2 { position: absolute; z-index: 1; bottom: 0; padding: 0 .12em .02em; }
+  .music .shot img { object-position: 50% 30%; }
+  .music .shot h2 { right: 0; }
+  .listen .shot img { object-position: 50% 58%; }
+  .listen .shot h2 { left: 0; }
+
+  /* The bio, in two columns on a wide screen like the PDF */
+  .cols { display: grid; gap: 0 clamp(24px, 4vw, 56px); margin-top: 28px; }
+  .cols p { max-width: 62ch; }
+  .cols p + p { margin-top: 1em; }
+  .cols div + div { margin-top: 1em; }
+  @media (min-width: 720px) {
+    .cols { grid-template-columns: 1fr 1fr; }
+    .cols div + div { margin-top: 0; }
+  }
+
+  /* Theatre-dance and festivals share one photo; on a wide screen each title sits on it over its own column */
+  .pair { display: grid; gap: 0 clamp(24px, 4vw, 56px); }
+  .pair .shot { grid-column: 1 / -1; }
+  .pair .shot img { object-position: 50% 50%; }
+  .pair h2 { position: relative; margin: -.8em 0 0; padding: 0 .12em .02em; font-size: clamp(48px, 18vw, 112px); }
+  .pair section + section h2 { margin-top: 56px; padding-left: 0; }
+  @media (min-width: 720px) {
+    .pair { grid-template-columns: 1fr 1fr; }
+    .pair h2 { font-size: 9vw; }
+    .pair section + section h2 { margin-top: -.8em; padding-left: .12em; }
+  }
+  @media (min-width: 960px) { .pair h2 { font-size: min(calc(7vw - 4px), 96px); } }
+  /* Each title as big as its column allows: THEATRE-DANCE is 4.45 times as wide as the letters are big */
+  @supports (container-type: inline-size) {
+    .pair section { container-type: inline-size; }
+    .pair h2 { font-size: min(21cqi, 112px); }
+  }
+  .pair ul { margin-top: 24px; }
+
+  .training li + li { margin-top: 18px; }
+  h3 { font: 600 16px/1.35 var(--body); color: var(--ink); }
+  .training p { margin-top: 2px; }
+
+  .years h3 { margin: 30px 0 10px; }
+  .years h3:first-child { margin-top: 0; }
+  .years li { display: grid; grid-template-columns: 6.5em 1fr; gap: 12px; padding: 7px 0; border-top: 1px solid var(--line); }
+  .years li:last-child { border-bottom: 1px solid var(--line); }
+  .years .when { color: var(--soft); font-variant-numeric: tabular-nums; }
+  .pair .years { margin-top: 24px; }
+
+  /* Listen and watch: the links of the PDF's last page, and stills from the videos */
+  .links { display: grid; grid-template-columns: 1fr 1fr; gap: 32px clamp(20px, 4vw, 48px); margin-top: 28px; }
+  .links h3 { margin-bottom: 8px; }
+  .links h3 span { display: block; font-weight: 400; color: var(--soft); }
+  .links li a {
+    display: flex; align-items: center; gap: 8px;
+    padding: 9px 0;
+    border-top: 1px solid var(--line);
+    font-size: 17px; font-weight: 600; text-decoration: none;
+  }
+  .links li:last-child a { border-bottom: 1px solid var(--line); }
+  .links svg { width: 10px; height: 10px; flex: none; opacity: .7; }
+  .stills { grid-column: 1 / -1; }
+  .stills ul { display: grid; grid-template-columns: 1fr 1fr; gap: 4px; }
+  .stills img { width: 100%; height: auto; aspect-ratio: 16 / 10; object-fit: cover; }
+  .stills figcaption { margin-top: 8px; font-size: 13px; color: var(--soft); }
+  @media (min-width: 900px) {
+    .links { grid-template-columns: 1fr 1fr 1.4fr; }
+    .stills { grid-column: auto; }
+  }
+
+  /* Contact */
+  .contact h2 { margin-bottom: 20px; }
+  .mail { font: 600 clamp(20px, 3.4vw, 34px)/1.25 var(--body); overflow-wrap: anywhere; }
+  .contact ul { margin-top: 18px; display: flex; flex-wrap: wrap; gap: 8px 28px; }
+  .contact li a { display: inline-block; padding: 6px 0; font-weight: 600; }
+
+  footer {
+    width: min(100% - 2 * var(--gutter), 1240px);
+    margin: clamp(56px, 9vw, 112px) auto 0;
+    padding: 20px 0 calc(28px + env(safe-area-inset-bottom));
+    border-top: 1px solid var(--line);
+    display: flex; flex-wrap: wrap; justify-content: space-between; gap: 8px 24px;
+    font-size: 13px; color: var(--soft);
+  }
+  footer a { color: var(--soft); }
+
+  /* Printed or saved as a PDF from the browser: black on white, no big photos, nothing to press */
+  @media print {
+    @page { margin: 14mm 16mm; }
+    :root { --bg: #fff; --ink: #111; --text: #222; --soft: #555; --line: #d5d5d5; --dark: #111; color-scheme: light; }
+    html { background: #fff; }
+    body { font-size: 10.5pt; line-height: 1.5; }
+    .skip, .side, .hero picture, .hero::after, .shot img, .shot::after, .stills { display: none; }
+    .hero { height: auto; min-height: 0; }
+    .hero-in { display: block; padding: 0; }
+    .hero h1 { display: flex; flex-direction: row; align-items: center; gap: 24px; }
+    .left { font-size: 96pt; }
+    .who { font-size: 16pt; }
+    .role { margin-top: 6px; }
+    .layout { display: block; width: auto; }
+    main > * { padding-top: 28px; }
+    main > :first-child { padding-top: 20px; }
+    .shot { aspect-ratio: auto; background: none; }
+    .shot h2, .pair h2, .pair section + section h2 { position: static; margin: 0; padding: 0; color: var(--ink); }
+    h2 { font-size: 34pt; }
+    .facts { grid-template-columns: repeat(4, 1fr); }
+    .facts b { font-size: 26pt; }
+    .cols, .pair, .links { grid-template-columns: 1fr 1fr; }
+    .pair ul, .pair .years, .cols { margin-top: 10px; }
+    li, .cols p { break-inside: avoid; }
+    .pair, .listen { break-before: page; }
+    a { text-decoration: none; }
+    .links li a { padding: 4px 0; font-size: 10.5pt; }
+    .links svg { display: none; }
+    footer { width: auto; margin-top: 28px; }
+  }
+</style>
+</head>
+<body>
+  <a class="skip" href="#main">Skip to the bio</a>
+
+  <header class="hero">
+    <picture>
+      <source media="(orientation: portrait)" srcset="img/stage-tall-800.webp 800w, img/stage-tall-1215.webp 1215w" sizes="100vw">
+      <img src="img/stage-2000.webp" srcset="img/stage-1200.webp 1200w, img/stage-2000.webp 2000w" sizes="100vw"
+           width="2000" height="1333" fetchpriority="high"
+           alt="António on a dark stage, lit from the side, with smoke drifting past him">
+    </picture>
+    <div class="hero-in">
+      <h1><span class="who">António<br>Maciel<br>Graça</span> <span class="left">LEFT.</span></h1>
+      <p class="role">Portuguese artist and producer, based in Lisbon</p>
+    </div>
+  </header>
+
+  <div class="layout">
+    <aside class="side">
+      <p class="sig" aria-hidden="true">artist cv / bio<b>António<br>Maciel<br>Graça</b></p>
+      <nav aria-label="Sections">
+        <ul>
+          <li><a href="#music">Music</a></li>
+          <li><a href="#stage">Theatre-dance &amp; festivals</a></li>
+          <li><a href="#listen">Listen &amp; watch</a></li>
+          <li><a href="#contact">Contact</a></li>
+        </ul>
+      </nav>
+      <a class="pdf" href="../antonio-graca-bio.pdf">The CV / bio as a PDF</a>
+    </aside>
+
+    <main id="main">
+      <section aria-label="Highlights">
+        <ul class="facts">
+          <li><b>10M+</b>streams of the album <i>Perspective</i> (2021)</li>
+          <li><b>Top 50</b><i>Limbo</i> (2024), one of the best Portuguese albums of the year for BLITZ and Expresso</li>
+          <li><b>50+</b>artists on the AVALANCHE albums <i>Volume I</i> and <i>II</i> (2022, 2025)</li>
+          <li><b>Winner</b>of the Antena 3 national radio band competition, as Antony Left</li>
+        </ul>
+      </section>
+
+      <section class="music" id="music" aria-labelledby="music-title">
+        <div class="shot">
+          <img src="img/jacket-1600.webp" srcset="img/jacket-800.webp 800w, img/jacket-1600.webp 1600w"
+               sizes="(min-width: 960px) 70vw, 100vw" width="1600" height="1066" loading="lazy"
+               alt="António from behind, in a black and yellow jacket, in a white photo studio">
+          <h2 id="music-title">Music</h2>
+        </div>
+        <div class="cols">
+          <div>
+            <p>António Graça is a multi-faceted Portuguese artist and producer, currently based in Lisbon.</p>
+            <p>He began his musical career in 2015 with the indie-folk project Antony Left, exploring classical textures such as violin, cello, and guitar. After winning a national radio band competition (Antena 3), he released his debut album <i>Influence</i> in 2017.</p>
+            <p>In 2019, the identity LEFT was born, moving towards a sound influenced by electronic music and R&amp;B. His 2021 album <i>Perspective</i> surpassed 10 million streams across digital platforms.</p>
+            <p>In 2024, he released <i>Limbo</i>, a game-album that blurs the line between narrative and interactivity, inviting listeners to make choices. It was selected by BLITZ and Expresso as one of the 50 Best Portuguese Albums of the Year.</p>
+          </div>
+          <div>
+            <p>Alongside his solo work, he has written and produced music for a wide range of national and international artists, from indie to mainstream pop, including iolanda, Inês Apenas, and Diogo Piçarra.</p>
+            <p>Deeply connected to collective creation, he co-founded AVALANCHE in 2020, a project bringing artists together in studio sessions and residencies to experiment, compose, and release music.</p>
+            <p>The collective released albums <i>Volume I</i> and <i>II</i> in 2022 and 2025, featuring over 50 national artists.</p>
+            <p>More recently, his main field of experimentation has been the live format. Drawing from his background in music production, theatre, and dance, he creates immersive performances where live-looping, improvisation, and physical presence merge. Whether solo or collaborative, his shows reflect a constant drive for reinvention, connection, and fearless artistic exploration.</p>
+          </div>
+        </div>
+      </section>
+
+      <div class="pair" id="stage">
+        <div class="shot">
+          <img src="img/jump-1600.webp" srcset="img/jump-800.webp 800w, img/jump-1600.webp 1600w"
+               sizes="(min-width: 960px) 70vw, 100vw" width="1600" height="1000" loading="lazy"
+               alt="António in a pink shirt, hanging from a railing by one arm with his legs in the air, tongue out">
+        </div>
+        <section aria-labelledby="theatre-title">
+          <h2 id="theatre-title">Theatre-dance</h2>
+          <ul class="training">
+            <li><h3>Playback Theatre</h3><p>Training, practice, and live improvised music since 2019.</p></li>
+            <li><h3>Clowning</h3><p>Intensive course taught by Pedro Fabião, 2024/2025.</p></li>
+            <li><h3>Theatre</h3><p>Training and workshops with ACT, Espaço EVOÉ, Jorge Parente, among others.</p></li>
+            <li><h3>Improvisational Comedy</h3><p>Training and practice with the groups Impromix and La Trouppe (with live music).</p></li>
+            <li><h3>Contact Improvisation Dance</h3><p>Ongoing training and consistent practice with various groups and teachers, both nationally and internationally. Live musical accompaniment for group improvisations.</p></li>
+            <li><h3>Animation Voice Acting</h3><p>Training at ZOV; voice acting work for Netflix (2025).</p></li>
+          </ul>
+        </section>
+        <section aria-labelledby="festivals-title">
+          <h2 id="festivals-title">Festivals</h2>
+          <div class="years">
+            <h3>Performances</h3>
+            <ul>
+              <li><span class="when">2025</span><span>NOS Alive</span></li>
+              <li><span class="when">2025</span><span>Festival F</span></li>
+              <li><span class="when">2023</span><span>Festival da Canção</span></li>
+              <li><span class="when">2019</span><span>N2 Chaves</span></li>
+              <li><span class="when">2015</span><span>Super Bock Super Rock</span></li>
+            </ul>
+            <h3>Music curation, stage hosting, production and volunteering</h3>
+            <ul>
+              <li><span class="when">2025</span><span>Sensoria</span></li>
+              <li><span class="when">Since 2022</span><span>Boom Festival</span></li>
+              <li><span class="when">Since 2018</span><span>Waking Life</span></li>
+              <li><span class="when">2012</span><span>FMJ</span></li>
+            </ul>
+          </div>
+        </section>
+      </div>
+
+      <section class="listen" id="listen" aria-labelledby="listen-title">
+        <div class="shot">
+          <img src="img/rose-1600.webp" srcset="img/rose-800.webp 800w, img/rose-1600.webp 1600w"
+               sizes="(min-width: 960px) 70vw, 100vw" width="1600" height="1066" loading="lazy"
+               alt="António in profile, singing to a pink rose">
+          <h2 id="listen-title">Listen &amp; watch</h2>
+        </div>
+        <div class="links">
+          <div>
+            <h3>Streaming <span>Spotify</span></h3>
+            <ul>
+              <li><a href="https://open.spotify.com/artist/1TWqzkKPlhxidBTNhCaUJD">Antony Left<svg viewBox="0 0 10 10" aria-hidden="true"><path d="M2 8 8 2M3 2h5v5" fill="none" stroke="currentColor" stroke-width="1.4"/></svg></a></li>
+              <li><a href="https://open.spotify.com/artist/2rsw8pxtVfU3LiTIT0CYUb">LEFT.<svg viewBox="0 0 10 10" aria-hidden="true"><path d="M2 8 8 2M3 2h5v5" fill="none" stroke="currentColor" stroke-width="1.4"/></svg></a></li>
+              <li><a href="https://open.spotify.com/artist/1BRFw2SgH5VM5P0FLmFp3z">AVALANCHE<svg viewBox="0 0 10 10" aria-hidden="true"><path d="M2 8 8 2M3 2h5v5" fill="none" stroke="currentColor" stroke-width="1.4"/></svg></a></li>
+              <li><a href="https://open.spotify.com/playlist/7C4hf9pHA0TGvfXg3eBZmK">Produced by LEFT.<svg viewBox="0 0 10 10" aria-hidden="true"><path d="M2 8 8 2M3 2h5v5" fill="none" stroke="currentColor" stroke-width="1.4"/></svg></a></li>
+              <li><a href="https://open.spotify.com/playlist/6rnllnr0ZH96MqbylgaqZR">All of LEFT.<svg viewBox="0 0 10 10" aria-hidden="true"><path d="M2 8 8 2M3 2h5v5" fill="none" stroke="currentColor" stroke-width="1.4"/></svg></a></li>
+            </ul>
+          </div>
+          <div>
+            <h3>Music videos <span>YouTube</span></h3>
+            <ul>
+              <li><a href="https://www.youtube.com/watch?v=K-1EbN5JQUk">Violento<svg viewBox="0 0 10 10" aria-hidden="true"><path d="M2 8 8 2M3 2h5v5" fill="none" stroke="currentColor" stroke-width="1.4"/></svg></a></li>
+              <li><a href="https://www.youtube.com/watch?v=iABVVU9elEk">Sympathize<svg viewBox="0 0 10 10" aria-hidden="true"><path d="M2 8 8 2M3 2h5v5" fill="none" stroke="currentColor" stroke-width="1.4"/></svg></a></li>
+              <li><a href="https://www.youtube.com/watch?v=IqBTZK3WFqs">Indigo<svg viewBox="0 0 10 10" aria-hidden="true"><path d="M2 8 8 2M3 2h5v5" fill="none" stroke="currentColor" stroke-width="1.4"/></svg></a></li>
+              <li><a href="https://www.youtube.com/watch?v=CvRcYWhC3SQ">Cleopatra<svg viewBox="0 0 10 10" aria-hidden="true"><path d="M2 8 8 2M3 2h5v5" fill="none" stroke="currentColor" stroke-width="1.4"/></svg></a></li>
+            </ul>
+          </div>
+          <figure class="stills">
+            <ul>
+              <li><img src="img/video-1.webp" width="576" height="360" loading="lazy" alt=""></li>
+              <li><img src="img/video-2.webp" width="576" height="360" loading="lazy" alt=""></li>
+              <li><img src="img/video-3.webp" width="576" height="360" loading="lazy" alt=""></li>
+              <li><img src="img/video-4.webp" width="576" height="360" loading="lazy" alt=""></li>
+            </ul>
+            <figcaption>Stills from the music videos</figcaption>
+          </figure>
+        </div>
+      </section>
+
+      <section class="contact" id="contact" aria-labelledby="contact-title">
+        <h2 id="contact-title">Contact</h2>
+        <a class="mail" href="mailto:left.music.info@gmail.com">left.music.info@gmail.com</a>
+        <ul>
+          <li><a href="https://www.instagram.com/antonio.left/">Instagram @antonio.left</a></li>
+          <li><a class="pdf-link" href="../antonio-graca-bio.pdf">The CV / bio as a PDF</a></li>
+        </ul>
+      </section>
+    </main>
+  </div>
+
+  <footer>
+    <span>António Graça · LEFT. · 2026</span>
+    <a href="../">antonioleft.com</a>
+  </footer>
+
+  <script>
+    // Inside Instagram and other apps, Android cannot open a PDF: there the link opens bio.html, which draws it
+    if (/Android/i.test(navigator.userAgent)) {
+      document.querySelectorAll('a[href$=".pdf"]').forEach(a => { a.href = '../bio.html'; });
+    }
+  </script>
+</body>
+</html>

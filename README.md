@@ -10,7 +10,8 @@ Live at https://antonioleft.com (the old address, antoniograzzawut.github.io/lef
 | `index.html` | The 8-bit version, at the main address |
 | `studio.html` | The studio version, at https://antonioleft.com/studio.html |
 | `layout.css` | Where everything sits, shared by both |
-| `page.js` | The photo loop, the bio box and the player's box, shared by both |
+| `page.js` | The photo loop, the bio box, the player's box and the 8-bit sounds, shared by both |
+| `portfolio/` | The portfolio for residencies and open calls, at https://antonioleft.com/portfolio/: the CV/BIO as a web page, with its photos in `portfolio/img/` |
 | `antonio-graca-bio.pdf` | The bio behind "about me": the CV/BIO without the phone number and personal email |
 | `bio.html` | How Android phones see that PDF: they cannot open one inside Instagram, so this page draws it |
 | `vendor/pdfjs/` | The tool `bio.html` draws the PDF with (pdf.js 5.7.284 by Mozilla, free to use) |
@@ -44,6 +45,12 @@ playlist instead, ask Claude.
 **Sounds.** On the 8-bit page every press makes a small sound, like an old
 game. To turn them off, open `index.html`, find `<body data-bpm="120" data-wobble data-sounds>`
 and delete ` data-sounds` (with the space before it). The studio page has no sounds.
+
+**The portfolio.** Its words are in `portfolio/index.html`, changed the same way
+as the link page, and each one is written only once. They come from the CV/BIO
+PDF, so when the PDF changes, change them too, or ask Claude. To get it as a
+PDF, open it on a laptop in Chrome, press Print and choose "Save as PDF": it
+comes out black on white, on three pages, with the links still working.
 
 **Photos.** Ask Claude. They are cropped, lined up and converted, so a raw photo
 uploaded over an old one will not sit right.
