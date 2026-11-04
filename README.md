@@ -12,6 +12,7 @@ Live at https://antonioleft.com (the old address, antoniograzzawut.github.io/lef
 | `layout.css` | Where everything sits, shared by both |
 | `page.js` | The photo loop, the bio box, the player's box and the 8-bit sounds, shared by both |
 | `portfolio/` | The portfolio for residencies and open calls, at https://antonioleft.com/portfolio/: the CV/BIO as a web page, with its photos in `portfolio/img/` |
+| `limbo/` | LIMBO as a game, at https://antonioleft.com/limbo/: five calls, a choice after each, the lyrics with English under them. Its sound goes in `limbo/audio/` |
 | `antonio-graca-bio.pdf` | The bio behind "about me": the CV/BIO without the phone number and personal email |
 | `bio.html` | How Android phones see that PDF: they cannot open one inside Instagram, so this page draws it |
 | `vendor/pdfjs/` | The tool `bio.html` draws the PDF with (pdf.js 5.7.284 by Mozilla, free to use) |
@@ -51,6 +52,11 @@ as the link page, and each one is written only once. They come from the CV/BIO
 PDF, so when the PDF changes, change them too, or ask Claude. To get it as a
 PDF, open it on a laptop in Chrome, press Print and choose "Save as PDF": it
 comes out black on white, on three pages, with the links still working.
+
+**LIMBO.** The words, the English, the calls and their choices, and the credits
+are all in `limbo/album.js`: each line of a song is the Portuguese, then ` | `,
+then the English. The sound is one MP3 per track in `limbo/audio/`, named by its
+number; the README in that folder says how to add them.
 
 **Photos.** Ask Claude. They are cropped, lined up and converted, so a raw photo
 uploaded over an old one will not sit right.

@@ -1,0 +1,305 @@
+<!doctype html>
+<html lang="pt">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>LIMBO · LEFT.</title>
+<meta name="description" content="LIMBO, the game-album by LEFT.: five phone calls, a choice after each one, 32 ways through. Lyrics in Portuguese with English translation.">
+<meta property="og:type" content="music.album">
+<meta property="og:title" content="LIMBO · LEFT.">
+<meta property="og:description" content="Um álbum-jogo de LEFT. A game-album by LEFT.">
+<meta name="theme-color" content="#FCE9E0">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 8 8' shape-rendering='crispEdges'%3E%3Cpath fill='%23D94E49' d='M2 1h4v1h1v4H6v1H2V6H1V2h1z'/%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Jersey+10&family=Silkscreen&display=swap" rel="stylesheet">
+<style>
+  /* The link page's 8-bit look, which is the LIMBO logo's: four inks on warm paper */
+  :root {
+    --paper: #FCE9E0;
+    --ink: #000000;
+    --indigo: #6750B8;
+    --red: #D94E49;
+    --gutter: clamp(16px, 4vw, 40px);
+    --arcade: "Jersey 10", "Arial Narrow", sans-serif;
+    --pixel: "Silkscreen", "Courier New", monospace;
+    color-scheme: light;
+  }
+  *, *::before, *::after { box-sizing: border-box; }
+  html { -webkit-text-size-adjust: 100%; text-size-adjust: 100%; }
+  body {
+    margin: 0;
+    min-height: 100vh;
+    min-height: 100svh;
+    display: flex;
+    flex-direction: column;
+    background: var(--paper);
+    color: var(--ink);
+    font-family: var(--pixel);
+    -webkit-font-smoothing: antialiased;
+  }
+  body::before {
+    content: "";
+    position: fixed; inset: 0; z-index: -1;
+    background: radial-gradient(130% 100% at 50% 35%, transparent 55%, rgb(169 59 65 / .10));
+  }
+  .grain {
+    position: fixed; inset: 0; z-index: 5;
+    pointer-events: none;
+    opacity: .24;
+    mix-blend-mode: multiply;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='260' height='260'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.7' numOctaves='3' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 .42 0 0 0 0 .2 0 0 0 0 .22 0 0 0 .55 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  }
+  h1, h2, p, ol, ul, figure { margin: 0; }
+  ol, ul { padding: 0; list-style: none; }
+  button { font: inherit; color: inherit; }
+  a { color: inherit; text-decoration-color: var(--red); text-decoration-thickness: 2px; text-underline-offset: 3px; }
+  a:hover { color: var(--red); }
+  :focus-visible { outline: 3px solid var(--red); outline-offset: 3px; }
+  .sr { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
+  /* The page's own words in the language chosen; the album's words are Portuguese, with English under them */
+  .ui-en { display: none; }
+  [data-lang="en"] .ui-en { display: inline; }
+  [data-lang="en"] .ui-pt { display: none; }
+
+  /* Top: the logo, the way so far, and the two languages */
+  .top {
+    display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between;
+    gap: 8px 16px;
+    width: min(100% - 2 * var(--gutter), 640px);
+    margin: 0 auto;
+    padding: calc(12px + env(safe-area-inset-top)) 0 8px;
+  }
+  .logo {
+    font: 400 32px/1 var(--arcade);
+    letter-spacing: .03em;
+    text-decoration: none;
+    text-shadow: 2px 2px 0 var(--indigo);
+  }
+  [data-screen="title"] .logo { visibility: hidden; }
+  .tools { display: flex; align-items: center; gap: 12px; margin-left: auto; }
+  .restart, .langs button {
+    min-height: 36px;
+    padding: 0 8px;
+    border: 0;
+    background: none;
+    font: 400 12px/1 var(--pixel);
+    letter-spacing: .06em;
+    text-transform: uppercase;
+    cursor: pointer;
+  }
+  .restart:hover { color: var(--red); }
+  .langs { display: flex; border: 2px solid var(--ink); }
+  .langs button { min-width: 40px; }
+  .langs [aria-pressed="true"] { background: var(--ink); color: var(--paper); }
+  .path {
+    order: 3;
+    flex-basis: 100%;
+    display: flex; flex-wrap: wrap; gap: 4px;
+    font: 400 10px/1 var(--pixel);
+    letter-spacing: .04em;
+    text-transform: uppercase;
+  }
+  [data-screen="title"] .path { display: none; }
+  .path li { padding: 5px 6px 4px; border: 2px solid var(--ink); background: var(--paper); }
+  .path .done { border-color: var(--indigo); color: var(--indigo); }
+  .path [aria-current] { background: var(--ink); border-color: var(--ink); color: var(--paper); }
+
+  main {
+    flex: 1;
+    width: min(100% - 2 * var(--gutter), 640px);
+    margin: 0 auto;
+    padding: 12px 0 32px;
+  }
+  .screen { animation: boot .4s steps(2) both; }
+  .screen h1, .screen h2 { outline: none; }
+
+  /* The title screen */
+  .title { display: grid; justify-items: center; gap: 14px; padding-top: clamp(8px, 4vh, 40px); text-align: center; }
+  .limbo {
+    font: 400 clamp(96px, 34vw, 200px)/.8 var(--arcade);
+    letter-spacing: .02em;
+    text-shadow: 3px 3px 0 var(--red), 6px 6px 0 var(--indigo);
+  }
+  .by { font-size: 14px; letter-spacing: .06em; text-transform: uppercase; color: var(--indigo); }
+  .how { max-width: 30em; font: 400 clamp(19px, 5.4vw, 22px)/1.25 var(--arcade); letter-spacing: .02em; }
+  .small { font-size: 12px; letter-spacing: .04em; text-transform: uppercase; }
+
+  /* Him, in 8 bits: he nods along while a song plays */
+  .him { display: block; width: 120px; height: auto; image-rendering: pixelated; }
+  .title .him { width: 144px; }
+  .playing .him { animation: bob 1s steps(1) infinite; }
+
+  /* The buttons, like a game menu: a cursor in front, a press pushes them in */
+  .big {
+    display: inline-flex; align-items: center; justify-content: center; gap: 12px;
+    min-height: 56px;
+    padding: 6px 22px 2px;
+    border: 3px solid var(--ink);
+    background: var(--paper);
+    box-shadow: 4px 4px 0 var(--indigo);
+    font: 400 32px/1 var(--arcade);
+    letter-spacing: .04em;
+    text-transform: uppercase;
+    cursor: pointer;
+    -webkit-tap-highlight-color: transparent;
+  }
+  .big::before, .pick::before {
+    content: "";
+    flex: none;
+    width: .4em; height: .66em;
+    background: var(--indigo);
+    -webkit-mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 3 5' shape-rendering='crispEdges'%3E%3Cpath d='M0 0h1v1h1v1h1v1H2v1H1v1H0z'/%3E%3C/svg%3E") center / contain no-repeat;
+            mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 3 5' shape-rendering='crispEdges'%3E%3Cpath d='M0 0h1v1h1v1h1v1H2v1H1v1H0z'/%3E%3C/svg%3E") center / contain no-repeat;
+  }
+  .big:hover, .big:focus-visible, .pick:hover, .pick:focus-visible { color: var(--red); }
+  .big:hover::before, .big:focus-visible::before, .pick:hover::before, .pick:focus-visible::before { background: var(--red); }
+  .big:active, .pick:active { transform: translate(3px, 3px); box-shadow: 1px 1px 0 var(--indigo); }
+
+  /* The box everything else happens in: a text box from an old role-playing game */
+  .box {
+    position: relative;
+    margin-top: 22px;
+    padding: 26px 18px 18px;
+    border: 3px solid var(--ink);
+    background: var(--paper);
+    box-shadow: 5px 5px 0 var(--indigo);
+  }
+  .tag {
+    position: absolute; top: -15px; left: 14px;
+    padding: 6px 10px 5px;
+    background: var(--ink); color: var(--paper);
+    font-size: 13px; line-height: 1; letter-spacing: .08em; text-transform: uppercase;
+  }
+  .head { display: flex; align-items: flex-end; gap: 14px; }
+  .head h2 { font: 400 clamp(40px, 12vw, 56px)/.85 var(--arcade); letter-spacing: .02em; text-transform: uppercase; }
+  .head .ft { display: block; margin-top: 4px; font-size: .42em; letter-spacing: .06em; }
+  .head .en { margin-top: 6px; font: 400 15px/1.2 var(--arcade); letter-spacing: .04em; color: var(--indigo); text-transform: none; }
+
+  /* The player: play or pause, where in the song, and a way to skip ahead */
+  .deck { display: flex; flex-wrap: wrap; align-items: center; gap: 10px 12px; margin-top: 18px; }
+  .pp {
+    display: grid; place-items: center;
+    width: 48px; height: 48px;
+    border: 3px solid var(--ink);
+    background: var(--ink);
+    color: var(--paper);
+    cursor: pointer;
+  }
+  .pp svg { width: 18px; height: 18px; }
+  .pp:hover { background: var(--red); border-color: var(--red); }
+  .seek { flex: 1 1 140px; min-width: 0; height: 24px; margin: 0; accent-color: var(--red); cursor: pointer; }
+  .time { font-size: 11px; letter-spacing: .04em; font-variant-numeric: tabular-nums; }
+  .skip {
+    min-height: 40px; padding: 0 6px;
+    border: 0; background: none;
+    font: 400 12px/1 var(--pixel); letter-spacing: .06em; text-transform: uppercase;
+    cursor: pointer;
+  }
+  .skip:hover { color: var(--red); }
+  .deck[data-state="missing"] .pp, .deck[data-state="missing"] .seek,
+  .deck[data-state="missing"] .time, .deck[data-state="missing"] .skip { display: none; }
+  .note { display: none; flex-basis: 100%; font: 400 18px/1.25 var(--arcade); letter-spacing: .02em; }
+  .deck[data-state="missing"] .note { display: block; }
+  .deck .go-on { display: none; }
+  .deck[data-state="missing"] .go-on { display: inline-flex; margin-top: 4px; font-size: 26px; min-height: 48px; }
+
+  /* The words: the Portuguese, and the English under each line when English is on */
+  .words { margin-top: 22px; font: 400 clamp(19px, 5.6vw, 22px)/1.2 var(--arcade); letter-spacing: .02em; }
+  .words p + p { margin-top: 1em; }
+  .words .line { display: block; }
+  .words .line + .line { margin-top: .2em; }
+  .en { display: none; }
+  [data-lang="en"] .en { display: block; }
+  .words .en { font-size: .82em; color: var(--indigo); }
+  .credits { margin-top: 24px; font-size: 11px; line-height: 1.6; letter-spacing: .02em; }
+  .credits summary { cursor: pointer; text-transform: uppercase; letter-spacing: .06em; }
+  .credits summary:hover { color: var(--red); }
+  .credits p { margin-top: 6px; color: var(--indigo); }
+
+  /* A call: the phone rings, then the voice on the line, then the choice */
+  .ring { display: grid; justify-items: center; gap: 16px; padding-top: clamp(8px, 5vh, 48px); text-align: center; }
+  .calling { display: flex; align-items: flex-end; justify-content: center; gap: 18px; }
+  .phone { width: 96px; height: 80px; color: var(--red); }
+  .ringing .phone { animation: shake .5s steps(2) infinite; }
+  .ring h2 { font: 400 clamp(44px, 14vw, 64px)/.85 var(--arcade); text-transform: uppercase; letter-spacing: .02em; }
+  .ring .incoming { font-size: 13px; letter-spacing: .08em; text-transform: uppercase; color: var(--indigo); }
+  .line-who { margin-top: 6px; font-size: 12px; letter-spacing: .06em; text-transform: uppercase; color: var(--indigo); }
+  .said { margin-top: 18px; font: 400 clamp(22px, 6.4vw, 27px)/1.2 var(--arcade); letter-spacing: .02em; }
+  .said .en { margin-top: 8px; font-size: .78em; color: var(--indigo); }
+  .choices { display: grid; gap: 14px; margin-top: 22px; }
+  .choices[hidden] { display: none; }
+  .choices > p { font-size: 12px; letter-spacing: .08em; text-transform: uppercase; }
+  .pick {
+    display: flex; align-items: center; gap: 12px;
+    width: 100%;
+    min-height: 60px;
+    padding: 10px 14px 8px;
+    border: 3px solid var(--ink);
+    background: var(--paper);
+    box-shadow: 4px 4px 0 var(--indigo);
+    font: 400 clamp(22px, 6.4vw, 26px)/1.1 var(--arcade);
+    letter-spacing: .02em;
+    text-align: left;
+    cursor: pointer;
+    animation: pop .24s steps(3) both;
+    -webkit-tap-highlight-color: transparent;
+  }
+  .pick + .pick { animation-delay: .12s; }
+  .pick .en { margin-top: 4px; font-size: .74em; color: var(--indigo); }
+
+  /* The end */
+  .end { text-align: center; }
+  .end .him { margin: 0 auto; }
+  .end h2 { font: 400 clamp(72px, 26vw, 128px)/.8 var(--arcade); letter-spacing: .02em; text-shadow: 3px 3px 0 var(--red), 6px 6px 0 var(--indigo); text-transform: uppercase; }
+  .end .box { text-align: left; }
+  .trail { counter-reset: n; font: 400 clamp(22px, 6.4vw, 26px)/1.25 var(--arcade); letter-spacing: .02em; }
+  .trail li { counter-increment: n; display: flex; gap: 10px; }
+  .trail li::before { content: counter(n); min-width: 1em; color: var(--red); }
+  .trail .en { display: none; }
+  [data-lang="en"] .trail .en { display: inline; margin-left: .4em; font-size: .7em; color: var(--indigo); }
+  .one { margin-top: 14px; font-size: 12px; letter-spacing: .04em; text-transform: uppercase; color: var(--indigo); }
+  .end .again { margin-top: 26px; }
+  .end .small { margin-top: 18px; }
+
+  footer {
+    width: min(100% - 2 * var(--gutter), 640px);
+    margin: 0 auto;
+    padding: 16px 0 calc(18px + env(safe-area-inset-bottom));
+    font-size: 11px; letter-spacing: .04em; text-transform: uppercase; color: var(--indigo);
+  }
+
+  @keyframes boot { from { opacity: 0; } to { opacity: 1; } }
+  @keyframes pop { from { transform: scale(.94); opacity: 0; } to { transform: none; opacity: 1; } }
+  @keyframes bob { 50% { transform: translateY(-3px); } }
+  @keyframes shake { 0% { transform: translateX(-3px) rotate(-6deg); } 100% { transform: translateX(3px) rotate(6deg); } }
+  @media (prefers-reduced-motion: reduce) {
+    .screen, .pick { animation: none; }
+    .playing .him, .ringing .phone { animation: none; }
+  }
+</style>
+</head>
+<body data-screen="title" data-lang="pt">
+  <div class="grain" aria-hidden="true"></div>
+  <header class="top">
+    <a class="logo" href="./">LIMBO</a>
+    <div class="tools">
+      <button class="restart" type="button" hidden></button>
+      <div class="langs" role="group" aria-label="Língua / Language">
+        <button type="button" data-lang="pt" aria-pressed="true">PT</button>
+        <button type="button" data-lang="en" aria-pressed="false">EN</button>
+      </div>
+    </div>
+    <ol class="path"></ol>
+  </header>
+
+  <main id="game"></main>
+
+  <footer>LIMBO (2024) · LEFT. · <a href="../">antonioleft.com</a></footer>
+  <p class="sr" aria-live="polite"></p>
+
+  <noscript><p style="padding: 16px">LIMBO precisa de JavaScript. LIMBO needs JavaScript.</p></noscript>
+  <script src="album.js"></script>
+  <script src="game.js"></script>
+</body>
+</html>
