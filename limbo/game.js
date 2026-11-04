@@ -23,7 +23,7 @@
       incoming: 'Chamada recebida', answer: 'Atender', onLine: 'Na linha', choose: 'Escolhe',
       next: 'Continuar', skip: 'Saltar', play: 'Tocar', pause: 'Pausa', where: 'Onde vai a faixa',
       soon: 'O áudio ainda não está aqui. Por agora, lê.', credits: 'Ficha técnica', end: 'Fim',
-      path: 'O teu caminho', oneOf: 'Um dos 32 caminhos de LIMBO.', again: 'Jogar outra vez', restart: 'Recomeçar',
+      bonus: 'Bónus 8-bit, desbloqueado', path: 'O teu caminho', oneOf: 'Um dos 32 caminhos de LIMBO.', again: 'Jogar outra vez', restart: 'Recomeçar',
     },
     en: {
       by: 'a game-album by LEFT.',
@@ -34,7 +34,7 @@
       incoming: 'Incoming call', answer: 'Answer', onLine: 'On the line', choose: 'Choose',
       next: 'Continue', skip: 'Skip', play: 'Play', pause: 'Pause', where: 'Position in the track',
       soon: 'The audio isn’t here yet. For now, read along.', credits: 'Credits', end: 'The end',
-      path: 'Your path', oneOf: 'One of LIMBO’s 32 paths.', again: 'Play again', restart: 'Start over',
+      bonus: '8-bit bonus, unlocked', path: 'Your path', oneOf: 'One of LIMBO’s 32 paths.', again: 'Play again', restart: 'Start over',
     },
   };
   // The credits are written in Portuguese; in English only the roles change
@@ -514,14 +514,49 @@
         <p class="line-who">${say('path')}</p>
         <ol class="trail">${path.map(n => `<li><span>${tr(byN.get(n).title, byN.get(n).en)}</span></li>`).join('')}</ol>
         <p class="one">${say('oneOf')}</p>
+        <div class="bonus">
+          <p class="line-who">${say('bonus')}</p>
+          <div class="tapes">${(album.bonus || []).map(b =>
+            `<button class="tape" type="button" aria-pressed="false" data-src="${esc(b.src)}">${ICON.play}<span>${esc(b.title)}</span></button>`).join('')}</div>
+        </div>
         ${creditsHTML(t)}
       </div>
       <button class="big again" type="button">${say('again')}</button>
       <p class="small"><a href="${esc(album.spotify)}">${say('spotify')}</a></p>`, null, 'void');
     hookDeck();
-    game.querySelector('.again').addEventListener('click', () => { audio.pause(); sfx.go(); begin(); });
+    hookTapes();
+    game.querySelector('.again').addEventListener('click', () => { audio.pause(); tape.pause(); sfx.go(); begin(); });
     listen(LAST, null);
   }
+
+  // ---- The 8-bit bonus at the end: one version at a time, each played through once ----
+  const tape = new Audio();
+  tape.preload = 'none';
+  function paintTapes() {
+    game.querySelectorAll('.tape').forEach(b => {
+      const on = !tape.paused && b.dataset.src === tape.dataset.src;
+      b.setAttribute('aria-pressed', String(on));
+      b.querySelector('svg').outerHTML = on ? ICON.pause : ICON.play;
+    });
+  }
+  function hookTapes() {
+    game.querySelectorAll('.tape').forEach(b => b.addEventListener('click', () => {
+      if (!tape.paused && tape.dataset.src === b.dataset.src) {
+        tape.pause();
+      } else {
+        audio.pause();
+        tape.dataset.src = b.dataset.src;
+        tape.src = b.dataset.src;
+        tape.play().catch(() => {});
+        sfx.go();
+      }
+      paintTapes();
+    }));
+  }
+  tape.addEventListener('play', paintTapes);
+  tape.addEventListener('pause', paintTapes);
+  tape.addEventListener('ended', paintTapes);
+  audio.addEventListener('play', () => { if (!tape.paused) tape.pause(); });
 
   // ---- Language ----
   function savedLang() {
@@ -541,7 +576,7 @@
   }
 
   restart.innerHTML = say('restart');
-  restart.addEventListener('click', () => { audio.pause(); sfx.hush(); chiptune.stop(0.2); title(); });
+  restart.addEventListener('click', () => { audio.pause(); tape.pause(); sfx.hush(); chiptune.stop(0.2); title(); });
   document.querySelectorAll('.langs button').forEach(b => b.addEventListener('click', () => setLang(b.dataset.lang)));
   setLang(lang);
   title();

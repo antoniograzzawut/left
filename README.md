@@ -66,7 +66,9 @@ number, plus `title.mp3`, the album's intro in 8 bits that loops on the title
 screen. The game is played in the dark, and each track has its own look (its
 `vibe` in `album.js`): its colours and the scene behind its words, drawn in
 `limbo/index.html`. The calls share the green of an old phone, and the end opens
-into the white void of the album's cover. Its pictures are in `limbo/img/`.
+into the white void of the album's cover. Its pictures are in `limbo/img/`. At the end, an 8-bit
+bonus opens: the chiptune versions of Siga, Pulso, A1 Norte and Quero mais, listed
+under `bonus` in `album.js`.
 
 **LIMBO's lyrics in time with the music.** Open https://antonioleft.com/limbo/sync.html
 (on a phone or a laptop), pick a song, and tap the big button, or press space, the

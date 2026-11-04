@@ -290,6 +290,20 @@
   .trail .en { display: none; }
   [data-lang="en"] .trail .en { display: inline; margin-left: .4em; font-size: .7em; color: var(--indigo); }
   .one { margin-top: 14px; font-size: 12px; letter-spacing: .04em; text-transform: uppercase; color: var(--indigo); }
+  /* The 8-bit bonus: the versions like cassettes, one playing at a time */
+  .bonus { margin-top: 20px; }
+  .tapes { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 8px; }
+  .tape {
+    display: inline-flex; align-items: center; gap: 8px;
+    min-height: 44px; padding: 5px 12px 2px;
+    border: 3px solid var(--ink); background: var(--paper);
+    box-shadow: 3px 3px 0 var(--indigo);
+    font: 400 21px/1 var(--arcade); letter-spacing: .03em;
+    cursor: pointer;
+  }
+  .tape svg { width: 12px; height: 12px; }
+  .tape:hover { color: var(--red); }
+  .tape[aria-pressed="true"] { background: var(--ink); color: var(--paper); }
   .end .again { margin-top: 26px; }
   .end .small { margin-top: 18px; }
 

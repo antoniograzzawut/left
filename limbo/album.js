@@ -5,6 +5,13 @@
 // and "Volto a ti - Letra" (2023). The English is Claude's translation, for António to check.
 window.LIMBO = {
   spotify: 'https://open.spotify.com/album/6DkuX5UAticvTx5NxEFVH5',
+  // The 8-bit versions, a bonus that opens at the end of the game. Siga's is also the title screen's music.
+  bonus: [
+    { title: 'Siga', src: 'audio/title.mp3' },
+    { title: 'Pulso', src: 'audio/8bit-pulso.mp3' },
+    { title: 'A1 Norte', src: 'audio/8bit-a1-norte.mp3' },
+    { title: 'Quero mais', src: 'audio/8bit-quero-mais.mp3' },
+  ],
   tracks: [
     {
       n: 1, title: 'Intro', en: 'Intro', vibe: 'night',
