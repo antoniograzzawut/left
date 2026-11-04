@@ -83,9 +83,12 @@
       return [pt.trim(), en.trim()];
     }));
   }
-  const wordsHTML = t => !t.words ? '' :
-    `<div class="words">${verses(t.words).map(v =>
-      `<p>${v.map(([pt, en]) => `<span class="line">${tr(pt, en)}</span>`).join('')}</p>`).join('')}</div>`;
+  const wordsHTML = t => {
+    if (!t.words) return '';
+    let i = 0;
+    return `<div class="words">${verses(t.words).map(v =>
+      `<p>${v.map(([pt, en]) => `<span class="line" data-i="${i++}">${tr(pt, en)}</span>`).join('')}</p>`).join('')}</div>`;
+  };
   const creditsEN = s => s.split(' · ').map(part => {
     const i = part.indexOf(': ');
     const role = part.slice(0, i).replace(/[A-Za-zÀ-ÿ]+/g, w => ROLES[w.toLowerCase()] || w);
@@ -244,6 +247,50 @@
     } catch {}
   }
 
+  // ---- The words appear with the music: lines whose times are known (timings.js, or the tap-along on this
+  // device) wait faintly, light up when they are sung, and stay a little dimmer after ----
+  function timesFor(n) {
+    let mine = {};
+    try { mine = JSON.parse(localStorage.getItem('limbo-times') || '{}'); } catch {}
+    return mine[n] || (window.LIMBO_TIMES || {})[n] || null;
+  }
+  let follow = null, scrolledAt = 0;
+  addEventListener('wheel', () => { scrolledAt = performance.now(); }, { passive: true });
+  addEventListener('touchmove', () => { scrolledAt = performance.now(); }, { passive: true });
+  function startFollow(n) {
+    const times = timesFor(n);
+    const box = game.querySelector('.words');
+    const lines = box ? [...box.querySelectorAll('.line')] : [];
+    follow = times && times.length && lines.length ? { box, lines, times, now: -2 } : null;
+    if (follow) box.classList.add('timed');
+  }
+  function paintLines() {
+    if (!follow || !follow.box.isConnected) return;
+    follow.box.classList.toggle('timed', !missing);
+    if (missing) return;
+    const pos = audio.currentTime + 0.05;
+    let i = -1;
+    while (i + 1 < follow.times.length && follow.times[i + 1] <= pos) i++;
+    if (i === follow.now) return;
+    follow.now = i;
+    follow.lines.forEach((el, k) => {
+      el.classList.toggle('sung', k < i);
+      el.classList.toggle('now', k === i);
+    });
+    // The line being sung stays on screen, unless the reader scrolled in the last few seconds
+    const line = follow.lines[i];
+    if (line && performance.now() - scrolledAt > 4000) {
+      const r = line.getBoundingClientRect();
+      if (r.top < 140 || r.bottom > innerHeight - 100) line.scrollIntoView({ block: 'center', behavior: calm ? 'auto' : 'smooth' });
+    }
+  }
+  function frame() {
+    paintLines();
+    if (follow && !audio.paused) requestAnimationFrame(frame);
+  }
+  audio.addEventListener('play', () => requestAnimationFrame(frame));
+  audio.addEventListener('seeked', paintLines);
+
   // ---- The little sounds of the game itself, made on the spot like the link page's ----
   const sfx = (() => {
     let ctx = null, wave = null, timer = null;
@@ -400,6 +447,7 @@
         ${creditsHTML(t)}
       </div>`, null, t.vibe);
     hookDeck();
+    startFollow(n);
     listen(n, () => {
       const next = n === 1 ? calls[0].n : nextAfter(n);
       if (next === LAST) finale(); else ring(next);

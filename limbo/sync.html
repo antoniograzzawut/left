@@ -1,0 +1,224 @@
+<!doctype html>
+<html lang="pt">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="robots" content="noindex">
+<title>LIMBO · tap-along</title>
+<meta name="theme-color" content="#0D0B14">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Jersey+10&family=Silkscreen&display=swap" rel="stylesheet">
+<style>
+  /* António's tool for timing LIMBO's lyrics: play a song and tap when each line starts. The game then lights
+     the lines up with the music. Not linked from anywhere. */
+  :root {
+    --paper: #0D0B14; --ink: #F2E8E3; --indigo: #9D8CFF; --red: #FF5C54;
+    --arcade: "Jersey 10", "Arial Narrow", sans-serif;
+    --pixel: "Silkscreen", "Courier New", monospace;
+    color-scheme: dark;
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: var(--paper); color: var(--ink); font-family: var(--pixel); }
+  main { width: min(100% - 32px, 640px); margin: 0 auto; padding: calc(20px + env(safe-area-inset-top)) 0 180px; }
+  h1 { margin: 0 0 6px; font: 400 48px/.9 var(--arcade); text-shadow: 2px 2px 0 var(--red), 4px 4px 0 var(--indigo); }
+  h2 { margin: 26px 0 8px; font: 400 36px/.9 var(--arcade); text-transform: uppercase; }
+  p, li { font: 400 19px/1.3 var(--arcade); letter-spacing: .02em; }
+  p { margin: 0 0 10px; }
+  .en { color: var(--indigo); }
+  small, .status { font: 400 11px/1.4 var(--pixel); letter-spacing: .05em; text-transform: uppercase; color: var(--indigo); }
+  button, .button {
+    display: inline-flex; align-items: center; justify-content: center;
+    min-height: 44px; padding: 4px 14px 2px;
+    border: 3px solid var(--ink); background: var(--paper); color: var(--ink);
+    box-shadow: 3px 3px 0 var(--indigo);
+    font: 400 22px/1 var(--arcade); letter-spacing: .04em; text-transform: uppercase; text-decoration: none;
+    cursor: pointer;
+  }
+  button:hover, .button:hover { color: var(--red); }
+  button:active, .button:active { transform: translate(2px, 2px); box-shadow: 1px 1px 0 var(--indigo); }
+  :focus-visible { outline: 3px solid var(--red); outline-offset: 3px; }
+  .songs { display: grid; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); gap: 10px; margin: 16px 0; padding: 0; list-style: none; }
+  .songs button { width: 100%; justify-content: space-between; gap: 8px; font-size: 20px; }
+  .songs .done { border-color: #6BD07A; color: #6BD07A; }
+  .lines { margin: 12px 0 0; padding: 0 0 0 2.2em; }
+  .lines li { opacity: .35; }
+  .lines li.done { opacity: .7; }
+  .lines li.next { opacity: 1; color: var(--red); }
+  .lines li.gap { margin-top: .8em; }
+  .lines li span { font-family: var(--pixel); font-size: 11px; color: var(--indigo); margin-left: .6em; }
+  .bar {
+    position: fixed; left: 0; right: 0; bottom: 0;
+    display: flex; gap: 8px; align-items: stretch;
+    padding: 10px 12px calc(10px + env(safe-area-inset-bottom));
+    background: rgb(13 11 20 / .94);
+    border-top: 3px solid var(--ink);
+  }
+  .bar[hidden] { display: none; }
+  .bar button { min-height: 60px; font-size: 20px; }
+  .bar .tap { flex: 1; background: var(--red); color: var(--paper); font-size: 32px; }
+  .bar .tap:hover { color: var(--paper); filter: brightness(1.1); }
+  .out pre {
+    overflow: auto; max-height: 220px; margin: 10px 0; padding: 10px;
+    border: 2px solid var(--indigo); font: 400 11px/1.4 var(--pixel); color: var(--ink);
+  }
+  .row { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; }
+</style>
+</head>
+<body>
+<main>
+  <h1>LIMBO</h1>
+  <p>Toca no botão grande (ou carrega no espaço) no momento em que cada verso começa. Enganaste-te? “Desfazer” (ou a tecla de apagar) volta um verso atrás.
+     <br><span class="en">Tap the big button (or press space) the moment each line starts. Missed one? “Undo” (or backspace) goes back a line.</span></p>
+  <small>Fica guardado neste aparelho, e o jogo neste aparelho já mostra os tempos. Para todos os verem: “Descarregar timings.js” no fim da página, e põe esse ficheiro na pasta limbo no GitHub (Add file › Upload files).</small>
+
+  <ul class="songs" aria-label="Canções"></ul>
+
+  <section class="work" hidden>
+    <h2></h2>
+    <p class="status" aria-live="polite"></p>
+    <ol class="lines"></ol>
+  </section>
+
+  <section class="out">
+    <h2>timings.js</h2>
+    <p class="status"></p>
+    <pre></pre>
+    <div class="row">
+      <a class="button download" download="timings.js">Descarregar timings.js</a>
+      <button class="copy" type="button">Copiar</button>
+    </div>
+  </section>
+</main>
+
+<div class="bar" hidden>
+  <button class="undo" type="button" aria-label="Desfazer / Undo">↶</button>
+  <button class="tap" type="button">Toca</button>
+  <button class="pp" type="button" aria-label="Tocar ou pausa / Play or pause">▶</button>
+  <button class="back5" type="button" aria-label="Recuar 5 segundos / Back 5 seconds">-5</button>
+</div>
+
+<script src="album.js"></script>
+<script src="timings.js"></script>
+<script>
+(() => {
+  const album = window.LIMBO;
+  const songs = album.tracks.filter(t => t.words);
+  const KEY = 'limbo-times';
+  const LATE = 0.15;  // a finger lands a little after the line starts
+  const file = window.LIMBO_TIMES || {};
+  let mine = {};
+  try { mine = JSON.parse(localStorage.getItem(KEY) || '{}'); } catch {}
+
+  const $ = s => document.querySelector(s);
+  const audio = new Audio();
+  audio.preload = 'auto';
+  const linesOf = t => t.words.trim().split(/\n\s*\n/).map(v => v.split('\n').map(l => l.split(' | ')[0].trim()));
+  const flat = t => linesOf(t).flat();
+  let track = null, marks = [];
+
+  function keep() {
+    try { localStorage.setItem(KEY, JSON.stringify(mine)); } catch {}
+    paintOut();
+    paintSongs();
+  }
+  const timesOf = n => mine[n] || file[n] || null;
+
+  function paintSongs() {
+    $('.songs').innerHTML = songs.map(t => {
+      const done = (timesOf(t.n) || []).length === flat(t).length;
+      return `<li><button type="button" data-n="${t.n}" class="${done ? 'done' : ''}"><span>${t.n}. ${t.title.replace(/ \(ft\..*\)/, '')}</span><span>${done ? '✓' : ''}</span></button></li>`;
+    }).join('');
+    document.querySelectorAll('.songs button').forEach(b => b.addEventListener('click', () => open(Number(b.dataset.n))));
+  }
+
+  function open(n) {
+    track = album.tracks.find(t => t.n === n);
+    marks = [];
+    audio.src = `audio/${String(n).padStart(2, '0')}.mp3`;
+    $('.work').hidden = false;
+    $('.bar').hidden = false;
+    $('.work h2').textContent = track.title;
+    let k = 0;
+    $('.lines').innerHTML = linesOf(track).map(v => v.map((l, j) =>
+      `<li class="${j === 0 && k ? 'gap' : ''}" data-k="${k++}">${l.replace(/&/g, '&amp;').replace(/</g, '&lt;')}<span></span></li>`).join('')).join('');
+    paintLines();
+    $('.work').scrollIntoView({ behavior: 'smooth' });
+  }
+
+  function paintLines() {
+    if (!track) return;
+    const items = [...document.querySelectorAll('.lines li')];
+    items.forEach((li, k) => {
+      li.classList.toggle('done', k < marks.length);
+      li.classList.toggle('next', k === marks.length);
+      li.querySelector('span').textContent = k < marks.length ? marks[k].toFixed(2) : '';
+    });
+    const total = items.length;
+    $('.work .status').textContent = marks.length === total
+      ? `Feito: ${total} versos. Done: ${total} lines.`
+      : `Verso ${marks.length + 1} de ${total} · line ${marks.length + 1} of ${total}${audio.paused ? ' · toca para começar / tap to start' : ''}`;
+    const next = items[marks.length];
+    if (next) {
+      const r = next.getBoundingClientRect();
+      if (r.top < 80 || r.bottom > innerHeight - 140) next.scrollIntoView({ block: 'center', behavior: 'smooth' });
+    }
+    $('.bar .pp').textContent = audio.paused ? '▶' : '❚❚';
+  }
+
+  function tap() {
+    if (!track) return;
+    if (audio.paused) { audio.play(); paintLines(); return; }
+    const total = flat(track).length;
+    if (marks.length >= total) return;
+    marks.push(Math.max(0, Math.round((audio.currentTime - LATE) * 100) / 100));
+    if (marks.length === total) {
+      mine[track.n] = marks.slice();
+      keep();
+    }
+    paintLines();
+  }
+  function undo() {
+    if (!track || !marks.length) return;
+    marks.pop();
+    audio.currentTime = Math.max(0, (marks.length ? marks[marks.length - 1] : 0) - 1);
+    paintLines();
+  }
+
+  function paintOut() {
+    const all = { ...file, ...mine };
+    const keys = Object.keys(all).map(Number).sort((a, b) => a - b);
+    const text = `// When each line of LIMBO's songs is sung: seconds from the start of the track, one per line, in the order of
+// album.js. Made with the tap-along at antonioleft.com/limbo/sync.html, which gives a new version of this file.
+// A song with no times here shows all its words at once.
+window.LIMBO_TIMES = {
+${keys.map(n => `  ${n}: [${all[n].join(', ')}],`).join('\n')}
+};
+`;
+    $('.out pre').textContent = text;
+    $('.out .status').textContent = `${keys.length} de ${songs.length} canções com tempos · ${keys.length} of ${songs.length} songs timed`;
+    const a = $('.download');
+    if (a.href) URL.revokeObjectURL(a.href);
+    a.href = URL.createObjectURL(new Blob([text], { type: 'text/javascript' }));
+  }
+
+  $('.bar .tap').addEventListener('click', tap);
+  $('.bar .undo').addEventListener('click', undo);
+  $('.bar .pp').addEventListener('click', () => { if (audio.paused) audio.play(); else audio.pause(); });
+  $('.bar .back5').addEventListener('click', () => { audio.currentTime = Math.max(0, audio.currentTime - 5); });
+  audio.addEventListener('play', paintLines);
+  audio.addEventListener('pause', paintLines);
+  $('.copy').addEventListener('click', () => {
+    navigator.clipboard?.writeText($('.out pre').textContent).then(() => { $('.copy').textContent = 'Copiado'; }, () => {});
+  });
+  addEventListener('keydown', e => {
+    if (!track || e.target.closest('input, textarea')) return;
+    if (e.code === 'Space') { e.preventDefault(); tap(); }
+    if (e.code === 'Backspace') { e.preventDefault(); undo(); }
+  });
+  paintSongs();
+  paintOut();
+})();
+</script>
+</body>
+</html>

@@ -231,6 +231,11 @@
   .en { display: none; }
   [data-lang="en"] .en { display: block; }
   .words .en { font-size: .82em; color: var(--indigo); }
+  /* With its times known, a line waits faintly, lights up while it is sung, and stays a little dimmer after */
+  .words.timed .line { opacity: .2; transition: opacity .3s steps(3), color .3s steps(3); }
+  .words.timed .line.sung { opacity: .62; }
+  .words.timed .line.now { opacity: 1; color: var(--red); }
+  .words.timed .line.now .en { color: var(--ink); }
   .credits { margin-top: 24px; font-size: 11px; line-height: 1.6; letter-spacing: .02em; }
   .credits summary { cursor: pointer; text-transform: uppercase; letter-spacing: .06em; }
   .credits summary:hover { color: var(--red); }
@@ -520,6 +525,7 @@
 
   <noscript><p style="padding: 16px">LIMBO precisa de JavaScript. LIMBO needs JavaScript.</p></noscript>
   <script src="album.js"></script>
+  <script src="timings.js"></script>
   <script src="game.js"></script>
 </body>
 </html>

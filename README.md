@@ -68,6 +68,14 @@ screen. The game is played in the dark, and each track has its own look (its
 `limbo/index.html`. The calls share the green of an old phone, and the end opens
 into the white void of the album's cover. Its pictures are in `limbo/img/`.
 
+**LIMBO's lyrics in time with the music.** Open https://antonioleft.com/limbo/sync.html
+(on a phone or a laptop), pick a song, and tap the big button, or press space, the
+moment each line starts; "Undo" goes back a line. A song timed this way already lights
+up line by line in the game on that same device. For everyone to see it, press
+"Descarregar timings.js" at the bottom, then in the `limbo` folder here press "Add
+file", "Upload files", drop that file in (it replaces the old one) and press "Commit
+changes". The times can also be pasted to Claude.
+
 **Photos.** Ask Claude. They are cropped, lined up and converted, so a raw photo
 uploaded over an old one will not sit right.
 
