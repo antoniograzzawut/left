@@ -76,15 +76,26 @@ are in the credits.
 
 **Playing it.** While a song plays only the line being sung shows, and its longest
 word lights up: catching it scores, more the sooner, and catches in a row multiply
-the points. In Silêncio it turns around: points for touching nothing. A ringing
-phone can be declined, which means GAME OVER, with nine seconds to go back. After
-each call there are ten seconds to choose, or fate picks ("Parar o relógio" stops
-the clock; phones set to reduce motion get none). Skipping a song early gets a
-cheeky line (`skips` in `album.js`). The end shows the score and a grade, the best
-on that phone, each choice with the share of "souls in Limbo" who chose the same
-(made up: `souls` in `album.js`), the ending's name and traits (`ending`), a
-button to share it, and the album's credits rolling up. Siga starts 2.6 seconds
-in, after its silence (`from` in `album.js`).
+the points. In Silêncio it turns around: points for touching nothing. When nobody
+sings, the song's own little 8-bit picture moves in the middle (a coin for the Intro,
+the sun for Siga, a bomb for Violento, a heart for Pulso, an hourglass for Volto a ti,
+the car for A1 Norte, a mirror ball for Dançar, a diamond for Quero mais, a candle for
+Silêncio, a rain cloud for Não estou bem, a crying eye for Chora), drawn in
+`limbo/game.js`. A call shows what the voice says as chat messages, at the second
+of the track given by `chat` in `album.js`, and its choice at another second while
+the call plays on; these times are for the call files on the site now, so new files
+need new times. A ringing phone can be declined, which means GAME OVER, with nine
+seconds to go back. Ten seconds to choose once a call is over, or fate picks ("Parar
+o relógio" stops the clock; phones set to reduce motion get none). After each song,
+the game's own system tells the story so far (`story` in `album.js`: each song's
+line depends on the choice before it) and who you are becoming, then the next call
+rings. The system is failing: glitches, rare at first and more and more towards the
+end, with its errors in the story. Skipping a song early gets a cheeky line
+(`skips`). The end shows the score and a grade, the best on that phone, each choice
+on a card in its song's colours with the share of "souls in Limbo" who chose the same
+(made up: `souls` in `album.js`), the ending's name and traits (`ending`), a button
+to share it, and the album's credits rolling up. Siga starts 2.6 seconds in, after
+its silence (`from` in `album.js`).
 
 **LIMBO's lyrics in time with the music.** `limbo/timings.js` says when each line
 is sung. Its first version was made by machine on 5 Nov 2026 (the voice pulled out

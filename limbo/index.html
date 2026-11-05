@@ -379,16 +379,20 @@
   .tally .sub { margin-top: 8px; font-size: 11px; letter-spacing: .05em; text-transform: uppercase; color: var(--indigo); }
   /* The recap: each call, what it asked, what you chose, and the souls who chose the same */
   .recap { margin-top: 26px; }
-  .recap ol { display: grid; gap: 18px; margin-top: 10px; counter-reset: n; }
-  .recap li { counter-increment: n; padding-left: 2em; position: relative; }
-  .recap li::before { content: counter(n); position: absolute; left: 0; top: 2px; font: 400 26px/1 var(--arcade); color: var(--red); }
-  .recap .who { font-size: 11px; letter-spacing: .08em; text-transform: uppercase; color: var(--indigo); }
-  .recap .q { margin-top: 4px; font: 400 17px/1.2 var(--arcade); letter-spacing: .02em; color: var(--indigo); }
+  .recap ol { display: grid; gap: 22px; margin-top: 12px; }
+  .recap li { border: 3px solid var(--ink); background: var(--paper); box-shadow: 5px 5px 0 var(--indigo); }
+  /* each card headed in the colours of the song it led to, with that song's picture */
+  .recap .band { display: flex; align-items: center; gap: 10px; padding: 8px 10px 6px; background: var(--paper); color: var(--ink); }
+  .recap .band .num { font: 400 30px/1 var(--arcade); color: var(--red); }
+  .recap .band .who { font-size: 11px; letter-spacing: .08em; text-transform: uppercase; color: var(--indigo); }
+  .recap .band .song { margin-left: auto; font: 400 24px/1 var(--arcade); letter-spacing: .03em; text-transform: uppercase; text-align: right; }
+  .recap .band .art { flex: none; width: 40px; }
+  .recap .then { padding: 12px 12px 14px; }
+  .recap .told { margin-top: 8px; padding-left: 10px; border-left: 3px solid var(--red); font: 400 17px/1.25 var(--arcade); letter-spacing: .02em; }
+  .recap .q { font: 400 17px/1.2 var(--arcade); letter-spacing: .02em; color: var(--indigo); }
   .recap .q .en { margin-top: 3px; font-size: .9em; }
   .recap .a { margin-top: 6px; font: 400 clamp(22px, 6.4vw, 26px)/1.15 var(--arcade); letter-spacing: .02em; }
   .recap .a .en { margin-top: 2px; font-size: .7em; color: var(--indigo); }
-  .recap .to { display: inline-block; margin-left: .5em; padding: 3px 6px 2px; background: var(--ink); color: var(--paper); font: 400 10px/1 var(--pixel); letter-spacing: .06em; text-transform: uppercase; vertical-align: middle; }
-  .recap .a .en + .to, .recap .a:has(.en) .to { margin-left: 0; margin-top: 6px; }
   .recap .pct { margin-top: 6px; font-size: 12px; letter-spacing: .04em; }
   .recap .pct b { font: 400 22px/1 var(--arcade); color: var(--red); }
   /* Your ending: its name, what your choices say about you, and a way to share it */
@@ -421,6 +425,71 @@
   .roll-track p:not(.roll-name) { margin-top: 3px; font-size: 11px; line-height: 1.5; letter-spacing: .03em; }
   .end .again { margin-top: 26px; }
   .end .small { margin-top: 18px; }
+
+  /* While nothing is sung: the song's little picture, moving in a few frames like an old game */
+  .idle { display: grid; place-items: center; }
+  .art { display: block; width: clamp(120px, 34vw, 168px); height: auto; overflow: hidden; }
+  .art .b, .art .f2, .art .f3 { opacity: 0; }
+  .art .a { animation: two-a 1s steps(1) infinite; }
+  .art .b { animation: two-b 1s steps(1) infinite; }
+  .art .f1 { animation: three-a 1.2s steps(1) infinite; }
+  .art .f2 { animation: three-b 1.2s steps(1) infinite; }
+  .art .f3 { animation: three-c 1.2s steps(1) infinite; }
+  .art .spin, .art .beat, .art .bob { transform-box: fill-box; transform-origin: center; }
+  .art .spin { animation: coin 1s steps(1) infinite; }
+  .art .beat { animation: thump .9s steps(1) infinite; }
+  .art .bob { animation: bob1 .6s steps(1) infinite; }
+  .art .dash { animation: dash .4s steps(2) infinite; }
+
+  /* A call's words: messages in a chat, "typing..." first */
+  .chat { display: grid; justify-items: start; gap: 10px; margin-top: 14px; }
+  .bubble, .typing {
+    position: relative;
+    max-width: 92%;
+    margin-left: 10px;
+    padding: 10px 12px 8px;
+    border: 3px solid var(--ink);
+    background: color-mix(in srgb, var(--indigo) 16%, var(--paper));
+    font: 400 clamp(19px, 5.4vw, 22px)/1.25 var(--arcade); letter-spacing: .02em;
+    animation: pop .2s steps(3) both;
+  }
+  .bubble::before, .typing::before {
+    content: ""; position: absolute; left: -11px; bottom: 6px; width: 8px; height: 10px;
+    background: var(--ink);
+    clip-path: polygon(100% 0, 0 100%, 100% 100%);
+  }
+  .bubble[hidden], .typing[hidden] { display: none; }
+  .bubble .en { margin-top: 6px; font-size: .8em; color: var(--indigo); }
+  .typing { display: flex; gap: 6px; padding: 14px 14px 12px; }
+  .typing i { width: 8px; height: 8px; background: var(--ink); animation: blink .9s steps(1) infinite; }
+  .typing i:nth-child(2) { animation-delay: .3s; }
+  .typing i:nth-child(3) { animation-delay: .6s; }
+  .call .voice { height: 64px; margin-top: 12px; }
+  @keyframes talk { from { height: 8px; } to { height: 54px; } }
+
+  /* The story so far: the game's own system talking, in a terminal of its own */
+  .story { display: grid; justify-items: center; gap: 22px; padding-top: clamp(8px, 4vh, 40px); }
+  .log {
+    width: 100%;
+    padding: 14px 14px 16px;
+    border: 3px solid #E6E6E6;
+    background: #050505; color: #E6E6E6;
+    box-shadow: 5px 5px 0 var(--red);
+    font: 400 12px/1.6 var(--pixel); letter-spacing: .03em;
+  }
+  .log-head { margin-bottom: 10px; color: #8CFF9E; text-transform: uppercase; letter-spacing: .1em; }
+  .log-head span { color: #9A9A9A; }
+  .log-line { margin-top: 6px; color: #9A9A9A; }
+  .log-line::before { content: "> "; color: #8CFF9E; }
+  .log-line.new { color: #FFFFFF; font: 400 clamp(19px, 5.4vw, 22px)/1.25 var(--arcade); letter-spacing: .02em; }
+  .log-line.err { color: #FF5C54; }
+  .log-line.err::before { content: "! "; color: #FF5C54; }
+  .log-who { margin-top: 14px; padding-top: 10px; border-top: 1px dashed #4A4A4A; color: #9A9A9A; text-transform: uppercase; letter-spacing: .08em; }
+  .log-who b { font-weight: 400; color: #FFD866; }
+
+  /* The system failing: a piece of the screen tears, and late in the game the whole screen slips */
+  .tear { animation: tear .34s steps(3) both !important; }
+  body.glitch main { transform: translateX(4px) skewX(-3deg); filter: drop-shadow(-3px 0 rgb(255 40 90 / .55)) drop-shadow(3px 0 rgb(40 220 255 / .55)); }
 
   /* A line over everything for a few seconds: fate's pick, the hint, what the game says on a skip */
   .toast {
@@ -478,7 +547,7 @@
   }
 
   /* sunrise: Siga ("sol a bater na cara, alma renovada"), the sun coming up, its rays turning */
-  [data-vibe="sunrise"] { --paper: #160C08; --ink: #FFE9CF; --indigo: #FFB066; --red: #FF7B42; --vignette: rgb(40 10 0 / .55); }
+  [data-vibe="sunrise"], [data-look="sunrise"] { --paper: #160C08; --ink: #FFE9CF; --indigo: #FFB066; --red: #FF7B42; --vignette: rgb(40 10 0 / .55); }
   [data-vibe="sunrise"] .scene { background: linear-gradient(transparent 40%, rgb(255 123 66 / .16)); }
   [data-vibe="sunrise"] .scene::before {
     width: 80vmin; height: 80vmin; right: -20vmin; bottom: -44vmin;
@@ -494,7 +563,7 @@
   }
 
   /* riot: Violento ("não dormi nada, arma apontada"), scanlines, and now and then a flash of red as the picture jumps */
-  [data-vibe="riot"] { --paper: #0C0303; --ink: #FFE8E3; --indigo: #FF6A5E; --red: #FF3A30; --vignette: rgb(70 0 0 / .65); }
+  [data-vibe="riot"], [data-look="riot"] { --paper: #0C0303; --ink: #FFE8E3; --indigo: #FF6A5E; --red: #FF3A30; --vignette: rgb(70 0 0 / .65); }
   [data-vibe="riot"] .scene::before { inset: 0; background: repeating-linear-gradient(transparent 0 2px, rgb(0 0 0 / .5) 2px 3px); }
   [data-vibe="riot"] .scene::after {
     inset: 0;
@@ -505,7 +574,7 @@
   }
 
   /* heart: Pulso ("ao teu lado o pulso dispara"), a heart beating behind the words and its line on a monitor */
-  [data-vibe="heart"] { --paper: #17061A; --ink: #FFE4F1; --indigo: #FF8BC2; --red: #FF4F98; --vignette: rgb(40 0 30 / .6); }
+  [data-vibe="heart"], [data-look="heart"] { --paper: #17061A; --ink: #FFE4F1; --indigo: #FF8BC2; --red: #FF4F98; --vignette: rgb(40 0 30 / .6); }
   [data-vibe="heart"] .scene::before {
     width: 52vmin; height: 45vmin; left: 50%; top: 22%; margin-left: -26vmin;
     background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 7 6' shape-rendering='crispEdges'%3E%3Cpath fill='%23FF4F98' d='M1 0h2v1h1V0h2v1h1v2H6v1H5v1H4v1H3V5H2V4H1V3H0V1h1z'/%3E%3C/svg%3E") center / contain no-repeat;
@@ -520,7 +589,7 @@
   }
 
   /* sepia: Volto a ti ("passaram anos"), the dust and flicker of an old film */
-  [data-vibe="sepia"] { --paper: #19130D; --ink: #F4E5CB; --indigo: #D3A576; --red: #E8875A; --vignette: rgb(30 15 0 / .75); }
+  [data-vibe="sepia"], [data-look="sepia"] { --paper: #19130D; --ink: #F4E5CB; --indigo: #D3A576; --red: #E8875A; --vignette: rgb(30 15 0 / .75); }
   [data-vibe="sepia"] .scene::before {
     inset: -50% 0 0;
     background:
@@ -531,7 +600,7 @@
   [data-vibe="sepia"] .scene::after { inset: 0; background: rgb(244 229 203 / .04); animation: flicker .5s steps(2) infinite; }
 
   /* road: A1 Norte ("na estrada só eu e tu"), the motorway at night, its lines rushing past, and the sign */
-  [data-vibe="road"] { --paper: #0A101C; --ink: #E8F0FF; --indigo: #7FB0FF; --red: #FFC633; --vignette: rgb(0 0 20 / .55); }
+  [data-vibe="road"], [data-look="road"] { --paper: #0A101C; --ink: #E8F0FF; --indigo: #7FB0FF; --red: #FFC633; --vignette: rgb(0 0 20 / .55); }
   [data-vibe="road"] .scene::after {
     left: 0; right: 0; bottom: 0; height: 22vh;
     border-top: 3px solid rgb(232 240 255 / .45);
@@ -553,7 +622,7 @@
   }
 
   /* club: Dançar ("dá pra ver a lua a pairar por cima do Tejo"), the moon over the river and the club's lights sweeping */
-  [data-vibe="club"] { --paper: #0B081E; --ink: #FFF0DB; --indigo: #57E4FF; --red: #FF58B2; --vignette: rgb(10 0 40 / .6); }
+  [data-vibe="club"], [data-look="club"] { --paper: #0B081E; --ink: #FFF0DB; --indigo: #57E4FF; --red: #FF58B2; --vignette: rgb(10 0 40 / .6); }
   [data-vibe="club"] .scene { background: linear-gradient(transparent 76%, rgb(30 50 110 / .55) 76%); }
   [data-vibe="club"] .scene::before {
     width: 64px; height: 64px; right: 9vw; top: 17vh;
@@ -569,7 +638,7 @@
   }
 
   /* gold: Quero mais ("quero um jaguar, quero caviar"), gold glinting in the dark */
-  [data-vibe="gold"] { --paper: #0B0905; --ink: #FFF2CC; --indigo: #E9BE52; --red: #FFD866; --vignette: rgb(20 12 0 / .6); }
+  [data-vibe="gold"], [data-look="gold"] { --paper: #0B0905; --ink: #FFF2CC; --indigo: #E9BE52; --red: #FFD866; --vignette: rgb(20 12 0 / .6); }
   [data-vibe="gold"] .scene { background: radial-gradient(90% 60% at 50% 110%, rgb(233 190 82 / .16), transparent 70%); }
   [data-vibe="gold"] .scene::before,
   [data-vibe="gold"] .scene::after {
@@ -582,11 +651,11 @@
   [data-vibe="gold"] .scene::after { background-position: 80px 60px, 10px 120px; animation-delay: -.8s; }
 
   /* quiet: Silêncio ("estar só, em silêncio, parar"), nothing moves, the words take more room, he fades */
-  [data-vibe="quiet"] { --paper: #0E0E0F; --ink: #CFCFCF; --indigo: #969696; --red: #BDBDBD; --vignette: rgb(0 0 0 / .4); }
+  [data-vibe="quiet"], [data-look="quiet"] { --paper: #0E0E0F; --ink: #CFCFCF; --indigo: #969696; --red: #BDBDBD; --vignette: rgb(0 0 0 / .4); }
   [data-vibe="quiet"] .words { letter-spacing: .12em; line-height: 1.6; }
 
   /* overcast: Não estou bem ("hoje estás no lodo"), a drizzle that doesn't stop, and mud at the bottom */
-  [data-vibe="overcast"] { --paper: #11151A; --ink: #DAE2EA; --indigo: #9AAABA; --red: #C29870; --vignette: rgb(0 0 0 / .6); }
+  [data-vibe="overcast"], [data-look="overcast"] { --paper: #11151A; --ink: #DAE2EA; --indigo: #9AAABA; --red: #C29870; --vignette: rgb(0 0 0 / .6); }
   [data-vibe="overcast"] .scene::before {
     inset: -100px 0 0;
     background: repeating-linear-gradient(100deg, transparent 0 22px, rgb(218 226 234 / .13) 22px 23px, transparent 23px 47px);
@@ -600,7 +669,7 @@
   }
 
   /* tears: Chora ("chora o peso, chora a mágoa"), drops falling all the time */
-  [data-vibe="tears"] { --paper: #061226; --ink: #E3F0FF; --indigo: #7DC2FF; --red: #4FAEFF; --vignette: rgb(0 0 30 / .6); }
+  [data-vibe="tears"], [data-look="tears"] { --paper: #061226; --ink: #E3F0FF; --indigo: #7DC2FF; --red: #4FAEFF; --vignette: rgb(0 0 30 / .6); }
   [data-vibe="tears"] .scene::before,
   [data-vibe="tears"] .scene::after {
     inset: 0;
@@ -651,10 +720,24 @@
   @keyframes breathe { 50% { transform: scale(1.06); } }
   @keyframes open { from { clip-path: inset(40% 36% 40% 36%); } to { clip-path: inset(-20px -20px -20px -20px); } }
   @keyframes glint { 50% { filter: brightness(1.35); } }
-  @keyframes talk { from { height: 10px; } to { height: 84px; } }
   @keyframes roll { from { transform: translateY(260px); } to { transform: translateY(-100%); } }
   @keyframes float-up { from { opacity: 1; } to { opacity: 0; translate: 0 -40px; } }
   @keyframes fade { to { opacity: 0; } }
+  @keyframes two-a { 50% { opacity: 0; } }
+  @keyframes two-b { 50% { opacity: 1; } }
+  @keyframes three-a { 33.33% { opacity: 0; } }
+  @keyframes three-b { 33.33% { opacity: 1; } 66.66% { opacity: 0; } }
+  @keyframes three-c { 66.66% { opacity: 1; } }
+  @keyframes coin { 0% { transform: scaleX(1); } 25% { transform: scaleX(.6); } 50% { transform: scaleX(.15); } 75% { transform: scaleX(.6); } }
+  @keyframes thump { 0% { transform: scale(1); } 12% { transform: scale(1.15); } 24% { transform: scale(1.05); } 36% { transform: scale(1); } }
+  @keyframes bob1 { 50% { transform: translateY(-1px); } }
+  @keyframes dash { to { transform: translateX(-4px); } }
+  @keyframes tear {
+    0% { clip-path: inset(0 0 58% 0); transform: translateX(-5px); text-shadow: 2px 0 var(--red), -2px 0 #3EE6FF; }
+    33% { clip-path: inset(38% 0 22% 0); transform: translateX(6px); }
+    66% { clip-path: inset(72% 0 0 0); transform: translateX(-3px); }
+    100% { clip-path: inset(0); transform: none; text-shadow: none; }
+  }
   @media (prefers-reduced-motion: reduce) {
     .screen, .screen.opening, .pick, .press, .go, .now-line, .key { animation: none; }
     .ringing .phone, .ring .caller, .clock.late .secs, .over-title { animation: none; }
@@ -662,6 +745,9 @@
     .pop { animation: fade .85s steps(2) forwards; }
     .roll-window { overflow: auto; }
     .roll-strip { animation: none; }
+    .art *, .typing i { animation: none !important; }
+    .bubble, .typing { animation: none; }
+    .tear { animation: none !important; }
     .toast, .toast.show { transition: none; }
     .scene, .scene::before, .scene::after { animation: none !important; }
   }

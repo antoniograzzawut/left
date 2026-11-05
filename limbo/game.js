@@ -29,7 +29,7 @@
       hushHint: 'Shhh. Aqui não se toca em nada.', hushed: 'Shhh!',
       recap: 'As tuas escolhas', souls: 'das almas no Limbo escolheram o mesmo.',
       yourEnd: 'O teu final', share: 'Partilhar', copied: 'Copiado. Cola onde quiseres.',
-      rollTitle: 'Créditos', again: 'Jogar outra vez', restart: 'Recomeçar',
+      rollTitle: 'Créditos', again: 'Jogar outra vez', restart: 'Recomeçar', soFar: 'até agora', character: 'Personagem',
     },
     en: {
       by: 'a game-album by LEFT.', chooseLang: 'Which language do you want to play in?',
@@ -44,7 +44,7 @@
       hushHint: 'Shhh. Touch nothing here.', hushed: 'Shhh!',
       recap: 'Your choices', souls: 'of the souls in Limbo chose the same.',
       yourEnd: 'Your ending', share: 'Share', copied: 'Copied. Paste it anywhere.',
-      rollTitle: 'Credits', again: 'Play again', restart: 'Start over',
+      rollTitle: 'Credits', again: 'Play again', restart: 'Start over', soFar: 'so far', character: 'Character',
     },
   };
   // The credits are written in Portuguese; in English only the roles change
@@ -196,6 +196,7 @@
   function render(name, html, focus, vibe = 'night', extra = '') {
     stopClock();
     clearInterval(overTimer);
+    clearTimeout(storyTimer);
     buzz(false);
     stage = null;
     convo = null;
@@ -403,6 +404,11 @@
     stage.noisy = false;
     if (shown < 0) { stage.box.innerHTML = idleHTML(stage.t); return; }
     stage.box.innerHTML = lineHTML(stage.lines[shown], shown);
+    if (Math.random() < 0.1 + 0.45 * decay()) {
+      const el = stage.box.querySelector('.now-line');
+      scramble(el, 160 + 260 * decay());
+      tear(el);
+    }
     const key = stage.box.querySelector('.key');
     if (key && stage.done[shown]) key.classList.add(stage.done[shown] === 'caught' ? 'caught' : 'gone');
     if (key && !hinted) { hinted = true; toast(both2('tapHint'), 2600); }
@@ -672,7 +678,7 @@
       <div class="box">
         <p class="tag hud">${hudHTML()}</p>
         ${deckHTML(true)}
-        <div class="stage" aria-live="polite"></div>
+        <div class="stage"></div>
         <div class="pops" aria-hidden="true"></div>
         ${creditsHTML(t)}
       </div>`, null, t.vibe, 'opening');
@@ -683,7 +689,7 @@
     listen(n, () => {
       settleAll();
       const next = n === 1 ? calls[0].n : nextAfter(n);
-      if (next === LAST) ready(LAST, finale); else ring(next);
+      story(() => (next === LAST ? ready(LAST, finale) : ring(next)));
     });
   }
 
@@ -848,6 +854,7 @@
       <div class="then">
         <p class="q">${tr(`“${c.question[0]}”`, `“${c.question[1]}”`)}</p>
         <p class="a">${tr(o.pt, o.en)}</p>
+        ${storyLine(i ? path[i - 1] : null, to) ? `<p class="told">${pair(storyLine(i ? path[i - 1] : null, to))}</p>` : ''}
         ${pct ? `<p class="pct"><b>${pct}%</b> ${say('souls')}</p>` : ''}
       </div>
     </li>`;
@@ -874,6 +881,100 @@
       </div>`;
     }).join('') + `<p class="roll-head">antonioleft.com</p>`;
   }
+
+  // ---- After each track: the story so far, in the game system's own box, before the next call comes. Each line
+  // depends on the choice before it, and under them, who you are becoming ----
+  const storyLine = (prev, n) => (album.story || {})[`${prev}>${n}`] || (album.story || {})[n] || null;
+  function storySoFar() {
+    return [storyLine(null, 1), ...path.map((n, i) => storyLine(i ? path[i - 1] : null, n))].filter(Boolean);
+  }
+  function character() {
+    const e = album.ending || {};
+    const name = [e.who?.[path[1]], e.where?.[path[2]]].filter(Boolean);
+    const traits = [path[0], path[3], path[4]].map(n => e.traits?.[n]).filter(Boolean);
+    const join = k => [name.map(x => x[k]).join(' '), ...traits.map(x => x[k])].filter(Boolean).join(' · ');
+    return [join(0), join(1)];
+  }
+  let storyTimer = null;
+  function story(then) {
+    const lines = storySoFar();
+    const errs = ((album.story || {}).errors || []).slice(0, Math.max(0, path.length - 2));
+    const who = character();
+    render('story', `
+      <div class="log">
+        <p class="log-head">LIMBO.SYS <span>· ${say('soFar')}</span></p>
+        ${lines.map((l, i) => `<p class="log-line${i === lines.length - 1 ? ' new' : ''}">${pair(l)}</p>`).join('')}
+        ${errs.map(l => `<p class="log-line err">${pair(l)}</p>`).join('')}
+        ${who[0] ? `<p class="log-who">${say('character')}: <b>${pair(who)}</b></p>` : ''}
+      </div>
+      <button class="big next" type="button">${say('next')}</button>`, '.next', byN.get(at).vibe);
+    const go = () => { clearTimeout(storyTimer); then(); };
+    game.querySelector('.next').addEventListener('click', () => { sfx.go(); go(); }, { once: true });
+    const newest = game.querySelector('.log-line.new');
+    if (newest) typeOut(newest);
+    announce(lines[lines.length - 1][lang === 'en' ? 1 : 0]);
+    storyTimer = setTimeout(go, Math.min(13000, 5500 + lines[lines.length - 1][0].length * 45 + errs.length * 900));
+  }
+
+  // ---- The system failing: glitches, rare at the start and more and more towards the end. They also cover for a
+  // line that comes a moment early or late ----
+  const GLYPHS = '█▓▒░#@$%&*?!<>/|¥§¤';
+  const junk = () => GLYPHS[Math.floor(Math.random() * GLYPHS.length)];
+  const decay = () => Math.min(1, (path.length + (screen === 'end' ? 1.5 : 0)) / 5);
+  function textNodes(el) {
+    const nodes = [], w = document.createTreeWalker(el, NodeFilter.SHOW_TEXT);
+    while (w.nextNode()) nodes.push(w.currentNode);
+    return nodes;
+  }
+  // some letters turn to junk for a moment, then come back
+  function scramble(el, ms = 240) {
+    if (!el || el.dataset.glitch) return;
+    const nodes = textNodes(el), orig = nodes.map(n => n.nodeValue);
+    const amount = 0.12 + 0.3 * decay();
+    el.dataset.glitch = '1';
+    let f = 0;
+    const step = () => {
+      if (f++ >= 3 || !el.isConnected) { nodes.forEach((n, i) => { n.nodeValue = orig[i]; }); delete el.dataset.glitch; return; }
+      nodes.forEach((n, i) => { n.nodeValue = [...orig[i]].map(c => (c.trim() && Math.random() < amount ? junk() : c)).join(''); });
+      setTimeout(step, ms / 3);
+    };
+    step();
+  }
+  // the picture tears for a moment
+  function tear(el) {
+    if (!el || calm) return;
+    el.classList.remove('tear');
+    void el.offsetWidth;
+    el.classList.add('tear');
+    setTimeout(() => el.classList.remove('tear'), 340);
+  }
+  // the newest line of the story types itself out, a wrong letter here and there
+  function typeOut(el) {
+    if (calm) return;
+    const nodes = textNodes(el), full = nodes.map(n => n.nodeValue);
+    const total = Math.max(...full.map(t => t.length));
+    let i = 0;
+    const step = () => {
+      i += 2;
+      if (!el.isConnected) return;
+      nodes.forEach((n, k) => { n.nodeValue = full[k].slice(0, i) + (i < full[k].length && Math.random() < 0.3 + decay() * 0.5 ? junk() : ''); });
+      if (i < total) setTimeout(step, 28); else nodes.forEach((n, k) => { n.nodeValue = full[k]; });
+    };
+    nodes.forEach(n => { n.nodeValue = ''; });
+    step();
+  }
+  // now and then something on screen hiccups, and late in the game the whole screen does
+  setInterval(() => {
+    if (document.hidden || ['title', 'lang', 'ready'].includes(screen)) return;
+    if (Math.random() > 0.04 + 0.32 * decay()) return;
+    const els = [...game.querySelectorAll('h2, .now-line, .hud, .log-line, .recap .band, .ending, .total, .roll-name')];
+    const el = els[Math.floor(Math.random() * els.length)];
+    if (el) { scramble(el, 200 + 300 * decay()); tear(el); }
+    if (!calm && Math.random() < decay() * 0.5) {
+      body.classList.add('glitch');
+      setTimeout(() => body.classList.remove('glitch'), 160 + Math.random() * 200);
+    }
+  }, 2800);
 
   // ---- Declining a call: GAME OVER, and nine seconds to continue, or back to the title ----
   let overTimer = null;
