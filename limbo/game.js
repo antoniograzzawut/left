@@ -778,7 +778,6 @@
       hold.disabled = true;
       game.querySelector('.pick')?.focus({ preventScroll: true });
     });
-    callTick();
     listen(n, () => {
       showChoices();
       const box = game.querySelector('.choices');
@@ -789,6 +788,7 @@
   // its own seconds, then the choice
   function callTick() {
     if (screen !== 'call' || !convo || missing || convo.choices) return;
+    if (!audio.src.includes(`/${String(at).padStart(2, '0')}.`)) return;  // still the track before, not this call
     const pos = audio.currentTime || 0;
     if (convo.choose != null && pos >= convo.choose) { showChoices(); return; }
     const first = convo.msgs[0];

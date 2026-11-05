@@ -64,6 +64,7 @@
   a { color: inherit; text-decoration-color: var(--red); text-decoration-thickness: 2px; text-underline-offset: 3px; }
   a:hover { color: var(--red); }
   :focus-visible { outline: 3px solid var(--red); outline-offset: 3px; }
+  [hidden] { display: none !important; }  /* hidden means hidden, whatever else styles the element */
   .sr { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
   /* The page's own words in the language chosen; the album's words are Portuguese, with English under them */
   .ui-en { display: none; }
@@ -277,7 +278,7 @@
   }
   /* In English the English leads, big and first, and the Portuguese follows under it, small: the line being
      sung, a call's messages, the choices, the recap */
-  [data-lang="en"] :is(.now-line, .bubble, .pick > span, .recap .q, .recap .a, .words .line):has(> .en) { display: flex; flex-direction: column; }
+  [data-lang="en"] :is(.now-line, .bubble, .pick > span, .recap .q, .recap .a, .words .line):not([hidden]):has(> .en) { display: flex; flex-direction: column; }
   [data-lang="en"] :is(.now-line, .bubble, .pick > span, .recap .q, .recap .a, .words .line) > .en { order: -1; margin: 0 0 6px; font-size: 1em; color: inherit; }
   [data-lang="en"] :is(.now-line, .bubble, .pick > span, .recap .q, .recap .a, .words .line):has(> .en) > .pt { font-size: .58em; color: var(--indigo); }
   .key.gone { background: none; color: inherit; box-shadow: none; opacity: .45; animation: none; }
@@ -789,8 +790,8 @@
   <p class="sr" aria-live="polite"></p>
 
   <noscript><p style="padding: 16px">LIMBO precisa de JavaScript. LIMBO needs JavaScript.</p></noscript>
-  <script src="album.js?v=20261105-3"></script>
-  <script src="timings.js?v=20261105-3"></script>
-  <script src="game.js?v=20261105-3"></script>
+  <script src="album.js?v=20261105-4"></script>
+  <script src="timings.js?v=20261105-4"></script>
+  <script src="game.js?v=20261105-4"></script>
 </body>
 </html>
