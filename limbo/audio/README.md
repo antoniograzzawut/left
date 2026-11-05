@@ -21,14 +21,16 @@ The game plays the album from this folder: the 17 tracks as MP3 files (M4A works
 | `15.mp3` | Não estou bem |
 | `16.mp3` | Chora |
 | `17.mp3` | Limbo (fim) |
-| `title.mp3` | Siga in 8 bits: the title screen's loop, the first of the bonus, and Siga in the secret 8-bit mode (LIMBO_INTRO_CHIPTUNE in Drive) |
-| `8bit-pulso.mp3`, `8bit-a1-norte.mp3`, `8bit-quero-mais.mp3` | The other 8-bit versions: the bonus at the end, and their songs in the secret 8-bit mode (CHIPTUNES in Drive) |
+| `title.mp3` | Siga in 8 bits, the title screen's music until PRESS START (LIMBO_INTRO_CHIPTUNE in Drive) |
 
-**The calls are louder here than the masters.** The five calls (`02`, `05`, `08`, `11`,
-`14`) were about 13 dB quieter than the songs, so on 4 Nov 2026 they were raised by about
-8 dB, with a limiter so nothing clips. The masters in Drive and on the WD drive are
-unchanged. A new version of a call uploaded here comes in at its own level: ask Claude to
-raise it the same way.
+**The calls.** The ones here still have the ringtone and the voice that says which track
+to go to, which the game does itself; new versions without them are on their way. Upload
+each one over the old file with the same name (`02`, `05`, `08`, `11`, `14`). The calls
+were about 13 dB quieter than the songs, so these were raised by about 8 dB here, with a
+limiter so nothing clips: export the new ones louder, or ask Claude to raise them the same way.
+
+The 8-bit versions of Pulso, A1 Norte and Quero mais were taken out on 5 Nov 2026; they
+are still in Drive (CHIPTUNES), and in this folder's history.
 
 **Adding them.** Rename the files as above. Open this folder on GitHub, press "Add file",
 then "Upload files", drop them in, and press "Commit changes". The game finds them on its

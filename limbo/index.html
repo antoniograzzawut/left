@@ -70,21 +70,23 @@
   [data-lang="en"] .ui-en { display: inline; }
   [data-lang="en"] .ui-pt { display: none; }
 
-  /* Top: the logo, the way so far, and the two languages */
+  /* Top: the name, starting over, and the two languages, small and faint. Not there while the screen is only
+     the title, the language or a play button */
   .top {
-    display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between;
+    display: flex; align-items: center; justify-content: space-between;
     gap: 8px 16px;
     width: min(100% - 2 * var(--gutter), 640px);
     margin: 0 auto;
-    padding: calc(12px + env(safe-area-inset-top)) 0 8px;
+    padding: calc(10px + env(safe-area-inset-top)) 0 6px;
+    opacity: .7;
   }
+  .top:hover, .top:focus-within { opacity: 1; }
+  [data-screen="title"] .top, [data-screen="lang"] .top, [data-screen="ready"] .top { visibility: hidden; }
   .logo {
-    font: 400 32px/1 var(--arcade);
+    font: 400 22px/1 var(--arcade);
     letter-spacing: .03em;
     text-decoration: none;
-    text-shadow: 2px 2px 0 var(--indigo);
   }
-  [data-screen="title"] .logo { visibility: hidden; }
   .tools { display: flex; align-items: center; gap: 12px; margin-left: auto; }
   .restart, .langs button {
     min-height: 36px;
@@ -100,18 +102,6 @@
   .langs { display: flex; border: 2px solid var(--ink); }
   .langs button { min-width: 40px; }
   .langs [aria-pressed="true"] { background: var(--ink); color: var(--paper); }
-  .path {
-    order: 3;
-    flex-basis: 100%;
-    display: flex; flex-wrap: wrap; gap: 4px;
-    font: 400 10px/1 var(--pixel);
-    letter-spacing: .04em;
-    text-transform: uppercase;
-  }
-  [data-screen="title"] .path { display: none; }
-  .path li { padding: 5px 6px 4px; border: 2px solid var(--ink); background: var(--paper); }
-  .path .done { border-color: var(--indigo); color: var(--indigo); }
-  .path [aria-current] { background: var(--ink); border-color: var(--ink); color: var(--paper); }
 
   main {
     flex: 1;
@@ -129,9 +119,8 @@
     letter-spacing: .02em;
     text-shadow: 3px 3px 0 var(--red), 6px 6px 0 var(--indigo), 0 0 40px rgb(255 92 84 / .35);
   }
-  .press { margin-top: 10px; animation: blink 1.1s steps(1) infinite; }
-  .press[hidden], .menu[hidden] { display: none; }
-  .menu { display: grid; justify-items: center; gap: 16px; animation: pop .3s steps(3) both; }
+  .press { margin-top: 10px; min-width: 9.4em; animation: blink 1.1s steps(1) infinite; }
+  .extras { display: grid; justify-items: center; gap: 10px; margin-top: 12px; }
   .music {
     min-height: 36px; padding: 0 8px;
     border: 0; background: none;
@@ -143,22 +132,31 @@
   .also { display: block; margin-top: 3px; color: var(--indigo); font-size: .85em; }
   .small .also, .music .also { display: inline; margin: 0 0 0 .5em; font-size: 1em; }
   .small .also::before, .music .also::before { content: "· "; }
-  .ask { font: 400 clamp(18px, 5vw, 21px)/1.25 var(--arcade); letter-spacing: .02em; }
+  .by { font-size: 14px; letter-spacing: .06em; text-transform: uppercase; color: var(--indigo); }
+
+  /* The language, alone on its screen */
+  .lang { display: grid; justify-items: center; align-content: center; gap: 26px; min-height: 64vh; min-height: 64svh; text-align: center; }
+  .ask { font: 400 clamp(24px, 7vw, 32px)/1.2 var(--arcade); letter-spacing: .02em; }
   .tongues { display: flex; flex-wrap: wrap; justify-content: center; gap: 14px; }
   .tongues .start { min-width: 8.6em; }
-  [data-screen="title"] .langs { visibility: hidden; }
-  .by { font-size: 14px; letter-spacing: .06em; text-transform: uppercase; color: var(--indigo); }
-  .how { max-width: 30em; font: 400 clamp(19px, 5.4vw, 22px)/1.25 var(--arcade); letter-spacing: .02em; }
-  .small { font-size: 12px; letter-spacing: .04em; text-transform: uppercase; }
 
-  /* Him, in 8 bits: he nods along while a song plays */
-  .him {
-    display: block; width: 120px; height: auto; image-rendering: pixelated;
-    touch-action: manipulation; -webkit-touch-callout: none; -webkit-user-select: none; user-select: none;
+  /* Before each song, only its play button, which opens into the song when pressed */
+  .ready { display: grid; place-items: center; min-height: 70vh; min-height: 70svh; }
+  .go {
+    display: grid; place-items: center;
+    width: 128px; height: 128px;
+    border: 4px solid var(--ink);
+    background: var(--paper); color: var(--ink);
+    box-shadow: 6px 6px 0 var(--indigo);
+    cursor: pointer;
+    animation: breathe 1.6s steps(2) infinite;
+    -webkit-tap-highlight-color: transparent;
   }
-  .title .him { width: 144px; }
-  .playing .him { animation: bob 1s steps(1) infinite; }
-  .him.poke { translate: 0 -6px; }  /* a tap makes him hop (five in a row is a secret) */
+  .go svg { width: 44px; height: 44px; margin-left: 8px; }
+  .go:hover, .go:focus-visible { color: var(--red); border-color: var(--red); }
+  .go:active { transform: translate(4px, 4px); box-shadow: 2px 2px 0 var(--indigo); }
+  .screen.opening { animation: open .42s steps(6) both; }
+  .small { font-size: 12px; letter-spacing: .04em; text-transform: uppercase; }
 
   /* The buttons, like a game menu: a cursor in front, a press pushes them in */
   .big {
@@ -202,10 +200,12 @@
     background: var(--ink); color: var(--paper);
     font-size: 13px; line-height: 1; letter-spacing: .08em; text-transform: uppercase;
   }
-  .head { display: flex; align-items: flex-end; gap: 14px; }
-  .head h2 { font: 400 clamp(40px, 12vw, 56px)/.85 var(--arcade); letter-spacing: .02em; text-transform: uppercase; }
-  .head .ft { display: block; margin-top: 4px; font-size: .42em; letter-spacing: .06em; }
-  .head .en { margin-top: 6px; font: 400 15px/1.2 var(--arcade); letter-spacing: .04em; color: var(--indigo); text-transform: none; }
+  .tag.hud { left: auto; right: 14px; }
+  .hud b { font-weight: 400; }
+  .hud .mult { color: var(--red); }
+  .song-title { margin-top: 8px; font: 400 clamp(40px, 12vw, 56px)/.85 var(--arcade); letter-spacing: .02em; text-transform: uppercase; }
+  .song-title .ft { display: block; margin-top: 4px; font-size: .42em; letter-spacing: .06em; }
+  .song-title .en { margin-top: 6px; font: 400 15px/1.2 var(--arcade); letter-spacing: .04em; color: var(--indigo); text-transform: none; }
 
   /* The player: play or pause, where in the song, and a way to skip ahead */
   .deck { display: flex; flex-wrap: wrap; align-items: center; gap: 10px 12px; margin-top: 18px; }
@@ -243,11 +243,37 @@
   .en { display: none; }
   [data-lang="en"] .en { display: block; }
   .words .en { font-size: .82em; color: var(--indigo); }
-  /* With its times known, a line waits faintly, lights up while it is sung, and stays a little dimmer after */
-  .words.timed .line { opacity: .2; transition: opacity .3s steps(3), color .3s steps(3); }
-  .words.timed .line.sung { opacity: .62; }
-  .words.timed .line.now { opacity: 1; color: var(--red); }
-  .words.timed .line.now .en { color: var(--ink); }
+  /* Only the line being sung, big in the middle, the English under it; its lit word is the one to catch */
+  .stage {
+    display: grid; place-items: center;
+    min-height: clamp(170px, 34vh, 300px);
+    margin-top: 14px;
+    text-align: center;
+  }
+  .stage:has(.words) { display: block; min-height: 0; text-align: left; }
+  .now-line { font: 400 clamp(28px, 8.4vw, 40px)/1.15 var(--arcade); letter-spacing: .02em; animation: pop .2s steps(3) both; }
+  .now-line .en { margin-top: 10px; font-size: .58em; color: var(--indigo); }
+  .key {
+    position: relative;
+    display: inline-block;
+    padding: 0 .14em;
+    background: var(--red); color: var(--paper);
+    box-shadow: 3px 3px 0 var(--ink);
+    cursor: pointer;
+    animation: glint .5s steps(1) infinite;
+    touch-action: manipulation; -webkit-user-select: none; user-select: none; -webkit-tap-highlight-color: transparent;
+  }
+  .key::after { content: ""; position: absolute; inset: -12px -8px; }  /* a bigger target for a thumb */
+  .key.caught { background: var(--ink); color: var(--paper); box-shadow: none; animation: none; }
+  .key.gone { background: none; color: inherit; box-shadow: none; opacity: .45; animation: none; }
+  .pops { position: absolute; inset: 0; pointer-events: none; overflow: visible; }
+  .pop {
+    position: absolute;
+    transform: translate(-50%, -110%);
+    font: 400 26px/1 var(--arcade); letter-spacing: .02em;
+    color: var(--red); text-shadow: 2px 2px 0 var(--paper);
+    animation: float-up .85s steps(5) forwards;
+  }
   .credits { margin-top: 24px; font-size: 11px; line-height: 1.6; letter-spacing: .02em; }
   .credits summary { cursor: pointer; text-transform: uppercase; letter-spacing: .06em; }
   .credits summary:hover { color: var(--red); }
@@ -258,23 +284,30 @@
   .calling { display: flex; align-items: flex-end; justify-content: center; gap: 18px; }
   .phone { width: 96px; height: 80px; color: var(--red); }
   .ringing .phone { animation: shake .5s steps(2) infinite; }
-  .ring h2 { font: 400 clamp(44px, 14vw, 64px)/.85 var(--arcade); text-transform: uppercase; letter-spacing: .02em; }
   .ring .incoming { font-size: 13px; letter-spacing: .08em; text-transform: uppercase; color: var(--indigo); }
-  /* Who's calling, on a plate like the old phone's screen, and the two ways to go */
-  .caller {
-    display: grid; justify-items: center; gap: 5px;
-    min-width: 13em; padding: 9px 14px 7px;
+  /* Who's calling: a name, never a number, on a plate like the old phone's screen; then the two ways to go */
+  .caller { font: 400 clamp(52px, 16vw, 80px)/.85 var(--arcade); letter-spacing: .03em; text-transform: uppercase; }
+  .ring .caller {
+    min-width: 5em; padding: 12px 18px 6px;
     border: 3px solid var(--ink);
     background: color-mix(in srgb, var(--indigo) 18%, var(--paper));
+    animation: blink 1.1s steps(1) infinite;
   }
-  .caller small { font: 400 10px/1 var(--pixel); letter-spacing: .08em; text-transform: uppercase; color: var(--indigo); }
-  .caller > span { font: 400 30px/1 var(--arcade); letter-spacing: .04em; text-transform: uppercase; animation: blink 1.1s steps(1) infinite; }
+  .call .caller { margin-top: 4px; }
+  /* The voice on the line: bars that move while it speaks */
+  .voice { display: flex; justify-content: center; align-items: center; gap: 6px; height: 110px; margin-top: 18px; }
+  .voice i { width: 10px; height: 10px; background: var(--ink); }
+  .playing .voice:not(.done) i { animation: talk .45s steps(3) infinite alternate; }
+  .voice i:nth-child(3n) { animation-duration: .6s !important; }
+  .voice i:nth-child(3n + 1) { animation-delay: -.2s !important; }
+  .voice i:nth-child(4n) { animation-duration: .35s !important; }
+  .voice.done { height: 30px; opacity: .4; }
   .answers { display: flex; flex-wrap: wrap; justify-content: center; gap: 14px 18px; margin-top: 4px; }
   .decline { border-color: var(--indigo); color: var(--indigo); box-shadow: none; }
 
-  /* GAME OVER, for hanging up on a call: him reaching out, and nine seconds to change your mind */
+  /* GAME OVER, for hanging up on a call: the phone dead, and nine seconds to change your mind */
   .over { display: grid; justify-items: center; gap: 16px; padding-top: clamp(8px, 4vh, 40px); text-align: center; }
-  .over .him { filter: grayscale(1); opacity: .85; }
+  .dead .phone { color: var(--indigo); transform: rotate(-16deg); }
   .over-title {
     font: 400 clamp(76px, 25vw, 140px)/.8 var(--arcade); letter-spacing: .02em; text-transform: uppercase;
     text-shadow: 3px 3px 0 var(--red), 6px 6px 0 var(--indigo);
@@ -286,11 +319,8 @@
   /* On a short phone (an iPhone SE), everything on these two screens, buttons included, fits without scrolling */
   @media (max-height: 620px) {
     .ring, .over { gap: 10px; padding-top: 0; }
-    .ring .him, .over .him { width: 84px; }
-    .ring .phone { width: 72px; height: 60px; }
-    .ring h2 { font-size: 40px; }
-    .caller { padding: 6px 12px 5px; }
-    .caller > span { font-size: 24px; }
+    .phone { width: 72px; height: 60px; }
+    .ring .caller { font-size: 44px; padding: 8px 14px 4px; }
     .over-title { font-size: 64px; }
   }
   .line-who { margin-top: 6px; font-size: 12px; letter-spacing: .06em; text-transform: uppercase; color: var(--indigo); }
@@ -298,7 +328,8 @@
   .said .en { margin-top: 8px; font-size: .78em; color: var(--indigo); }
   .choices { display: grid; gap: 14px; margin-top: 22px; }
   .choices[hidden] { display: none; }
-  .choices > p { font-size: 12px; letter-spacing: .08em; text-transform: uppercase; }
+  .choices > p.choose-label { font-size: 12px; letter-spacing: .08em; text-transform: uppercase; }
+  .choices .said { margin-top: 0; }
   .pick {
     display: flex; align-items: center; gap: 12px;
     width: 100%;
@@ -338,22 +369,28 @@
 
   /* The end */
   .end { text-align: center; }
-  .end .him { margin: 0 auto; }
-  .cover {
-    display: block;
-    width: min(62vw, 260px); height: auto;
-    margin: 4px auto 22px;
-    border: 3px solid var(--ink);
-    box-shadow: 6px 6px 0 var(--red);
-  }
   .end h2 { font: 400 clamp(72px, 26vw, 128px)/.8 var(--arcade); letter-spacing: .02em; text-shadow: 3px 3px 0 var(--red), 6px 6px 0 var(--indigo); text-transform: uppercase; }
   .end .box { text-align: left; }
-  .trail { counter-reset: n; font: 400 clamp(22px, 6.4vw, 26px)/1.25 var(--arcade); letter-spacing: .02em; }
-  .trail li { counter-increment: n; display: flex; gap: 10px; }
-  .trail li::before { content: counter(n); min-width: 1em; color: var(--red); }
-  .trail .en { display: none; }
-  [data-lang="en"] .trail .en { display: inline; margin-left: .4em; font-size: .7em; color: var(--indigo); }
-  .one { margin-top: 14px; font-size: 12px; letter-spacing: .04em; text-transform: uppercase; color: var(--indigo); }
+  /* The score: the points, a grade from the share of words caught, and the best on this device */
+  .tally { margin-top: 18px; text-align: center; }
+  .total { font: 400 clamp(64px, 20vw, 104px)/.85 var(--arcade); letter-spacing: .02em; color: var(--red); }
+  .grade { margin-top: 6px; font: 400 24px/1 var(--arcade); letter-spacing: .06em; text-transform: uppercase; }
+  .grade b { font-weight: 400; color: var(--red); }
+  .tally .sub { margin-top: 8px; font-size: 11px; letter-spacing: .05em; text-transform: uppercase; color: var(--indigo); }
+  /* The recap: each call, what it asked, what you chose, and the souls who chose the same */
+  .recap { margin-top: 26px; }
+  .recap ol { display: grid; gap: 18px; margin-top: 10px; counter-reset: n; }
+  .recap li { counter-increment: n; padding-left: 2em; position: relative; }
+  .recap li::before { content: counter(n); position: absolute; left: 0; top: 2px; font: 400 26px/1 var(--arcade); color: var(--red); }
+  .recap .who { font-size: 11px; letter-spacing: .08em; text-transform: uppercase; color: var(--indigo); }
+  .recap .q { margin-top: 4px; font: 400 17px/1.2 var(--arcade); letter-spacing: .02em; color: var(--indigo); }
+  .recap .q .en { margin-top: 3px; font-size: .9em; }
+  .recap .a { margin-top: 6px; font: 400 clamp(22px, 6.4vw, 26px)/1.15 var(--arcade); letter-spacing: .02em; }
+  .recap .a .en { margin-top: 2px; font-size: .7em; color: var(--indigo); }
+  .recap .to { display: inline-block; margin-left: .5em; padding: 3px 6px 2px; background: var(--ink); color: var(--paper); font: 400 10px/1 var(--pixel); letter-spacing: .06em; text-transform: uppercase; vertical-align: middle; }
+  .recap .a .en + .to, .recap .a:has(.en) .to { margin-left: 0; margin-top: 6px; }
+  .recap .pct { margin-top: 6px; font-size: 12px; letter-spacing: .04em; }
+  .recap .pct b { font: 400 22px/1 var(--arcade); color: var(--red); }
   /* Your ending: its name, what your choices say about you, and a way to share it */
   .card {
     margin-top: 22px; padding: 16px 14px 18px;
@@ -367,24 +404,25 @@
   .traits li { padding: 5px 8px 4px; border: 2px solid currentColor; font: 400 11px/1 var(--pixel); letter-spacing: .06em; text-transform: uppercase; }
   .card .share { margin-top: 16px; min-height: 48px; border-color: var(--paper); color: var(--ink); font-size: 26px; }
   .card .share:hover, .card .share:focus-visible { color: var(--red); }
-  /* The 8-bit bonus: the versions like cassettes, one playing at a time */
-  .bonus { margin-top: 20px; }
-  .tapes { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 8px; }
-  .tape {
-    display: inline-flex; align-items: center; gap: 8px;
-    min-height: 44px; padding: 5px 12px 2px;
-    border: 3px solid var(--ink); background: var(--paper);
-    box-shadow: 3px 3px 0 var(--indigo);
-    font: 400 21px/1 var(--arcade); letter-spacing: .03em;
-    cursor: pointer;
+  .rare { margin-top: 12px; font-size: 11px; letter-spacing: .05em; text-transform: uppercase; opacity: .8; }
+  /* The credits roll up like a game's, while the last track plays; a mouse on them holds them */
+  .roll { margin-top: 26px; }
+  .roll-window {
+    height: 260px; margin-top: 10px; overflow: hidden;
+    -webkit-mask-image: linear-gradient(transparent, #000 14%, #000 86%, transparent);
+            mask-image: linear-gradient(transparent, #000 14%, #000 86%, transparent);
+    text-align: center;
   }
-  .tape svg { width: 12px; height: 12px; }
-  .tape:hover { color: var(--red); }
-  .tape[aria-pressed="true"] { background: var(--ink); color: var(--paper); }
+  .roll-strip { animation: roll 150s linear infinite; }
+  .roll-window:hover .roll-strip, .roll-window:focus .roll-strip { animation-play-state: paused; }
+  .roll-head { margin: 24px 0; font: 400 30px/1.05 var(--arcade); letter-spacing: .04em; text-transform: uppercase; }
+  .roll-track { margin-top: 22px; }
+  .roll-name { margin-bottom: 6px; font: 400 22px/1 var(--arcade); letter-spacing: .03em; color: var(--red); }
+  .roll-track p:not(.roll-name) { margin-top: 3px; font-size: 11px; line-height: 1.5; letter-spacing: .03em; }
   .end .again { margin-top: 26px; }
   .end .small { margin-top: 18px; }
 
-  /* A line over everything for a few seconds: what he says when you skip, fate's pick, the secret */
+  /* A line over everything for a few seconds: fate's pick, the hint, what the game says on a skip */
   .toast {
     position: fixed; left: 50%; bottom: calc(16px + env(safe-area-inset-bottom)); z-index: 7;
     width: max-content; max-width: calc(100% - 32px);
@@ -399,21 +437,7 @@
   }
   .toast.show { visibility: visible; transform: translate(-50%, 0); transition: transform .24s steps(3); }
 
-  /* The secret 8-bit mode: the lines of an old TV over everything, and a label by the name */
-  .eightbit::after {
-    content: ""; position: fixed; inset: 0; z-index: 6; pointer-events: none;
-    background: repeating-linear-gradient(transparent 0 2px, rgb(0 0 0 / .26) 2px 3px);
-    box-shadow: inset 0 0 18vmin rgb(0 0 0 / .5);
-  }
-  .eightbit .logo::after, .eightbit .limbo::after {
-    content: "8-bit";
-    padding: 3px 5px 2px;
-    background: var(--red); color: var(--paper);
-    font: 400 10px/1 var(--pixel); letter-spacing: .06em; text-transform: uppercase; text-shadow: none;
-  }
-  .eightbit .logo::after { margin-left: 6px; vertical-align: super; }
-  .eightbit .limbo::after { display: block; width: max-content; margin: 10px auto 0; }
-
+  body:not([data-screen="title"]):not([data-screen="end"]) footer { display: none; }
   footer {
     width: min(100% - 2 * var(--gutter), 640px);
     margin: 0 auto;
@@ -559,8 +583,6 @@
 
   /* quiet: Silêncio ("estar só, em silêncio, parar"), nothing moves, the words take more room, he fades */
   [data-vibe="quiet"] { --paper: #0E0E0F; --ink: #CFCFCF; --indigo: #969696; --red: #BDBDBD; --vignette: rgb(0 0 0 / .4); }
-  [data-vibe="quiet"] .him { opacity: .5; }
-  [data-vibe="quiet"] .playing .him { animation: none; }
   [data-vibe="quiet"] .words { letter-spacing: .12em; line-height: 1.6; }
 
   /* overcast: Não estou bem ("hoje estás no lodo"), a drizzle that doesn't stop, and mud at the bottom */
@@ -626,12 +648,21 @@
   @keyframes pop { from { transform: scale(.94); opacity: 0; } to { transform: none; opacity: 1; } }
   @keyframes bob { 50% { transform: translateY(-3px); } }
   @keyframes shake { 0% { transform: translateX(-3px) rotate(-6deg); } 100% { transform: translateX(3px) rotate(6deg); } }
+  @keyframes breathe { 50% { transform: scale(1.06); } }
+  @keyframes open { from { clip-path: inset(40% 36% 40% 36%); } to { clip-path: inset(-20px -20px -20px -20px); } }
+  @keyframes glint { 50% { filter: brightness(1.35); } }
+  @keyframes talk { from { height: 10px; } to { height: 84px; } }
+  @keyframes roll { from { transform: translateY(260px); } to { transform: translateY(-100%); } }
+  @keyframes float-up { from { opacity: 1; } to { opacity: 0; translate: 0 -40px; } }
+  @keyframes fade { to { opacity: 0; } }
   @media (prefers-reduced-motion: reduce) {
-    .screen, .pick, .menu, .press { animation: none; }
-    .playing .him, .ringing .phone { animation: none; }
-    .caller > span, .clock.late .secs, .over-title { animation: none; }
+    .screen, .screen.opening, .pick, .press, .go, .now-line, .key { animation: none; }
+    .ringing .phone, .ring .caller, .clock.late .secs, .over-title { animation: none; }
+    .playing .voice:not(.done) i { animation: none; height: 40px; }
+    .pop { animation: fade .85s steps(2) forwards; }
+    .roll-window { overflow: auto; }
+    .roll-strip { animation: none; }
     .toast, .toast.show { transition: none; }
-    .him.poke { translate: none; }
     .scene, .scene::before, .scene::after { animation: none !important; }
   }
 </style>
@@ -648,7 +679,6 @@
         <button type="button" data-lang="en" aria-pressed="false">EN</button>
       </div>
     </div>
-    <ol class="path"></ol>
   </header>
 
   <main id="game"></main>

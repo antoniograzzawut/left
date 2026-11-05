@@ -1,18 +1,14 @@
 // LIMBO (2024), the game-album by LEFT.: its words, the calls and their choices, and who made each track.
 // To change a line: each one is the Portuguese, then " | ", then the English. An empty line starts a new verse.
-// vibe is the look of a track's screen (its colours and its scene), defined in index.html.
+// vibe is the look of a track's screen (its colours and its scene), defined in index.html. A call's caller is the
+// name its phone shows; voice is who speaks it, as in its credits.
 // The words come from "LIMBO - Letras", "LIMBO - Tracklist" and "Limbo - Ficha técnica" in Google Drive,
 // and "Volto a ti - Letra" (2023). The English is Claude's translation, for António to check.
 window.LIMBO = {
   spotify: 'https://open.spotify.com/album/6DkuX5UAticvTx5NxEFVH5',
-  // The 8-bit versions: a bonus that opens at the end of the game, and what the secret 8-bit mode plays in place
-  // of these songs (n is the track). Siga's is also the title screen's music.
-  bonus: [
-    { n: 3, title: 'Siga', src: 'audio/title.mp3' },
-    { n: 6, title: 'Pulso', src: 'audio/8bit-pulso.mp3' },
-    { n: 9, title: 'A1 Norte', src: 'audio/8bit-a1-norte.mp3' },
-    { n: 12, title: 'Quero mais', src: 'audio/8bit-quero-mais.mp3' },
-  ],
+  // How many of "the souls in Limbo" took each song after its call, in percent: made up, for the recap at the end
+  // (each pair adds up to 100). Your ending's share is these five multiplied.
+  souls: { 3: 64, 4: 36, 7: 41, 6: 59, 9: 55, 10: 45, 12: 38, 13: 62, 15: 47, 16: 53 },
 
   // The name of your ending, from your choices: the second call says who you are, the third where, and the other
   // three give a trait each. Each is [Portuguese, English]; 2 x 2 x 2 x 2 x 2 = 32, one for each way through.
@@ -40,7 +36,7 @@ window.LIMBO = {
     15: ['Fugir também é resposta.', 'Running away is an answer too.'],
     16: ['Nem uma lágrima?', 'Not even one tear?'],
     any: [
-      ['Saltaste? Ele ouviu isso.', 'Skipped? He heard that.'],
+      ['Saltaste? Eu ouvi isso.', 'Skipped? I heard that.'],
       ['Uau. Nem o refrão.', 'Wow. Not even the chorus.'],
     ],
   },
@@ -64,7 +60,7 @@ Começar | As the start
       credits: 'Produção: LEFT. · Música e letra: António Graça · Interpretação, instrumentos e vozes: LEFT. · Mistura: LEFT. · Master: Michael Ferreira',
     },
     {
-      n: 2, title: 'Level 1', en: 'Level 1', call: 1, voice: 'L-ALI', vibe: 'lcd',
+      n: 2, title: 'Level 1', en: 'Level 1', call: 1, voice: 'L-ALI', caller: ['Amigo', 'Friend'], vibe: 'lcd',
       question: ['Tens estado em baixo? Vais levantar a cabeça e seguir em frente? Ou bater com a cabeça em tudo?',
                  'You’ve been feeling down? Are you going to lift your head and move on? Or bang your head against everything?'],
       options: [
@@ -202,7 +198,7 @@ Sou eu no final | Is me, in the end
       credits: 'Produção: LEFT. · Música e letra: António Graça, Hélder, Rossana · Interpretação: LEFT., L-Ali, Rossana · Sintetizadores e beat: LEFT. · Vozes: LEFT., L-Ali, Rossana · Mistura e master: Michael Ferreira',
     },
     {
-      n: 5, title: 'Level 2', en: 'Level 2', call: 2, voice: 'Ana Mariano', vibe: 'lcd',
+      n: 5, title: 'Level 2', en: 'Level 2', call: 2, voice: 'Ana Mariano', caller: ['Namorada', 'Girlfriend'], vibe: 'lcd',
       question: ['Isto não está a correr muito bem. Queres acabar?',
                  'This isn’t going very well. Do you want to end it?'],
       options: [
@@ -354,7 +350,7 @@ Não volto a ti | I won’t come back to you
       credits: 'Produção: LEFT., Luar · Música e letra: António Graça · Interpretação: LEFT. · Guitarras: LEFT., Luar · Cordas: Luar · Vozes: LEFT., Luar, Helena Silva · Mistura e master: Michael Ferreira',
     },
     {
-      n: 8, title: 'Level 3', en: 'Level 3', call: 3, voice: 'Miguel Garcia', vibe: 'lcd',
+      n: 8, title: 'Level 3', en: 'Level 3', call: 3, voice: 'Miguel Garcia', caller: ['Amigo 2', 'Friend 2'], vibe: 'lcd',
       question: ['Puto, estou farto. Bora sair de Lisboa e viajar? Ou preferes só ir dançar a algum lado?',
                  'Kid, I’m fed up. Let’s get out of Lisbon and travel? Or would you rather just go dancing somewhere?'],
       options: [
@@ -474,7 +470,7 @@ A pairar por cima do Tejo | Hanging over the Tagus
       credits: 'Produção: LEFT. · Música e letra: António Graça · Interpretação: LEFT. · Bateria, sintetizadores, baixo e vozes: LEFT. · Mistura: LEFT. · Master: Michael Ferreira',
     },
     {
-      n: 11, title: 'Level 4', en: 'Level 4', call: 4, voice: 'Luar', vibe: 'lcd',
+      n: 11, title: 'Level 4', en: 'Level 4', call: 4, voice: 'Luar', caller: ['Irmão', 'Brother'], vibe: 'lcd',
       question: ['O que é que tu queres afinal? Queres mais? Ou queres só ficar satisfeito com o que tens?',
                  'So what is it you want? Do you want more? Or do you just want to be happy with what you have?'],
       options: [
@@ -532,7 +528,7 @@ Eu quero mais | I want more
       credits: 'Produção: LEFT., Luar · Música e letra: António Graça · Interpretação: LEFT. · Guitarras: LEFT., Luar · Sopros, bateria e vozes: LEFT. · Mistura e master: Michael Ferreira',
     },
     {
-      n: 13, title: 'Silêncio', en: 'Silence', vibe: 'quiet',
+      n: 13, title: 'Silêncio', en: 'Silence', vibe: 'quiet', hush: true,  // the game here: touch nothing
       words: `
 Estar só | To be alone
 Em silêncio | In silence
@@ -549,7 +545,7 @@ Sem tempo | Without time
       credits: 'Produção: LEFT. · Música e letra: António Graça · Interpretação: LEFT. · Guitarras, cordas, bateria e vozes: LEFT. · Mistura: LEFT. · Master: Michael Ferreira',
     },
     {
-      n: 14, title: 'Level 5', en: 'Level 5', call: 5, voice: 'Manuela Maciel', vibe: 'lcd',
+      n: 14, title: 'Level 5', en: 'Level 5', call: 5, voice: 'Manuela Maciel', caller: ['Mãe', 'Mom'], vibe: 'lcd',
       question: ['Quando te vais abaixo, tens que assumir que não estás bem, e aceitar-te por isso. Ou então chora só, filho, chora.',
                  'When you hit bottom, you have to admit you’re not okay, and accept yourself for it. Or else just cry, son, cry.'],
       options: [

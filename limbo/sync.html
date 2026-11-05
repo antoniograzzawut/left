@@ -70,6 +70,8 @@
   <h1>LIMBO</h1>
   <p>Toca no botão grande (ou carrega no espaço) no momento em que cada verso começa. Enganaste-te? “Desfazer” (ou a tecla de apagar) volta um verso atrás.
      <br><span class="en">Tap the big button (or press space) the moment each line starts. Missed one? “Undo” (or backspace) goes back a line.</span></p>
+  <p>Todas as canções já têm tempos feitos à máquina, que podem estar um ou dois segundos fora. Marca aqui só as que precisarem.
+     <br><span class="en">Every song already has machine-made times, which can be a second or two off. Tap along only the ones that need it.</span></p>
   <small>Fica guardado neste aparelho, e o jogo neste aparelho já mostra os tempos. Para todos os verem: “Descarregar timings.js” no fim da página, e põe esse ficheiro na pasta limbo no GitHub (Add file › Upload files).</small>
 
   <ul class="songs" aria-label="Canções"></ul>
@@ -188,11 +190,11 @@
   function paintOut() {
     const all = { ...file, ...mine };
     const keys = Object.keys(all).map(Number).sort((a, b) => a - b);
-    const text = `// When each line of LIMBO's songs is sung: seconds from the start of the track, one per line, in the order of
-// album.js. Made with the tap-along at antonioleft.com/limbo/sync.html, which gives a new version of this file.
-// A song with no times here shows all its words at once.
+    const text = `// When each line of LIMBO's songs is sung, in seconds from the start of the track, one per line, in the order of
+// album.js: when it starts, or [start, end]. Made by machine and with the tap-along at antonioleft.com/limbo/sync.html,
+// which gives a new version of this file. A song with no times here shows all its words at once.
 window.LIMBO_TIMES = {
-${keys.map(n => `  ${n}: [${all[n].join(', ')}],`).join('\n')}
+${keys.map(n => `  ${n}: ${JSON.stringify(all[n])},`).join('\n')}
 };
 `;
     $('.out pre').textContent = text;

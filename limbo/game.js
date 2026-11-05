@@ -1,9 +1,11 @@
 // LIMBO, the game-album by LEFT., played in the browser.
 // The album is a path: the Intro, then five phone calls. Each call ends in a choice between two songs, and every
-// path ends on "Limbo (fim)", so there are 32 ways through. The words, translations, choices and credits are in
-// album.js. Track 7's sound is audio/07.mp3, and so on; while a track's sound is not there yet, the game shows its
-// words and goes on when you tap Continue. It is played in the dark, and each part of the album has its own look
-// (its vibe in album.js, drawn in index.html). The title screen loops the album's intro in 8 bits.
+// path ends on "Limbo (fim)", so there are 32 ways through. The words, translations, calls, choices and credits are
+// in album.js; when each line is sung is in timings.js.
+// The title screen plays the album's intro in 8 bits until PRESS START; then the language, with no music. Each song
+// waits behind a single play button, which opens into it. While it plays only the line being sung shows, and one
+// word of it lights up: catching it scores. A call rings, and is answered or not. Each part of the album has its
+// own look (its vibe in album.js, drawn in index.html). The end recaps the choices, the score and the credits.
 (() => {
   const album = window.LIMBO;
   const byN = new Map(album.tracks.map(t => [t.n, t]));
@@ -15,38 +17,34 @@
 
   const TEXT = {
     pt: {
-      by: 'um álbum-jogo de LEFT.',
-      how: 'Cinco chamadas. Cada uma acaba numa escolha entre duas canções. Há 32 caminhos.',
-      start: 'Jogar', chooseLang: 'Em que língua queres jogar?', musicOn: 'Música: ligada', musicOff: 'Música: desligada', phones: 'Melhor com auscultadores',
-      cover: 'A capa de LIMBO: António a flutuar num vazio branco, iluminado de vermelho',
-      spotify: 'Ouvir o álbum no Spotify', track: 'Faixa', call: 'Chamada',
-      incoming: 'Chamada recebida', answer: 'Atender', onLine: 'Na linha', choose: 'Escolhe',
-      next: 'Continuar', skip: 'Saltar', play: 'Tocar', pause: 'Pausa', where: 'Onde vai a faixa',
-      soon: 'O áudio ainda não está aqui. Por agora, lê.', credits: 'Ficha técnica', end: 'Fim',
-      bonus: 'Bónus 8-bit, desbloqueado', path: 'O teu caminho', oneOf: 'Um dos 32 caminhos de LIMBO.',
-      decline: 'Recusar', caller: 'Quem liga', hungUp: 'Desligaste-lhe na cara.', cont: 'Continuar?',
-      backToCall: 'Sim, voltar à chamada', fate: 'O destino escolheu por ti.', hold: 'Parar o relógio', held: 'Relógio parado',
-      secret: 'Segredo: da próxima vez, toca nele cinco vezes seguidas.',
+      by: 'um álbum-jogo de LEFT.', chooseLang: 'Em que língua queres jogar?',
+      musicOn: 'Música: ligada', musicOff: 'Música: desligada', phones: 'Melhor com auscultadores',
+      spotify: 'Ouvir o álbum no Spotify', play: 'Tocar', pause: 'Pausa', where: 'Onde vai a faixa',
+      skip: 'Saltar', next: 'Continuar', soon: 'O áudio ainda não está aqui. Por agora, lê.',
+      incoming: 'Chamada recebida', answer: 'Atender', decline: 'Recusar', onLine: 'Na linha',
+      choose: 'Escolhe', hold: 'Parar o relógio', held: 'Relógio parado', fate: 'O destino escolheu por ti.',
+      hungUp: 'Desligaste-lhe na cara.', cont: 'Continuar?', backToCall: 'Sim, voltar à chamada',
+      credits: 'Ficha técnica', end: 'Fim', score: 'Pontos', best: 'Recorde', newBest: 'Novo recorde!',
+      caught: 'Palavras apanhadas', grade: 'Nota', tapHint: 'Toca na palavra que acende.',
+      hushHint: 'Shhh. Aqui não se toca em nada.', hushed: 'Shhh!',
+      recap: 'As tuas escolhas', souls: 'das almas no Limbo escolheram o mesmo.',
       yourEnd: 'O teu final', share: 'Partilhar', copied: 'Copiado. Cola onde quiseres.',
-      shareText: 'Joguei LIMBO de LEFT. e saiu-me', shareAsk: 'E a ti?',
-      eightOn: 'Modo 8-bit: ligado', eightOff: 'Modo 8-bit: desligado', again: 'Jogar outra vez', restart: 'Recomeçar',
+      rollTitle: 'Créditos', again: 'Jogar outra vez', restart: 'Recomeçar',
     },
     en: {
-      by: 'a game-album by LEFT.',
-      how: 'Five phone calls. Each one ends in a choice between two songs. There are 32 ways through.',
-      start: 'Play', chooseLang: 'Which language do you want to play in?', musicOn: 'Music: on', musicOff: 'Music: off', phones: 'Best with headphones',
-      cover: 'The cover of LIMBO: António floating in a white void, lit red',
-      spotify: 'Listen to the album on Spotify', track: 'Track', call: 'Call',
-      incoming: 'Incoming call', answer: 'Answer', onLine: 'On the line', choose: 'Choose',
-      next: 'Continue', skip: 'Skip', play: 'Play', pause: 'Pause', where: 'Position in the track',
-      soon: 'The audio isn’t here yet. For now, read along.', credits: 'Credits', end: 'The end',
-      bonus: '8-bit bonus, unlocked', path: 'Your path', oneOf: 'One of LIMBO’s 32 paths.',
-      decline: 'Decline', caller: 'Caller', hungUp: 'You hung up on them.', cont: 'Continue?',
-      backToCall: 'Yes, back to the call', fate: 'Fate chose for you.', hold: 'Stop the clock', held: 'Clock stopped',
-      secret: 'Secret: next time, tap him five times in a row.',
+      by: 'a game-album by LEFT.', chooseLang: 'Which language do you want to play in?',
+      musicOn: 'Music: on', musicOff: 'Music: off', phones: 'Best with headphones',
+      spotify: 'Listen to the album on Spotify', play: 'Play', pause: 'Pause', where: 'Position in the track',
+      skip: 'Skip', next: 'Continue', soon: 'The audio isn’t here yet. For now, read along.',
+      incoming: 'Incoming call', answer: 'Answer', decline: 'Decline', onLine: 'On the line',
+      choose: 'Choose', hold: 'Stop the clock', held: 'Clock stopped', fate: 'Fate chose for you.',
+      hungUp: 'You hung up on them.', cont: 'Continue?', backToCall: 'Yes, back to the call',
+      credits: 'Credits', end: 'The end', score: 'Score', best: 'Best', newBest: 'New best!',
+      caught: 'Words caught', grade: 'Grade', tapHint: 'Tap the word that lights up.',
+      hushHint: 'Shhh. Touch nothing here.', hushed: 'Shhh!',
+      recap: 'Your choices', souls: 'of the souls in Limbo chose the same.',
       yourEnd: 'Your ending', share: 'Share', copied: 'Copied. Paste it anywhere.',
-      shareText: 'I played LIMBO by LEFT. and got', shareAsk: 'What about you?',
-      eightOn: '8-bit mode: on', eightOff: '8-bit mode: off', again: 'Play again', restart: 'Start over',
+      rollTitle: 'Credits', again: 'Play again', restart: 'Start over',
     },
   };
   // The credits are written in Portuguese; in English only the roles change
@@ -59,7 +57,6 @@
 
   const body = document.body;
   const game = document.getElementById('game');
-  const pathList = document.querySelector('.path');
   const restart = document.querySelector('.restart');
   const live = document.querySelector('.sr');
   const scene = document.querySelector('.scene');
@@ -71,7 +68,9 @@
 
   const esc = s => String(s).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' })[c]);
   // Words of the page itself come in both languages, and the one chosen shows
-  const say = key => `<span class="ui-pt">${esc(TEXT.pt[key])}</span><span class="ui-en" lang="en">${esc(TEXT.en[key])}</span>`;
+  const pair = ([pt, en]) => `<span class="ui-pt">${esc(pt)}</span><span class="ui-en" lang="en">${esc(en)}</span>`;
+  const say = key => pair([TEXT.pt[key], TEXT.en[key]]);
+  const both2 = key => [TEXT.pt[key], TEXT.en[key]];
   // Before the language is chosen: the Portuguese, and the English under it
   const both = key => `${esc(TEXT.pt[key])}<span class="also" lang="en">${esc(TEXT.en[key])}</span>`;
   // Words of the album are always in Portuguese, with the English under them when English is on
@@ -82,9 +81,9 @@
     return (guest ? `${esc(guest[1])}<span class="ft">${esc(guest[2])}</span>` : esc(t.title)) +
       (t.en && t.en !== t.title ? `<span class="en" lang="en">${esc(t.en)}</span>` : '');
   };
+  const plainTitle = t => t.title.replace(/ \(ft\..*\)/, '');
   const mmss = s => `${Math.floor(s / 60)}:${String(Math.floor(s % 60)).padStart(2, '0')}`;
 
-  const SPRITE = look => `<img class="him" src="img/${look}.png" width="96" height="120" alt="">`;
   const ICON = {
     play: '<svg viewBox="0 0 7 7" shape-rendering="crispEdges" aria-hidden="true"><path fill="currentColor" d="M1 0h1v1h1v1h1v1h1v1H4v1H3v1H2v1H1z"/></svg>',
     pause: '<svg viewBox="0 0 7 7" shape-rendering="crispEdges" aria-hidden="true"><path fill="currentColor" d="M1 0h2v7H1zM4 0h2v7H4z"/></svg>',
@@ -97,12 +96,9 @@
       return [pt.trim(), en.trim()];
     }));
   }
-  const wordsHTML = t => {
-    if (!t.words) return '';
-    let i = 0;
-    return `<div class="words">${verses(t.words).map(v =>
-      `<p>${v.map(([pt, en]) => `<span class="line" data-i="${i++}">${tr(pt, en)}</span>`).join('')}</p>`).join('')}</div>`;
-  };
+  // All the words at once: only for a song whose times aren't known yet
+  const wordsHTML = t => !t.words ? '' : `<div class="words">${verses(t.words).map(v =>
+    `<p>${v.map(([pt, en]) => `<span class="line">${tr(pt, en)}</span>`).join('')}</p>`).join('')}</div>`;
   const creditsEN = s => s.split(' · ').map(part => {
     const i = part.indexOf(': ');
     const role = part.slice(0, i).replace(/[A-Za-zÀ-ÿ]+/g, w => ROLES[w.toLowerCase()] || w);
@@ -111,14 +107,16 @@
   const creditsHTML = t => !t.credits ? '' :
     `<details class="credits"><summary>${say('credits')}</summary>
       <p><span class="ui-pt">${esc(t.credits)}</span><span class="ui-en" lang="en">${esc(creditsEN(t.credits))}</span></p></details>`;
+  const callerHTML = t => pair(t.caller || [t.voice, t.voice]);
 
+  // ---- A line over everything for a few seconds: fate's pick, the hint, what the game says on a skip ----
   const toastEl = document.createElement('p');
   toastEl.className = 'toast';
   toastEl.setAttribute('aria-hidden', 'true');
   document.body.append(toastEl);
   let toastTimer = null;
   function toast([pt, en], ms = 3200) {
-    toastEl.innerHTML = `<span class="ui-pt">${esc(pt)}</span><span class="ui-en" lang="en">${esc(en)}</span>`;
+    toastEl.innerHTML = pair([pt, en]);
     toastEl.classList.remove('show');
     void toastEl.offsetWidth;
     toastEl.classList.add('show');
@@ -126,8 +124,6 @@
     toastTimer = setTimeout(() => toastEl.classList.remove('show'), ms);
     announce(lang === 'en' ? en : pt);
   }
-  const both2 = key => [TEXT.pt[key], TEXT.en[key]];
-
   function announce(message) {
     live.textContent = '';
     setTimeout(() => { live.textContent = message; }, 60);
@@ -143,16 +139,16 @@
     themeColor.content = getComputedStyle(body).getPropertyValue('--paper').trim();
   }
 
-  function render(name, html, focus, vibe = 'night') {
+  function render(name, html, focus, vibe = 'night', extra = '') {
     stopClock();
     clearInterval(overTimer);
     buzz(false);
+    stage = null;
     screen = name;
     body.dataset.screen = name;
     setVibe(vibe);
-    game.innerHTML = `<section class="screen ${name}">${html}</section>`;
+    game.innerHTML = `<section class="screen ${name} ${extra}">${html}</section>`;
     restart.hidden = name === 'title';
-    paintPath();
     scrollTo(0, 0);
     if (focus === false) return;
     const target = game.querySelector(focus || 'h2');
@@ -160,18 +156,6 @@
       if (!target.matches('button, a')) target.tabIndex = -1;
       target.focus({ preventScroll: true });
     }
-  }
-
-  // The way so far, along the top: the Intro, one step per call (the song picked, once picked), and the end
-  function paintPath() {
-    const now = at === 1 ? 0 : at === LAST ? 6 : byN.get(at)?.call || path.indexOf(at) + 1;
-    const steps = [
-      'Intro',
-      ...calls.map((c, i) => path[i] ? esc(byN.get(path[i]).title.replace(/ \(ft\..*\)/, '')) : `${c.call} ?`),
-      say('end'),
-    ];
-    pathList.innerHTML = screen === 'title' ? '' : steps.map((s, i) =>
-      `<li${i === now ? ' aria-current="step"' : ''}${i < now ? ' class="done"' : ''}>${s}</li>`).join('');
   }
 
   // ---- The sound of the album ----
@@ -189,19 +173,12 @@
     media(n);
     load(n, 0);
   }
-  // In the secret 8-bit mode a song with an 8-bit version plays that; otherwise the track, from where it starts
-  const chipFor = n => (eight ? (album.bonus || []).find(b => b.n === n) : null);
-  function sourceFor(n, k) {
-    const chip = chipFor(n);
-    if (chip) return { src: chip.src, last: true };
-    const from = byN.get(n)?.from;
-    return { src: file(n, KINDS[k]) + (from ? `#t=${from}` : ''), last: false };
-  }
+  // A track starts where its sound does (from, in album.js: Siga opens with seconds of silence)
   function load(n, k) {
     const mine = ++attempt;
-    const source = sourceFor(n, k);
-    kind = source.last ? KINDS.length - 1 : k;
-    audio.src = source.src;
+    kind = k;
+    const from = byN.get(n)?.from;
+    audio.src = file(n, KINDS[k]) + (from ? `#t=${from}` : '');
     paint();
     const p = audio.play();
     if (p) p.then(paint, err => {
@@ -209,13 +186,14 @@
       else paint();  // the browser waits for a tap on Play, or another track was asked for first
     });
   }
-  // That file isn't there: the other kind is tried, and with neither (yet) the words stay
+  // That file isn't there: the other kind is tried, and with neither (yet) the words show whole
   // and the game goes on without the sound
   function failed(n, which) {
     if (n !== at || which !== attempt || handled === which || missing) return;
     handled = which;
     if (kind + 1 < KINDS.length) return load(n, kind + 1);
     missing = true;
+    if (stage) { stage.box.innerHTML = wordsHTML(stage.t); stage = null; }
     paint();
     if (screen === 'call') finish();
   }
@@ -268,7 +246,7 @@
     deck.querySelector('.go-on')?.addEventListener('click', () => { sfx.go(); finish(); });
     paint();
   }
-  // What he says when a song is skipped: its own line most of the time, or one of the lines for any song
+  // What the game says when a song is skipped: its own line most of the time, or one of the lines for any song
   function skipLine(n) {
     const lines = album.skips || {}, any = lines.any || [];
     if (lines[n] && (Math.random() < 0.7 || !any.length)) return lines[n];
@@ -276,8 +254,8 @@
   }
   function paint() {
     const deck = game.querySelector('.deck');
-    const stage = game.querySelector('.screen');
-    if (stage) stage.classList.toggle('playing', !!deck && !missing && !audio.paused);
+    const section = game.querySelector('.screen');
+    if (section) section.classList.toggle('playing', !!deck && !missing && !audio.paused);
     if (!deck) return;
     deck.dataset.state = missing ? 'missing' : audio.paused ? 'paused' : 'playing';
     deck.querySelector('.pp').innerHTML = (audio.paused ? ICON.play : ICON.pause) +
@@ -294,8 +272,7 @@
   // On the lock screen and in the phone's music controls
   function media(n) {
     if (!('mediaSession' in navigator) || !window.MediaMetadata) return;
-    const title = byN.get(n).title + (chipFor(n) ? ' (8-bit)' : '');
-    try { navigator.mediaSession.metadata = new MediaMetadata({ title, artist: 'LEFT.', album: 'LIMBO' }); } catch {}
+    try { navigator.mediaSession.metadata = new MediaMetadata({ title: byN.get(n).title, artist: 'LEFT.', album: 'LIMBO' }); } catch {}
   }
   if ('mediaSession' in navigator) {
     try {
@@ -304,50 +281,150 @@
     } catch {}
   }
 
-  // ---- The words appear with the music: lines whose times are known (timings.js, or the tap-along on this
-  // device) wait faintly, light up when they are sung, and stay a little dimmer after ----
+  // ---- Only the line being sung. Its times come from timings.js, or from the tap-along on this device: each is
+  // when the line starts, or [start, end]. A line without an end stays until the next one, or a few seconds ----
   function timesFor(n) {
     let mine = {};
     try { mine = JSON.parse(localStorage.getItem('limbo-times') || '{}'); } catch {}
     return mine[n] || (window.LIMBO_TIMES || {})[n] || null;
   }
-  let follow = null, scrolledAt = 0;
-  addEventListener('wheel', () => { scrolledAt = performance.now(); }, { passive: true });
-  addEventListener('touchmove', () => { scrolledAt = performance.now(); }, { passive: true });
-  function startFollow(n) {
-    const times = chipFor(n) ? null : timesFor(n);
-    const box = game.querySelector('.words');
-    const lines = box ? [...box.querySelectorAll('.line')] : [];
-    follow = times && times.length && lines.length ? { box, lines, times, now: -2 } : null;
-    if (box) box.classList.toggle('timed', !!follow);
-    if (!follow) lines.forEach(el => el.classList.remove('sung', 'now'));
-  }
-  function paintLines() {
-    if (!follow || !follow.box.isConnected) return;
-    follow.box.classList.toggle('timed', !missing);
-    if (missing) return;
-    const pos = audio.currentTime + 0.05;
-    let i = -1;
-    while (i + 1 < follow.times.length && follow.times[i + 1] <= pos) i++;
-    if (i === follow.now) return;
-    follow.now = i;
-    follow.lines.forEach((el, k) => {
-      el.classList.toggle('sung', k < i);
-      el.classList.toggle('now', k === i);
+  // The word to catch in a line: its longest (four letters or more), the later one if two are as long
+  function keyIndex(line) {
+    let best = -1, bestLen = 0;
+    line.split(/\s+/).forEach((w, i) => {
+      const l = w.replace(/[^\p{L}\p{N}]/gu, '').length;
+      if (l >= 4 && l >= bestLen) { best = i; bestLen = l; }
     });
-    // The line being sung stays on screen, unless the reader scrolled in the last few seconds
-    const line = follow.lines[i];
-    if (line && performance.now() - scrolledAt > 4000) {
-      const r = line.getBoundingClientRect();
-      if (r.top < 140 || r.bottom > innerHeight - 100) line.scrollIntoView({ block: 'center', behavior: calm ? 'auto' : 'smooth' });
-    }
+    return best;
   }
+  function linesOf(t) {
+    const times = timesFor(t.n);
+    if (!t.words || !times) return null;
+    const flat = verses(t.words).flat();
+    if (times.length !== flat.length) return null;  // times for other words: show the words whole
+    const startOf = v => (Array.isArray(v) ? v[0] : v);
+    return flat.map(([pt, en], i) => {
+      const start = startOf(times[i]);
+      const next = i + 1 < times.length ? startOf(times[i + 1]) : Infinity;
+      const guess = Math.min(7, Math.max(1.6, 0.8 + 0.075 * pt.length));
+      let end = Math.min(next, Array.isArray(times[i]) && times[i][1] ? Math.max(times[i][1], start + 0.8) : start + guess);
+      if (next - end < 1.2) end = next;  // a short breath between two lines: the first stays until the next
+      // a word to catch, if the line stays long enough to catch it
+      return { pt, en, start, end, key: end - start >= 1 ? keyIndex(pt) : -1 };
+    });
+  }
+  const lineHTML = (line, i) => {
+    const pt = line.pt.split(/\s+/).map((w, k) => (k === line.key && !stage.hush
+      ? `<span class="key">${esc(w)}</span>` : esc(w))).join(' ');
+    return `<p class="now-line" data-i="${i}"><span class="pt">${pt}</span>${line.en && line.en !== line.pt ? `<span class="en" lang="en">${esc(line.en)}</span>` : ''}</p>`;
+  };
+
+  // ---- The points: a lit word caught soon after it lights is worth more, and catches in a row multiply them.
+  // In Silêncio the game turns around: every line let go by in silence scores, and a touch breaks it ----
+  let run = null, best = 0, hinted = false;
+  try { best = Number(localStorage.getItem('limbo-best')) || 0; } catch {}
+  const newRun = () => ({ score: 0, combo: 0, caught: 0, keys: 0 });
+  const mult = () => Math.min(4, 1 + Math.floor(run.combo / 5));
+  let stage = null;  // the song on screen: { t, box, lines, now, done, hush, noisy }
+
+  function startStage(t) {
+    const box = game.querySelector('.stage');
+    if (!box) return;
+    const lines = linesOf(t);
+    if (!lines) { box.innerHTML = wordsHTML(t); return; }
+    stage = { t, box, lines, now: -2, done: {}, hush: !!t.hush, noisy: false };
+  }
+  function paintStage() {
+    if (!stage || !stage.box.isConnected || missing) return;
+    const pos = audio.currentTime;
+    let i = -1;
+    for (let k = 0; k < stage.lines.length && stage.lines[k].start <= pos; k++) i = k;
+    const shown = i >= 0 && pos < stage.lines[i].end ? i : -1;
+    if (shown === stage.now) return;
+    settle(stage.now);
+    stage.now = shown;
+    stage.noisy = false;
+    if (shown < 0) { stage.box.innerHTML = ''; return; }
+    stage.box.innerHTML = lineHTML(stage.lines[shown], shown);
+    const key = stage.box.querySelector('.key');
+    if (key && stage.done[shown]) key.classList.add(stage.done[shown] === 'caught' ? 'caught' : 'gone');
+    if (key && !hinted) { hinted = true; toast(both2('tapHint'), 2600); }
+  }
+  // A line leaving the screen: its word was caught or not; in Silêncio, it went by quietly or not
+  function settle(i) {
+    if (!stage || i < 0 || stage.done[i]) return;
+    if (stage.hush) {
+      run.keys++;
+      if (stage.noisy) { stage.done[i] = 'noise'; run.combo = 0; }
+      else { stage.done[i] = 'quiet'; run.caught++; run.combo++; score(100, stage.box); }
+    } else if (stage.lines[i].key >= 0) {
+      run.keys++;
+      stage.done[i] = 'missed';
+      run.combo = 0;
+    }
+    paintHUD();
+  }
+  function settleAll() { if (stage) settle(stage.now); }
+  function score(points, near) {
+    const m = mult();
+    run.score += points * m;
+    const layer = game.querySelector('.pops');
+    if (layer && near) {
+      const pop = document.createElement('span');
+      pop.className = 'pop';
+      pop.textContent = `+${points * m}`;
+      const a = layer.getBoundingClientRect(), b = near.getBoundingClientRect();
+      pop.style.left = `${Math.round(b.left - a.left + b.width / 2)}px`;
+      pop.style.top = `${Math.round(b.top - a.top)}px`;
+      layer.append(pop);
+      setTimeout(() => pop.remove(), 900);
+    }
+    paintHUD();
+  }
+  function catchKey() {
+    if (!stage || stage.hush || stage.now < 0) return;
+    const i = stage.now, line = stage.lines[i];
+    if (line.key < 0 || stage.done[i]) return;
+    const key = stage.box.querySelector('.key');
+    const late = audio.currentTime - line.start;
+    stage.done[i] = 'caught';
+    run.keys++;
+    run.caught++;
+    run.combo++;
+    key?.classList.add('caught');
+    sfx.catch();
+    score(late < 1 ? 100 : late < 2 ? 70 : 50, key || stage.box);
+  }
+  function noise() {
+    if (!stage || !stage.hush || stage.now < 0 || stage.noisy || stage.done[stage.now]) return;
+    stage.noisy = true;
+    sfx.shh();
+    toast(both2('hushed'), 1400);
+  }
+  const hudHTML = () => `${say('score')} <b class="points">${run.score}</b><b class="mult"></b>`;
+  function paintHUD() {
+    const hud = game.querySelector('.hud');
+    if (!hud) return;
+    hud.querySelector('.points').textContent = run.score;
+    hud.querySelector('.mult').textContent = mult() > 1 ? ` x${mult()}` : '';
+  }
+  game.addEventListener('pointerdown', e => {
+    if (screen !== 'song') return;
+    if (e.target.closest('.key')) { e.preventDefault(); catchKey(); return; }
+    if (!e.target.closest('.deck, .credits, a, button')) noise();
+  });
+  addEventListener('keydown', e => {
+    if (screen !== 'song' || e.repeat || !(e.code === 'Space' || e.code === 'Enter')) return;
+    if (e.target.closest('button, input, summary, a')) return;
+    e.preventDefault();
+    if (stage?.hush) noise(); else catchKey();
+  });
   function frame() {
-    paintLines();
-    if (follow && !audio.paused) requestAnimationFrame(frame);
+    paintStage();
+    if (stage && !audio.paused) requestAnimationFrame(frame);
   }
   audio.addEventListener('play', () => requestAnimationFrame(frame));
-  audio.addEventListener('seeked', paintLines);
+  audio.addEventListener('seeked', paintStage);
 
   // ---- The little sounds of the game itself, made on the spot like the link page's ----
   const sfx = (() => {
@@ -364,7 +441,7 @@
         }
         wave = ctx.createPeriodicWave(real, imag);
       }
-      if (ctx.state === 'suspended') ctx.resume();
+      if (ctx.state === 'suspended') ctx.resume().catch(() => {});
       return true;
     }
     function notes(list, volume) {
@@ -390,8 +467,16 @@
     const tone = semitones => 440 * 2 ** (semitones / 12);
     return {
       context: () => (up() ? ctx : null),
+      // Whether this page may play sound before any tap on it: Chrome lets it after a tap on a link of this site
+      awake() {
+        try { if (navigator.getAutoplayPolicy) return navigator.getAutoplayPolicy('audiocontext') === 'allowed'; } catch {}
+        return !!(up() && ctx.state === 'running');
+      },
       go: () => notes([[tone(10), 35], [tone(17), 35], [tone(22), 80]], 0.07),
       pick: () => notes([[tone(3), 45], [tone(7), 45], [tone(10), 45], [tone(15), 100]], 0.07),
+      coin: () => notes([[987.8, 70], [1318.5, 340]], 0.08),
+      catch: () => notes([[tone(19), 30], [tone(26), 60]], 0.06),
+      shh: () => notes([[tone(-14), 140]], 0.07),
       over: () => notes([[tone(3), 180], [tone(2), 180], [tone(1), 180], [tone(0), 520]], 0.08),
       tick: () => notes([[tone(24), 25]], 0.05),
       // An old phone: two notes trading fast, a pause, again; it gives up after six rings
@@ -412,9 +497,10 @@
   // ---- The title music: the album's intro in 8 bits (16.29 s), looping without a gap ----
   const chiptune = (() => {
     const LOOP = 16.2857;
-    let data = null, buffer = null, source = null, gain = null, on = true;
-    fetch('audio/title.mp3').then(r => (r.ok ? r.arrayBuffer() : null)).then(b => { data = b; }, () => {});
+    let data = null, buffer = null, source = null, gain = null, on = true, wanted = false;
+    fetch('audio/title.mp3').then(r => (r.ok ? r.arrayBuffer() : null)).then(b => { data = b; if (wanted) play(); }, () => {});
     async function play() {
+      wanted = true;
       const ctx = sfx.context();
       if (!ctx || !on || source) return;
       // On an iPhone set to silent, heard like the album itself is
@@ -424,7 +510,7 @@
           if (!data) return;
           buffer = await ctx.decodeAudioData(data.slice(0));
         }
-        if (source || !on) return;
+        if (source || !on || !wanted) return;
         // An MP3 starts with a few silent milliseconds: the loop starts at the first sound
         const first = buffer.getChannelData(0).findIndex(v => Math.abs(v) > 0.002);
         const start = Math.max(0, first) / buffer.sampleRate;
@@ -434,12 +520,13 @@
         source.loopStart = start;
         source.loopEnd = Math.min(buffer.duration, start + LOOP);
         gain = ctx.createGain();
-        gain.gain.value = 0.9;  // the chiptune is quieter than the album: close to full, so the Intro isn't a jump
+        gain.gain.value = 0.9;  // the chiptune is quieter than the album: close to full
         source.connect(gain).connect(ctx.destination);
         source.start(0, start);
       } catch { /* no title music on this browser */ }
     }
     function stop(fade = 0.6) {
+      wanted = false;
       if (!source) return;
       const ctx = sfx.context(), s = source, g = gain;
       source = gain = null;
@@ -457,69 +544,89 @@
   })();
 
   // ---- The screens ----
-  // The title screen: PRESS START first (a browser plays sound only after a tap), then the music and the menu
+  // The title: the 8-bit intro plays until PRESS START. A browser plays sound only after a first tap (unless the
+  // tap was on a link of this same site, on Chrome), so then the button asks for a coin first, like an arcade
   function title() {
     at = 0;
     onEnd = null;
+    audio.pause();
+    let coin = !sfx.awake();
     render('title', `
       <h1 class="limbo">LIMBO</h1>
       <p class="by">${both('by')}</p>
-      ${SPRITE('front')}
-      <button class="big press" type="button">Press start</button>
-      <div class="menu" hidden>
-        <p class="how">${both('how')}</p>
-        <p class="ask">${both('chooseLang')}</p>
-        <div class="tongues">
-          <button class="big start" type="button" data-lang="pt" lang="pt">Português</button>
-          <button class="big start" type="button" data-lang="en" lang="en">English</button>
-        </div>
+      <button class="big press" type="button">${coin ? 'Insert coin' : 'Press start'}</button>
+      <div class="extras">
         <button class="music" type="button" aria-pressed="${chiptune.on}">${both(chiptune.on ? 'musicOn' : 'musicOff')}</button>
         <p class="small">${both('phones')}</p>
         <p class="small"><a href="${esc(album.spotify)}">${both('spotify')}</a></p>
       </div>`, false, 'night');
-    const press = game.querySelector('.press'), menu = game.querySelector('.menu');
+    const press = game.querySelector('.press');
+    const inserted = () => { coin = false; press.textContent = 'Press start'; };
+    if (!coin) chiptune.play();
     press.addEventListener('click', () => {
+      if (coin) { sfx.coin(); chiptune.play(); inserted(); return; }
+      chiptune.stop(0.3);
       sfx.go();
-      chiptune.play();
-      press.hidden = true;
-      menu.hidden = false;
-      menu.querySelector(`.start[data-lang="${lang}"]`).focus({ preventScroll: true });
+      language();
     });
-    menu.querySelectorAll('.start').forEach(button => button.addEventListener('click', () => {
-      setLang(button.dataset.lang);
-      chiptune.stop();
-      sfx.go();
-      begin();
-    }));
-    const music = menu.querySelector('.music');
+    const music = game.querySelector('.music');
     music.addEventListener('click', () => {
       const on = chiptune.toggle();
       music.setAttribute('aria-pressed', String(on));
       music.innerHTML = both(on ? 'musicOn' : 'musicOff');
+      if (coin && on) inserted();
     });
+  }
+
+  // The language, and nothing else: no music, no menu
+  function language() {
+    render('lang', `
+      <p class="ask">${both('chooseLang')}</p>
+      <div class="tongues">
+        <button class="big start" type="button" data-lang="pt" lang="pt">Português</button>
+        <button class="big start" type="button" data-lang="en" lang="en">English</button>
+      </div>`, `.start[data-lang="${lang}"]`, 'night');
+    game.querySelectorAll('.start').forEach(button => button.addEventListener('click', () => {
+      setLang(button.dataset.lang);
+      sfx.go();
+      begin();
+    }));
   }
 
   function begin() {
     path = [];
-    song(1);
+    run = newRun();
+    hinted = false;
+    ready(1, () => song(1));
+  }
+
+  // Before a track: one play button, in the look of what's coming, and nothing else. Pressed, it opens into it
+  function ready(n, then) {
+    at = n;
+    render('ready', `<button class="go" type="button"><span class="sr">${say('play')}</span>${ICON.play}</button>`, '.go', byN.get(n).vibe);
+    game.querySelector('.go').addEventListener('click', () => { sfx.go(); then(); }, { once: true });
   }
 
   function song(n) {
     const t = byN.get(n);
     at = n;
     render('song', `
-      <div class="head">${SPRITE('front')}<h2>${titleHTML(t)}</h2></div>
+      <h2 class="song-title">${titleHTML(t)}</h2>
       <div class="box">
-        <p class="tag">${say('track')} ${n}</p>
+        <p class="tag hud">${hudHTML()}</p>
         ${deckHTML(true)}
-        ${wordsHTML(t)}
+        <div class="stage" aria-live="polite"></div>
+        <div class="pops" aria-hidden="true"></div>
         ${creditsHTML(t)}
-      </div>`, null, t.vibe);
+      </div>`, null, t.vibe, 'opening');
     hookDeck();
-    startFollow(n);
+    startStage(t);
+    paintHUD();
+    if (t.hush) toast(both2('hushHint'), 4200);
     listen(n, () => {
+      settleAll();
       const next = n === 1 ? calls[0].n : nextAfter(n);
-      if (next === LAST) finale(); else ring(next);
+      if (next === LAST) ready(LAST, finale); else ring(next);
     });
   }
 
@@ -528,33 +635,33 @@
     at = n;
     audio.pause();
     render('ring', `
-      <div class="calling ringing">${SPRITE('look-right')}${PHONE}</div>
-      <h2>${say('call')} ${t.call}/5</h2>
+      <div class="calling ringing">${PHONE}</div>
       <p class="incoming">${say('incoming')}</p>
-      <p class="caller"><small>${say('caller')}</small><span>${esc(t.voice)}</span></p>
+      <h2 class="caller">${callerHTML(t)}</h2>
       <div class="answers">
         <button class="big answer" type="button">${say('answer')}</button>
         <button class="big decline" type="button">${say('decline')}</button>
       </div>`, '.answer', 'lcd');
     sfx.ring();
     buzz(true);
-    announce(`${TEXT[lang].incoming}: ${TEXT[lang].call} ${t.call}/5, ${t.voice}`);
+    announce(`${TEXT[lang].incoming}: ${t.caller ? t.caller[lang === 'en' ? 1 : 0] : ''}`);
     game.querySelector('.answer').addEventListener('click', () => { sfx.hush(); buzz(false); sfx.go(); call(n); });
     game.querySelector('.decline').addEventListener('click', () => { sfx.hush(); buzz(false); gameOver(n); });
   }
 
+  // On the line: who it is and their voice; then what they ask, and the choice
   function call(n) {
     const t = byN.get(n);
     at = n;
     render('call', `
-      <div class="head">${SPRITE('front')}<h2>${titleHTML(t)}</h2></div>
+      <p class="line-who">${say('onLine')}</p>
+      <h2 class="caller">${callerHTML(t)}</h2>
       <div class="box">
-        <p class="tag">${say('call')} ${t.call}/5</p>
-        <p class="line-who">${say('onLine')}: ${esc(t.voice)}</p>
-        <p class="said">${tr(`“${t.question[0]}”`, `“${t.question[1]}”`)}</p>
         ${deckHTML(false)}
+        <div class="voice" aria-hidden="true">${'<i></i>'.repeat(9)}</div>
         <div class="choices" hidden>
-          <p>${say('choose')}</p>
+          <p class="said">${tr(`“${t.question[0]}”`, `“${t.question[1]}”`)}</p>
+          <p class="choose-label">${say('choose')}</p>
           ${clockOn() ? `<div class="clock" style="--left: 1">
             <span class="secs" aria-hidden="true">${CHOOSE_IN}</span>
             <button class="hold" type="button">${say('hold')}</button>
@@ -565,10 +672,10 @@
       </div>`, null, 'lcd');
     hookDeck();
     game.querySelectorAll('.pick').forEach(button => button.addEventListener('click', () => {
-      const fated = button.dataset.fated === '1';
+      const to = Number(button.dataset.to), fated = button.dataset.fated === '1';
       sfx.pick();
-      path.push(Number(button.dataset.to));
-      song(Number(button.dataset.to));
+      path.push(to);
+      ready(to, () => song(to));
       if (fated) toast(both2('fate'));
     }));
     game.querySelector('.hold')?.addEventListener('click', e => {
@@ -587,46 +694,87 @@
     const box = game.querySelector('.choices');
     if (!box || !box.hidden) return;
     box.hidden = false;
+    game.querySelector('.voice')?.classList.add('done');
     startClock(box);
-    announce(TEXT[lang].choose);
+    const t = byN.get(at);
+    announce(`${t.question[lang === 'en' ? 1 : 0]} ${TEXT[lang].choose}`);
     box.querySelector('.pick').focus({ preventScroll: true });
     box.scrollIntoView({ block: 'nearest', behavior: calm ? 'auto' : 'smooth' });
   }
 
+  // ---- The end: the last track plays over the score, the choices, your ending and the credits ----
   function finale() {
-    const t = byN.get(LAST);
     at = LAST;
     const name = endingName(path);
+    const newBest = run.score > best;
+    if (newBest) { best = run.score; try { localStorage.setItem('limbo-best', String(best)); } catch {} }
+    const rate = run.keys >= 8 ? run.caught / run.keys : null;
+    const grade = rate == null ? '' : rate >= 0.9 ? 'S' : rate >= 0.75 ? 'A' : rate >= 0.55 ? 'B' : rate >= 0.35 ? 'C' : 'D';
     render('end', `
-      <img class="cover" src="img/cover.webp" width="720" height="720" alt="${esc(TEXT[lang].cover)}">
       <h2>${say('end')}</h2>
       <div class="box">
-        <p class="tag">${say('track')} ${LAST} · ${esc(t.title)}</p>
         ${deckHTML(false)}
-        <p class="line-who">${say('path')}</p>
-        <ol class="trail">${path.map(n => `<li><span>${tr(byN.get(n).title, byN.get(n).en)}</span></li>`).join('')}</ol>
+        <section class="tally">
+          <p class="line-who">${say('score')}</p>
+          <p class="total">${run.score}</p>
+          ${grade ? `<p class="grade">${say('grade')} <b>${grade}</b></p>` : ''}
+          <p class="sub">${say('caught')}: ${run.caught}/${run.keys} · ${say('best')}: ${best}${newBest && run.score ? ` · ${say('newBest')}` : ''}</p>
+        </section>
+        <section class="recap">
+          <p class="line-who">${say('recap')}</p>
+          <ol>${path.map((to, i) => recapHTML(calls[i], to)).join('')}</ol>
+        </section>
         <div class="card">
           <p class="line-who">${say('yourEnd')}</p>
-          <p class="ending"><span class="ui-pt">${esc(name.pt)}</span><span class="ui-en" lang="en">${esc(name.en)}</span></p>
-          <ul class="traits">${name.traits.map(([pt, en]) => `<li><span class="ui-pt">${esc(pt)}</span><span class="ui-en" lang="en">${esc(en)}</span></li>`).join('')}</ul>
+          <p class="ending">${pair([name.pt, name.en])}</p>
+          <ul class="traits">${name.traits.map(tt => `<li>${pair(tt)}</li>`).join('')}</ul>
+          <p class="rare">${pair(rarityText(soulsShare(path)))}</p>
           <button class="big share" type="button">${say('share')}</button>
         </div>
-        <p class="one">${say('oneOf')}</p>
-        <div class="bonus">
-          <p class="line-who">${say('bonus')}</p>
-          <div class="tapes">${(album.bonus || []).map(b =>
-            `<button class="tape" type="button" aria-pressed="false" data-src="${esc(b.src)}">${ICON.play}<span>${esc(b.title)}</span></button>`).join('')}</div>
-          <p class="one">${say('secret')}</p>
-        </div>
-        ${creditsHTML(t)}
+        <section class="roll">
+          <p class="line-who">${say('rollTitle')}</p>
+          <div class="roll-window" tabindex="0"><div class="roll-strip">${rollHTML()}</div></div>
+        </section>
       </div>
       <button class="big again" type="button">${say('again')}</button>
-      <p class="small"><a href="${esc(album.spotify)}">${say('spotify')}</a></p>`, null, 'void');
+      <p class="small"><a href="${esc(album.spotify)}">${say('spotify')}</a></p>`, null, 'void', 'opening');
     hookDeck();
-    hookTapes();
     game.querySelector('.share').addEventListener('click', () => shareEnding(name));
-    game.querySelector('.again').addEventListener('click', () => { audio.pause(); tape.pause(); sfx.go(); begin(); });
+    game.querySelector('.again').addEventListener('click', () => { audio.pause(); sfx.go(); title(); });
     listen(LAST, null);
+  }
+  // One choice in the recap: who called, what they asked, what you picked, and how many souls did the same
+  function recapHTML(c, to) {
+    const o = c.options.find(x => x.to === to);
+    const pct = (album.souls || {})[to];
+    return `<li>
+      <p class="who">${callerHTML(c)}</p>
+      <p class="q">${tr(`“${c.question[0]}”`, `“${c.question[1]}”`)}</p>
+      <p class="a">${tr(o.pt, o.en)}<span class="to">${esc(plainTitle(byN.get(to)))}</span></p>
+      ${pct ? `<p class="pct"><b>${pct}%</b> ${say('souls')}</p>` : ''}
+    </li>`;
+  }
+  // The share of souls that took this whole path: the five choices' shares multiplied
+  function soulsShare(picks) {
+    const s = album.souls || {};
+    if (picks.length < calls.length || !picks.every(p => s[p])) return null;
+    return picks.reduce((a, p) => a * s[p] / 100, 100);
+  }
+  function rarityText(p) {
+    if (p == null) return ['', ''];
+    if (p < 1) return ['Menos de 1% das almas chegaram a este final.', 'Fewer than 1% of souls reached this ending.'];
+    const n = Math.round(p);
+    return [`Só ${n}% das almas chegaram a este final.`, `Only ${n}% of souls reached this ending.`];
+  }
+  // The album's credits, track by track, rolling up like a game's
+  function rollHTML() {
+    return `<p class="roll-head">LIMBO (2024)<br>LEFT.</p>` + album.tracks.filter(t => t.credits).map(t => {
+      const en = creditsEN(t.credits).split(' · ');
+      return `<div class="roll-track">
+        <p class="roll-name">${esc(t.call && t.caller ? `${t.title} · ${t.caller[0]}` : t.title)}</p>
+        ${t.credits.split(' · ').map((part, k) => `<p>${pair([part, en[k]])}</p>`).join('')}
+      </div>`;
+    }).join('') + `<p class="roll-head">antonioleft.com</p>`;
   }
 
   // ---- Declining a call: GAME OVER, and nine seconds to continue, or back to the title ----
@@ -634,7 +782,7 @@
   function gameOver(n) {
     at = n;
     render('over', `
-      ${SPRITE('reach')}
+      <div class="dead">${PHONE}</div>
       <h2 class="over-title">Game over</h2>
       <p class="said">${say('hungUp')}</p>
       <p class="cont">${say('cont')} <span class="count">9</span></p>
@@ -696,7 +844,7 @@
     } catch {}
   }
 
-  // ---- Your ending's name, from your five choices (album.js), and a way to share it ----
+  // ---- Your ending's name, from your five choices (album.js), and a way to share it with your score ----
   function endingName(picks) {
     const e = album.ending || {};
     const who = (e.who || {})[picks[1]] || ['', ''], where = (e.where || {})[picks[2]] || ['', ''];
@@ -707,8 +855,9 @@
     };
   }
   async function shareEnding(name) {
-    const en = lang === 'en';
-    const text = `${TEXT[lang].shareText} “${en ? name.en : name.pt}” (${name.traits.map(t => t[en ? 1 : 0]).join(' · ')}). ${TEXT[lang].shareAsk}`;
+    const text = lang === 'en'
+      ? `I played LIMBO by LEFT.: got “${name.en}” and scored ${run.score}. What about you?`
+      : `Joguei LIMBO de LEFT.: saiu-me “${name.pt}” e fiz ${run.score} pontos. E tu?`;
     const url = 'https://antonioleft.com/limbo/';
     sfx.go();
     if (navigator.share) {
@@ -716,70 +865,6 @@
     }
     try { await navigator.clipboard.writeText(`${text} ${url}`); toast(both2('copied')); } catch { toast([`${text} ${url}`, `${text} ${url}`], 6000); }
   }
-
-  // ---- The secret 8-bit mode: five quick taps on him, or ↑ ↑ ↓ ↓ ← → ← → B A on a keyboard.
-  // Songs with an 8-bit version play that instead, and everything turns a little more 8-bit ----
-  let eight = false;
-  try { eight = sessionStorage.getItem('limbo-8bit') === '1'; } catch {}
-  body.classList.toggle('eightbit', eight);
-  function setEight(on) {
-    eight = on;
-    body.classList.toggle('eightbit', on);
-    try { sessionStorage.setItem('limbo-8bit', on ? '1' : '0'); } catch {}
-    sfx.pick();
-    toast(both2(on ? 'eightOn' : 'eightOff'));
-    if (screen === 'song' && (album.bonus || []).some(b => b.n === at)) {
-      startFollow(at);
-      listen(at, onEnd);
-    }
-  }
-  let taps = [];
-  game.addEventListener('click', e => {
-    const him = e.target.closest('.him');
-    if (!him) return;
-    const now = performance.now();
-    taps = taps.filter(t => now - t < 2000);
-    taps.push(now);
-    him.classList.add('poke');
-    setTimeout(() => him.classList.remove('poke'), 160);
-    if (taps.length >= 5) { taps = []; setEight(!eight); } else sfx.tick();
-  });
-  const KONAMI = ['ArrowUp', 'ArrowUp', 'ArrowDown', 'ArrowDown', 'ArrowLeft', 'ArrowRight', 'ArrowLeft', 'ArrowRight', 'b', 'a'];
-  let konami = 0;
-  addEventListener('keydown', e => {
-    const key = e.key.length === 1 ? e.key.toLowerCase() : e.key;
-    konami = key === KONAMI[konami] ? konami + 1 : key === 'ArrowUp' ? (konami === 2 ? 2 : 1) : 0;
-    if (konami === KONAMI.length) { konami = 0; setEight(!eight); }
-  });
-
-  // ---- The 8-bit bonus at the end: one version at a time, each played through once ----
-  const tape = new Audio();
-  tape.preload = 'none';
-  function paintTapes() {
-    game.querySelectorAll('.tape').forEach(b => {
-      const on = !tape.paused && b.dataset.src === tape.dataset.src;
-      b.setAttribute('aria-pressed', String(on));
-      b.querySelector('svg').outerHTML = on ? ICON.pause : ICON.play;
-    });
-  }
-  function hookTapes() {
-    game.querySelectorAll('.tape').forEach(b => b.addEventListener('click', () => {
-      if (!tape.paused && tape.dataset.src === b.dataset.src) {
-        tape.pause();
-      } else {
-        audio.pause();
-        tape.dataset.src = b.dataset.src;
-        tape.src = b.dataset.src;
-        tape.play().catch(() => {});
-        sfx.go();
-      }
-      paintTapes();
-    }));
-  }
-  tape.addEventListener('play', paintTapes);
-  tape.addEventListener('pause', paintTapes);
-  tape.addEventListener('ended', paintTapes);
-  audio.addEventListener('play', () => { if (!tape.paused) tape.pause(); });
 
   // ---- Language ----
   function savedLang() {
@@ -794,12 +879,11 @@
     body.dataset.lang = l;
     document.documentElement.lang = l;
     document.querySelectorAll('.langs button').forEach(b => b.setAttribute('aria-pressed', String(b.dataset.lang === l)));
-    pathList.setAttribute('aria-label', TEXT[l].path);
     try { localStorage.setItem('limbo-lang', l); } catch {}
   }
 
   restart.innerHTML = say('restart');
-  restart.addEventListener('click', () => { audio.pause(); tape.pause(); sfx.hush(); chiptune.stop(0.2); title(); });
+  restart.addEventListener('click', () => { audio.pause(); sfx.hush(); chiptune.stop(0.2); title(); });
   document.querySelectorAll('.langs button').forEach(b => b.addEventListener('click', () => setLang(b.dataset.lang)));
   setLang(lang);
   title();

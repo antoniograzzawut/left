@@ -62,32 +62,40 @@ comes out black on white, on three pages, with the links still working.
 **LIMBO.** The words, the English, the calls and their choices, and the credits
 are all in `limbo/album.js`: each line of a song is the Portuguese, then ` | `,
 then the English. The sound is one MP3 per track in `limbo/audio/`, named by its
-number, plus `title.mp3`, the album's intro in 8 bits that loops on the title
-screen. The game is played in the dark, and each track has its own look (its
-`vibe` in `album.js`): its colours and the scene behind its words, drawn in
-`limbo/index.html`. The calls share the green of an old phone, and the end opens
-into the white void of the album's cover. Its pictures are in `limbo/img/`. At the end, an 8-bit
-bonus opens: the chiptune versions of Siga, Pulso, A1 Norte and Quero mais, listed
-under `bonus` in `album.js`.
+number, plus `title.mp3`, the album's intro in 8 bits, the only 8-bit thing left:
+it plays on the title screen until PRESS START. (A phone only lets a page play sound
+after a tap on it, so on a first visit the button says INSERT COIN first; coming from
+the sticker on the link page, Chrome lets the music start at once.) Then a screen
+with only the choice of language, and no music. Each song waits behind a single
+play button that opens into it. The game is played in the dark, each track with its
+own look (its `vibe` in `album.js`), drawn in `limbo/index.html`; the calls share the
+green of an old phone, and the end opens into the white void of the album's cover.
+There are no pictures of António in the game: the phone shows who calls as a role
+(Amigo, Namorada, Amigo 2, Irmão, Mãe: `caller` in `album.js`), and the real voices
+are in the credits.
 
-**LIMBO's little games.** While the phone rings it shows who is calling, and on Android
-phones it also vibrates. "Recusar" (decline) means GAME OVER, with nine seconds to go back
-to the call before the game returns to the title. After each call there are ten seconds to
-choose, or fate picks one; "Parar o relógio" stops the clock for the rest of the game, and
-phones set to reduce motion get no clock at all. Skipping a song early gets a cheeky line:
-they are under `skips` in `album.js`. At the end, the path gets a name ("O Ex da Estrada")
-and three traits, from `ending` in `album.js`, with a button to share it. And a secret:
-five quick taps on him (or ↑ ↑ ↓ ↓ ← → ← → B A on a keyboard) turns on an 8-bit mode, where
-Siga, Pulso, A1 Norte and Quero mais play their 8-bit versions instead; the end screen
-hints at it. Siga starts 2.6 seconds in, after its silence (`from` in `album.js`).
+**Playing it.** While a song plays only the line being sung shows, and its longest
+word lights up: catching it scores, more the sooner, and catches in a row multiply
+the points. In Silêncio it turns around: points for touching nothing. A ringing
+phone can be declined, which means GAME OVER, with nine seconds to go back. After
+each call there are ten seconds to choose, or fate picks ("Parar o relógio" stops
+the clock; phones set to reduce motion get none). Skipping a song early gets a
+cheeky line (`skips` in `album.js`). The end shows the score and a grade, the best
+on that phone, each choice with the share of "souls in Limbo" who chose the same
+(made up: `souls` in `album.js`), the ending's name and traits (`ending`), a
+button to share it, and the album's credits rolling up. Siga starts 2.6 seconds
+in, after its silence (`from` in `album.js`).
 
-**LIMBO's lyrics in time with the music.** Open https://antonioleft.com/limbo/sync.html
-(on a phone or a laptop), pick a song, and tap the big button, or press space, the
-moment each line starts; "Undo" goes back a line. A song timed this way already lights
-up line by line in the game on that same device. For everyone to see it, press
-"Descarregar timings.js" at the bottom, then in the `limbo` folder here press "Add
-file", "Upload files", drop that file in (it replaces the old one) and press "Commit
-changes". The times can also be pasted to Claude.
+**LIMBO's lyrics in time with the music.** `limbo/timings.js` says when each line
+is sung. Its first version was made by machine on 5 Nov 2026 (the voice pulled out
+of each song, what it sings recognised and matched to the words), so some lines can
+be a second or two off. To fix a song, open https://antonioleft.com/limbo/sync.html
+on a phone or a laptop, pick the song, and tap the big button, or press space, the
+moment each line starts; "Undo" goes back a line. A song timed this way plays in
+time on that same device at once. For everyone, press "Descarregar timings.js" at
+the bottom, then in the `limbo` folder here press "Add file", "Upload files", drop
+that file in (it replaces the old one) and press "Commit changes". The times can
+also be pasted to Claude.
 
 **Photos.** Ask Claude. They are cropped, lined up and converted, so a raw photo
 uploaded over an old one will not sit right.
