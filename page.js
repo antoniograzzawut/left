@@ -172,10 +172,11 @@
     a.addEventListener('click', e => {
       chime('go');
       if (e.metaKey || e.ctrlKey || e.shiftKey || e.altKey) return;  // opened in another tab
-      // He keeps reaching while the page leaves. If it never does (the app opened instead), he carries on.
+      // He reaches for it: while the page leaves, or for a moment when it opens in a tab of its own (the
+      // platforms do, so this page stays). If the page never leaves (the app opened instead), he carries on.
       leaving = true;
       hold('reach');
-      setTimeout(() => { leaving = false; settle(); }, 3000);
+      setTimeout(() => { leaving = false; settle(); }, a.target === '_blank' ? 900 : 3000);
     });
   });
 

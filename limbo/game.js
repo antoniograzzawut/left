@@ -624,7 +624,7 @@
       <div class="extras">
         <button class="music" type="button" aria-pressed="${chiptune.on}">${both(chiptune.on ? 'musicOn' : 'musicOff')}</button>
         <p class="small">${both('phones')}</p>
-        <p class="small"><a href="${esc(album.spotify)}">${both('spotify')}</a></p>
+        <p class="small"><a href="${esc(album.spotify)}" target="_blank" rel="noopener">${both('spotify')}</a></p>
       </div>`, false, 'night');
     const press = game.querySelector('.press');
     // the coin drops into the slot, and the button turns into PRESS START
@@ -854,7 +854,7 @@
         </section>
       </div>
       <button class="big again" type="button">${say('again')}</button>
-      <p class="small"><a href="${esc(album.spotify)}">${say('spotify')}</a></p>`, null, 'void', 'opening');
+      <p class="small"><a href="${esc(album.spotify)}" target="_blank" rel="noopener">${say('spotify')}</a></p>`, null, 'void', 'opening');
     hookDeck();
     game.querySelector('.share').addEventListener('click', () => shareEnding(name));
     game.querySelector('.again').addEventListener('click', () => { audio.pause(); sfx.go(); title(); });
