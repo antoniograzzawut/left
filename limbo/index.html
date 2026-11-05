@@ -120,6 +120,12 @@
     text-shadow: 3px 3px 0 var(--red), 6px 6px 0 var(--indigo), 0 0 40px rgb(255 92 84 / .35);
   }
   .press { margin-top: 10px; min-width: 9.4em; animation: blink 1.1s steps(1) infinite; }
+  /* INSERT COIN carries its coin, spinning; put in, it drops into the slot */
+  .press.coined::before { display: none; }
+  .press .coin { display: block; flex: none; width: 34px; margin: -6px 0; }
+  .press .coin .art { width: 100%; }
+  .press .coin.drop { animation: drop .36s steps(4) forwards; }
+  @keyframes drop { from { transform: none; opacity: 1; } to { transform: translateY(26px) scaleY(.4); opacity: 0; } }
   .extras { display: grid; justify-items: center; gap: 10px; margin-top: 12px; }
   .music {
     min-height: 36px; padding: 0 8px;
@@ -265,6 +271,15 @@
   }
   .key::after { content: ""; position: absolute; inset: -12px -8px; }  /* a bigger target for a thumb */
   .key.caught { background: var(--ink); color: var(--paper); box-shadow: none; animation: none; }
+  /* only the leading language's word is lit: the Portuguese one in Portuguese, the English one in English */
+  [data-lang="en"] .now-line:has(> .en) .pt .key, [data-lang="pt"] .now-line .en .key {
+    padding: 0; background: none; color: inherit; box-shadow: none; animation: none; pointer-events: none;
+  }
+  /* In English the English leads, big and first, and the Portuguese follows under it, small: the line being
+     sung, a call's messages, the choices, the recap */
+  [data-lang="en"] :is(.now-line, .bubble, .pick > span, .recap .q, .recap .a, .words .line):has(> .en) { display: flex; flex-direction: column; }
+  [data-lang="en"] :is(.now-line, .bubble, .pick > span, .recap .q, .recap .a, .words .line) > .en { order: -1; margin: 0 0 6px; font-size: 1em; color: inherit; }
+  [data-lang="en"] :is(.now-line, .bubble, .pick > span, .recap .q, .recap .a, .words .line):has(> .en) > .pt { font-size: .58em; color: var(--indigo); }
   .key.gone { background: none; color: inherit; box-shadow: none; opacity: .45; animation: none; }
   .pops { position: absolute; inset: 0; pointer-events: none; overflow: visible; }
   .pop {
@@ -465,6 +480,7 @@
   .typing i:nth-child(2) { animation-delay: .3s; }
   .typing i:nth-child(3) { animation-delay: .6s; }
   .call .voice { height: 64px; margin-top: 12px; }
+  .voice[hidden] { display: none; }
   @keyframes talk { from { height: 8px; } to { height: 54px; } }
 
   /* The story so far: the game's own system talking, in a terminal of its own */

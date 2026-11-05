@@ -74,7 +74,7 @@
   // Before the language is chosen: the Portuguese, and the English under it
   const both = key => `${esc(TEXT.pt[key])}<span class="also" lang="en">${esc(TEXT.en[key])}</span>`;
   // Words of the album are always in Portuguese, with the English under them when English is on
-  const tr = (pt, en) => `${esc(pt)}${en && en !== pt ? `<span class="en" lang="en">${esc(en)}</span>` : ''}`;
+  const tr = (pt, en) => `<span class="pt">${esc(pt)}</span>${en && en !== pt ? `<span class="en" lang="en">${esc(en)}</span>` : ''}`;
   // A track's name as a heading: a guest artist in smaller letters under it, then the English
   const titleHTML = t => {
     const guest = t.title.match(/^(.*?) (\(ft\. .*\))$/);
@@ -366,13 +366,16 @@
       let end = Math.min(next, Array.isArray(times[i]) && times[i][1] ? Math.max(times[i][1], start + 0.8) : start + guess);
       if (next - end < 1.2) end = next;  // a short breath between two lines: the first stays until the next
       // a word to catch, if the line stays long enough to catch it
-      return { pt, en, start, end, key: end - start >= 1 ? keyIndex(pt) : -1 };
+      const long = end - start >= 1;
+      return { pt, en, start, end, key: long ? keyIndex(pt) : -1, keyEn: long && en && en !== pt ? keyIndex(en) : -1 };
     });
   }
+  // In English the lit word is in the English line, which leads; in Portuguese, in the Portuguese
+  const english = line => lang === 'en' && line.en && line.en !== line.pt;
+  const keyOf = line => (english(line) ? line.keyEn : line.key);
+  const keyed = (text, k) => text.split(/\s+/).map((w, j) => (j === k && !stage.hush ? `<span class="key">${esc(w)}</span>` : esc(w))).join(' ');
   const lineHTML = (line, i) => {
-    const pt = line.pt.split(/\s+/).map((w, k) => (k === line.key && !stage.hush
-      ? `<span class="key">${esc(w)}</span>` : esc(w))).join(' ');
-    return `<p class="now-line" data-i="${i}"><span class="pt">${pt}</span>${line.en && line.en !== line.pt ? `<span class="en" lang="en">${esc(line.en)}</span>` : ''}</p>`;
+    return `<p class="now-line" data-i="${i}"><span class="pt">${keyed(line.pt, line.key)}</span>${line.en && line.en !== line.pt ? `<span class="en" lang="en">${keyed(line.en, line.keyEn)}</span>` : ''}</p>`;
   };
 
   // ---- The points: a lit word caught soon after it lights is worth more, and catches in a row multiply them.
@@ -409,9 +412,9 @@
       scramble(el, 160 + 260 * decay());
       tear(el);
     }
-    const key = stage.box.querySelector('.key');
-    if (key && stage.done[shown]) key.classList.add(stage.done[shown] === 'caught' ? 'caught' : 'gone');
-    if (key && !hinted) { hinted = true; toast(both2('tapHint'), 2600); }
+    const keys = stage.box.querySelectorAll('.key');
+    if (stage.done[shown]) keys.forEach(k => k.classList.add(stage.done[shown] === 'caught' ? 'caught' : 'gone'));
+    if (keyOf(stage.lines[shown]) >= 0 && !hinted) { hinted = true; toast(both2('tapHint'), 2600); }
   }
   // A line leaving the screen: its word was caught or not; in Silêncio, it went by quietly or not
   function settle(i) {
@@ -420,7 +423,7 @@
       run.keys++;
       if (stage.noisy) { stage.done[i] = 'noise'; run.combo = 0; }
       else { stage.done[i] = 'quiet'; run.caught++; run.combo++; score(100, stage.box); }
-    } else if (stage.lines[i].key >= 0) {
+    } else if (keyOf(stage.lines[i]) >= 0) {
       run.keys++;
       stage.done[i] = 'missed';
       run.combo = 0;
@@ -447,14 +450,14 @@
   function catchKey() {
     if (!stage || stage.hush || stage.now < 0) return;
     const i = stage.now, line = stage.lines[i];
-    if (line.key < 0 || stage.done[i]) return;
-    const key = stage.box.querySelector('.key');
+    if (keyOf(line) < 0 || stage.done[i]) return;
+    const key = stage.box.querySelector(english(line) ? '.en .key' : '.pt .key');
+    stage.box.querySelectorAll('.key').forEach(k => k.classList.add('caught'));
     const late = audio.currentTime - line.start;
     stage.done[i] = 'caught';
     run.keys++;
     run.caught++;
     run.combo++;
-    key?.classList.add('caught');
     sfx.catch();
     score(late < 1 ? 100 : late < 2 ? 70 : 50, key || stage.box);
   }
@@ -617,14 +620,21 @@
     render('title', `
       <h1 class="limbo">LIMBO</h1>
       <p class="by">${both('by')}</p>
-      <button class="big press" type="button">${coin ? 'Insert coin' : 'Press start'}</button>
+      <button class="big press${coin ? ' coined' : ''}" type="button">${coin ? `<span class="coin">${ART.night}</span>` : ''}<span class="label">${coin ? 'Insert coin' : 'Press start'}</span></button>
       <div class="extras">
         <button class="music" type="button" aria-pressed="${chiptune.on}">${both(chiptune.on ? 'musicOn' : 'musicOff')}</button>
         <p class="small">${both('phones')}</p>
         <p class="small"><a href="${esc(album.spotify)}">${both('spotify')}</a></p>
       </div>`, false, 'night');
     const press = game.querySelector('.press');
-    const inserted = () => { coin = false; press.textContent = 'Press start'; };
+    // the coin drops into the slot, and the button turns into PRESS START
+    const inserted = () => {
+      coin = false;
+      const c = press.querySelector('.coin');
+      if (c && !calm) { c.classList.add('drop'); setTimeout(() => { c.remove(); press.classList.remove('coined'); }, 380); }
+      else { c?.remove(); press.classList.remove('coined'); }
+      press.querySelector('.label').textContent = 'Press start';
+    };
     if (!coin) chiptune.play();
     press.addEventListener('click', () => {
       if (coin) { sfx.coin(); chiptune.play(); inserted(); return; }
@@ -712,13 +722,22 @@
     game.querySelector('.decline').addEventListener('click', () => { sfx.hush(); buzz(false); gameOver(n); });
   }
 
-  // On the line: who it is and their voice; then what they ask, and the choice
+  // On the line: who it is and their voice; what they say, one message at a time; then only the choice
+  // A call's messages: "from-to | Portuguese | English", in seconds of the track. A call without them yet shows its
+  // question all along, and the choice when it ends
+  function messagesOf(t) {
+    if (!t.chat) return { choose: null, msgs: [{ from: 0, to: Infinity, pt: t.question[0], en: t.question[1] }] };
+    const msgs = t.chat.words.trim().split('\n').map(line => {
+      const [when, pt = '', en = ''] = line.split(' | ').map(x => x.trim());
+      const [from, to] = when.split('-').map(Number);
+      return { from, to, pt, en };
+    });
+    return { choose: t.chat.choose ?? null, msgs };
+  }
   function call(n) {
     const t = byN.get(n);
     at = n;
-    // a call without its chat yet: its question, as a message from the start, and the choice when it ends
-    const chat = t.chat || { at: 0, choose: null, words: `${t.question[0]} | ${t.question[1]}` };
-    const msgs = chat.words.trim().split('\n').map(l => l.split(' | ').map(x => (x || '').trim()));
+    const { choose, msgs } = messagesOf(t);
     render('call', `
       <p class="line-who">${say('onLine')}</p>
       <h2 class="caller">${callerHTML(t)}</h2>
@@ -727,7 +746,7 @@
         <div class="voice" aria-hidden="true">${'<i></i>'.repeat(9)}</div>
         <div class="chat" aria-live="polite">
           <p class="typing" hidden aria-hidden="true"><i></i><i></i><i></i></p>
-          ${msgs.map(([pt, en]) => `<p class="bubble" hidden>${tr(pt, en)}</p>`).join('')}
+          ${msgs.map(m => `<p class="bubble" hidden>${tr(m.pt, m.en)}</p>`).join('')}
         </div>
         <div class="choices" hidden>
           <p class="choose-label">${say('choose')}</p>
@@ -740,7 +759,7 @@
         ${creditsHTML(t)}
       </div>`, null, 'lcd');
     hookDeck();
-    convo = { chat, typing: false, said: false, choices: false };
+    convo = { choose, msgs, now: -2, typing: false, choices: false };
     game.querySelectorAll('.pick').forEach(button => button.addEventListener('click', () => {
       const to = Number(button.dataset.to), fated = button.dataset.fated === '1';
       onEnd = null;
@@ -759,39 +778,41 @@
       hold.disabled = true;
       game.querySelector('.pick')?.focus({ preventScroll: true });
     });
+    callTick();
     listen(n, () => {
-      showChat();
       showChoices();
-      game.querySelector('.voice')?.classList.add('done');
       const box = game.querySelector('.choices');
       if (box) startClock(box);  // the clock only once the call is over
     });
   }
-  // The call's moments, by the track's time: "typing..." just before its messages, then they show, then the choice
+  // The call's moments, by the track's time: "typing..." just before the first message, then each message alone in
+  // its own seconds, then the choice
   function callTick() {
-    if (screen !== 'call' || !convo || missing) return;
-    const pos = audio.currentTime;
-    if (!convo.said && !convo.typing && pos >= convo.chat.at - 0.9) {
-      convo.typing = true;
+    if (screen !== 'call' || !convo || missing || convo.choices) return;
+    const pos = audio.currentTime || 0;
+    if (convo.choose != null && pos >= convo.choose) { showChoices(); return; }
+    const first = convo.msgs[0];
+    const typing = pos >= first.from - 0.9 && pos < first.from;
+    if (typing !== convo.typing) {
+      convo.typing = typing;
       const dots = game.querySelector('.typing');
-      if (dots) dots.hidden = false;
+      if (dots) dots.hidden = !typing;
     }
-    if (!convo.said && pos >= convo.chat.at) showChat();
-    if (!convo.choices && convo.chat.choose != null && pos >= convo.chat.choose) showChoices();
+    const now = convo.msgs.findIndex(m => pos >= m.from && pos < m.to);
+    if (now === convo.now) return;
+    convo.now = now;
+    game.querySelectorAll('.bubble').forEach((b, i) => { b.hidden = i !== now; });
   }
   audio.addEventListener('timeupdate', callTick);
   audio.addEventListener('seeked', callTick);
-  function showChat() {
-    if (!convo || convo.said) return;
-    convo.said = true;
-    const dots = game.querySelector('.typing');
-    if (dots) dots.hidden = true;
-    [...game.querySelectorAll('.bubble')].forEach((b, i) => setTimeout(() => { b.hidden = false; }, calm ? 0 : i * 700));
-  }
+  // The choice: the messages and the voice go, so it has the screen to itself
   function showChoices() {
     const box = game.querySelector('.choices');
     if (!box || !box.hidden) return;
     if (convo) convo.choices = true;
+    game.querySelectorAll('.bubble, .typing').forEach(el => { el.hidden = true; });
+    const voice = game.querySelector('.voice');
+    if (voice) voice.hidden = true;
     box.hidden = false;
     announce(TEXT[lang].choose);
     box.querySelector('.pick').focus({ preventScroll: true });

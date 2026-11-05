@@ -81,9 +81,10 @@ sings, the song's own little 8-bit picture moves in the middle (a coin for the I
 the sun for Siga, a bomb for Violento, a heart for Pulso, an hourglass for Volto a ti,
 the car for A1 Norte, a mirror ball for Dançar, a diamond for Quero mais, a candle for
 Silêncio, a rain cloud for Não estou bem, a crying eye for Chora), drawn in
-`limbo/game.js`. A call shows what the voice says as chat messages, at the second
-of the track given by `chat` in `album.js`, and its choice at another second while
-the call plays on; these times are for the call files on the site now, so new files
+`limbo/game.js`. A call shows what the voice says as chat messages, one at a time,
+each in its own seconds of the track (`chat` in `album.js`: "from-to | Portuguese |
+English"); at its `choose` second the messages go and only the choice stays, while
+the call plays on. These times are for the call files on the site now, so new files
 need new times. A ringing phone can be declined, which means GAME OVER, with nine
 seconds to go back. Ten seconds to choose once a call is over, or fate picks ("Parar
 o relógio" stops the clock; phones set to reduce motion get none). After each song,

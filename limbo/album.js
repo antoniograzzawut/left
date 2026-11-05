@@ -1,9 +1,10 @@
 // LIMBO (2024), the game-album by LEFT.: its words, the calls and their choices, and who made each track.
 // To change a line: each one is the Portuguese, then " | ", then the English. An empty line starts a new verse.
 // vibe is the look of a track's screen (its colours and its scene), defined in index.html. A call's caller is the
-// name its phone shows; voice is who speaks it, as in its credits. Its chat is what the voice says, shown as
-// messages (one per line, Portuguese | English) at "at" seconds into the track, with the choice at "choose"; a call
-// without one shows its question as a message, and the choice when it ends. The question is also the recap's.
+// name its phone shows; voice is who speaks it, as in its credits. Its chat is what the voice says, as messages
+// shown one at a time, each line "from-to | Portuguese | English" in seconds of the track, and at "choose" the
+// messages go and only the choice stays; a call without one shows its question until it ends. The question is
+// also the recap's.
 // The words come from "LIMBO - Letras", "LIMBO - Tracklist" and "Limbo - Ficha técnica" in Google Drive,
 // and "Volto a ti - Letra" (2023). The English is Claude's translation, for António to check.
 window.LIMBO = {
@@ -29,7 +30,7 @@ window.LIMBO = {
   // [Portuguese, English]. errors: what the failing system adds, more and more towards the end
   story: {
     1: ['Entraste no jogo. Dizem que ninguém ganha.', 'You entered the game. They say nobody wins.'],
-    3: ['Levantaste a cabeça e seguiste em frente. O sol voltou a bater na cara.', 'You lifted your head and moved on. The sun is back on your face.'],
+    3: ['Levantaste a cabeça e seguiste em frente. Voltaste a sentir o sol na cara.', 'You lifted your head and moved on. You feel the sun on your face again.'],
     4: ['Perdeste a cabeça. Não dormiste, e rebentaste com tudo à tua volta.', 'You lost your head. No sleep, and everything around you blown up.'],
     '3>6': ['De cabeça erguida, ficaste com ela. Ao lado dela, o pulso ainda dispara.', 'Head held high, you stayed with her. Beside her, your pulse still races.'],
     '4>6': ['Partiste tudo, e ela ficou na mesma. Tu também. O pulso ainda dispara.', 'You broke everything, and she stayed anyway. So did you. Your pulse still races.'],
@@ -96,10 +97,11 @@ Começar | As the start
       n: 2, title: 'Level 1', en: 'Level 1', call: 1, voice: 'L-ALI', caller: ['Amigo', 'Friend'], vibe: 'lcd',
       question: ['Tens estado em baixo? Vais levantar a cabeça e seguir em frente? Ou bater com a cabeça em tudo?',
                  'You’ve been feeling down? Are you going to lift your head and move on? Or bang your head against everything?'],
-      // what the voice says, as messages in a chat: they show at 7 s of the track, the choice at 20 s
-      chat: { at: 7, choose: 20, words: `
-então, ouvi dizer que estás um bocado em baixo, a vida tem-te tratado mal? | so, I heard you’re feeling kind of down, has life been treating you badly?
-ouve, deste lado parece que só tens duas opções: ou levantas a cabeça e segues em frente, ou perdes a cabeça e rebentas com tudo à tua volta. o que é que tu pensas fazer? | listen, from where I’m standing it looks like you’ve only got two options: either you lift your head and move on, or you lose your head and blow up everything around you. what are you planning to do?
+      // what the voice says: one message at a time, from one second of the track to another (from-to | PT | EN),
+      // then at choose, only the choice
+      chat: { choose: 20, words: `
+7-10 | então, ouvi dizer que estás um bocado em baixo, a vida tem-te tratado mal? | so, I heard you’re feeling kind of down, has life been treating you badly?
+10-19 | ouve, deste lado parece que só tens duas opções: ou levantas a cabeça e segues em frente, ou perdes a cabeça e rebentas com tudo à tua volta. o que é que tu pensas fazer? | listen, from where I’m standing it looks like you’ve only got two options: either you lift your head and move on, or you lose your head and blow up everything around you. what are you planning to do?
 ` },
       options: [
         { to: 3, pt: 'Levantar a cabeça e seguir em frente', en: 'Lift my head and move on' },
@@ -116,12 +118,12 @@ Se no fim da história acabo sozinho | Whether at the end of the story I end up 
 Se vou ficar no Limbo | Whether I’ll stay in Limbo
 
 Outro dia acordo já tou bem melhor | Next day I wake up, I’m already much better
-Sol a bater na cara, vivo o agora | Sun hitting my face, I live the now
+Sinto o sol na cara, vivo o agora | I feel the sun on my face, I live the now
 Alma renovada, venha o encore | Soul renewed, bring on the encore
 Já não vou ficar no Limbo | I won’t stay in Limbo anymore
 (Agora pensa) | (Now think)
 
-Se não tivesse o que tens quem eras tu? | If you didn’t have what you have, who would you be?
+Se não tivesses o que tens quem eras tu? | If you didn’t have what you have, who would you be?
 Não conhecesses quem conheces quem eras tu? | If you didn’t know who you know, who would you be?
 Acordas e olhas ao espelho não és tu… | You wake up and look in the mirror, it’s not you…
 
@@ -140,7 +142,7 @@ Se vem um dilema | When a dilemma comes
 Tu perdes o Norte | You lose your North
 Para, pensa, segue, vai. | Stop, think, move on, go.
 
-Se não tivesse o que tens quem eras tu? | If you didn’t have what you have, who would you be?
+Se não tivesses o que tens quem eras tu? | If you didn’t have what you have, who would you be?
 Não conhecesses quem conheces quem eras tu? | If you didn’t know who you know, who would you be?
 Acordas e olhas ao espelho não és tu… (Quem és tu?) | You wake up and look in the mirror, it’s not you… (Who are you?)
 Se dizes que está tudo bem quem és tu? | If you say everything’s fine, who are you?
@@ -239,9 +241,13 @@ Sou eu no final | Is me, in the end
       n: 5, title: 'Level 2', en: 'Level 2', call: 2, voice: 'Ana Mariano', caller: ['Namorada', 'Girlfriend'], vibe: 'lcd',
       question: ['Isto não está a correr muito bem. Queres acabar?',
                  'This isn’t going very well. Do you want to end it?'],
-      // what the voice says, as messages in a chat: they show at 8 s of the track, the choice at 29 s
-      chat: { at: 8, choose: 29, words: `
-oi, hum, olha temos mesmo que tomar uma decisão, eu percebo que seja muito difícil para os dois, mas, honestamente, não vai ficar mais fácil, e não podemos ficar neste limbo para sempre. se acabar for a melhor decisão, então é encarar e seguir em frente. mas eu preciso mesmo de saber: o que é que tu queres? | hi, um, look, we really have to make a decision. I get that it’s really hard for both of us, but honestly, it’s not going to get any easier, and we can’t stay in this limbo forever. if ending it is the best decision, then we face it and move on. but I really need to know: what do you want?
+      // what the voice says: one message at a time, from one second of the track to another (from-to | PT | EN),
+      // then at choose, only the choice
+      chat: { choose: 29, words: `
+8-14.5 | oi, hum, olha temos mesmo que tomar uma decisão, | hi, um, look, we really have to make a decision.
+14.5-22 | eu percebo que seja muito difícil para os dois, mas, honestamente, não vai ficar mais fácil, e não podemos ficar neste limbo para sempre. | I get that it’s really hard for both of us, but honestly, it’s not going to get any easier, and we can’t stay in this limbo forever.
+22-26.8 | se acabar for a melhor decisão, então é encarar e seguir em frente. | if ending it is the best decision, then we face it and move on.
+26.8-29 | mas eu preciso mesmo de saber: o que é que tu queres? | but I really need to know: what do you want?
 ` },
       options: [
         { to: 7, pt: 'Sim, acabar', en: 'Yes, end it' },
@@ -395,9 +401,13 @@ Não volto a ti | I won’t come back to you
       n: 8, title: 'Level 3', en: 'Level 3', call: 3, voice: 'Miguel Garcia', caller: ['Amigo 2', 'Friend 2'], vibe: 'lcd',
       question: ['Puto, estou farto. Bora sair de Lisboa e viajar? Ou preferes só ir dançar a algum lado?',
                  'Kid, I’m fed up. Let’s get out of Lisbon and travel? Or would you rather just go dancing somewhere?'],
-      // what the voice says, as messages in a chat: they show at 10 s of the track, the choice at 28 s
-      chat: { at: 10, choose: 28, words: `
-então amigo como é que tens andado? já não sei de ti há bué, sei que tens andado fechado na tua bolha... mas olha tem-me apetecido bué sair de Lisboa, espairecer um bocado, dar um passeio... ou então, dar um passinho de dança, ir a uma festa. bora sair de casa, diz-me o que te apetece fazer. | so, buddy, how have you been? haven’t heard from you in ages, I know you’ve been shut away in your bubble... but look, I’ve been dying to get out of Lisbon, clear my head a bit, go for a ride... or else, bust a little dance move, go to a party. let’s get out of the house, tell me what you feel like doing.
+      // what the voice says: one message at a time, from one second of the track to another (from-to | PT | EN),
+      // then at choose, only the choice
+      chat: { choose: 28, words: `
+10.5-15.7 | então amigo como é que tens andado? já não sei de ti há bué, sei que tens andado fechado na tua bolha... | so, buddy, how have you been? haven’t heard from you in ages, I know you’ve been shut away in your bubble...
+15.7-20.2 | mas olha tem-me apetecido bué sair de Lisboa, espairecer um bocado, dar um passeio... | but look, I’ve been dying to get out of Lisbon, clear my head a bit, go for a ride...
+20.2-25 | ou então, dar um passinho de dança, ir a uma festa. | or else, bust a little dance move, go to a party.
+25-28 | bora sair de casa, diz-me o que te apetece fazer. | let’s get out of the house, tell me what you feel like doing.
 ` },
       options: [
         { to: 9, pt: 'Sair de Lisboa e viajar', en: 'Leave Lisbon and travel' },
