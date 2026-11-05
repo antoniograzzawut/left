@@ -170,6 +170,7 @@
   .who:focus-visible,
   .hear:focus-visible,
   .close:focus-visible,
+  .bio-langs button:focus-visible,
   .pages a:focus-visible,
   .next:focus-visible,
   .back:focus-visible {
@@ -331,6 +332,22 @@
     inset: -8px;
   }
   .close:hover { background: var(--red); }
+  /* Portuguese or English: two tabs on the bio's top edge, by its X */
+  .bio-langs { position: absolute; top: -15px; right: 56px; display: flex; }
+  .bio-langs button {
+    min-width: 34px;
+    padding: 6px 7px 5px;
+    border: 0;
+    background: var(--paper);
+    color: var(--ink);
+    box-shadow: inset 0 0 0 2px var(--ink);
+    font: 400 14px/1 var(--pixel);
+    letter-spacing: .04em;
+    cursor: pointer;
+    -webkit-tap-highlight-color: transparent;
+  }
+  .bio-langs [aria-pressed="true"] { background: var(--ink); color: var(--paper); }
+  .bio-langs button:hover { color: var(--red); }
 
   /* Laptop, and phones held sideways */
   @media (min-width: 900px), (orientation: landscape) and (max-height: 540px) {
@@ -515,7 +532,24 @@
         <button class="back" type="button" hidden>Back</button>
         <button class="next" type="button">Next</button>
       </div>
+      <div class="bio-langs" role="group" aria-label="Língua · Language">
+        <button type="button" data-lang="pt" aria-pressed="false">PT</button>
+        <button type="button" data-lang="en" aria-pressed="true">EN</button>
+      </div>
       <form method="dialog"><button class="close" aria-label="Close">X</button></form>
+      <!-- The same two pages in Portuguese: page.js puts them in when PT is chosen -->
+      <template class="bio-pt">
+        <div>
+          <p>Depende do lado. Um escreve canções como <a href="https://open.spotify.com/artist/2rsw8pxtVfU3LiTIT0CYUb">LEFT</a> ou <a href="https://open.spotify.com/artist/1TWqzkKPlhxidBTNhCaUJD">Antony Left</a>. Outro produz música para <a href="https://open.spotify.com/playlist/7C4hf9pHA0TGvfXg3eBZmK">vários artistas nacionais e internacionais</a>. Outro é sócio de uma <a href="https://open.spotify.com/artist/1BRFw2SgH5VM5P0FLmFp3z">editora colaborativa</a>. Outro faz clown, teatro de improviso e contact improvisation. Outro organiza retiros criativos.</p>
+          <p>São todos o António Graça, de Lisboa para o mundo.</p>
+        </div>
+        <div>
+          <p>Queres ver alguns dos meus <a href="https://www.youtube.com/@LEFTmp3/videos">vídeos</a>?</p>
+          <p>Queres <a href="portfolio/">conhecer melhor as minhas andanças</a>?</p>
+          <p>Queres <a href="mailto:left.music.info@gmail.com">falar comigo</a>?</p>
+          <p class="mail">left.music.info@gmail.com</p>
+        </div>
+      </template>
     </div>
   </dialog>
 

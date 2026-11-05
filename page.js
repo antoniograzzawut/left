@@ -267,6 +267,34 @@
     hush();
   }
 
+  // The bio in Portuguese or English: the two tabs on its top edge. It opens in the visitor's own language, or the
+  // one they last picked; picking the other while it is open types the page out again in it
+  const ptPages = dialog.querySelector('.bio-pt');
+  const tongues = [...dialog.querySelectorAll('.bio-langs button')];
+  const bioWords = {
+    en: { pages: pages.map(p => p.innerHTML), label: 'Who am I?', next: next.textContent, back: back.textContent, close: 'Close' },
+    pt: ptPages && { pages: [...ptPages.content.children].map(d => d.innerHTML), label: 'Quem sou eu?', next: 'Seguinte', back: 'Voltar', close: 'Fechar' },
+  };
+  function bioLang(l, again) {
+    const w = bioWords[l];
+    if (!w) return;
+    if (typing) finishTyping();
+    pages.forEach((p, i) => { p.innerHTML = w.pages[i]; p.lang = l; });
+    dialog.setAttribute('aria-label', w.label);
+    next.textContent = w.next;
+    back.textContent = w.back;
+    dialog.querySelector('.close')?.setAttribute('aria-label', w.close);
+    tongues.forEach(b => b.setAttribute('aria-pressed', String(b.dataset.lang === l)));
+    try { localStorage.setItem('bio-lang', l); } catch {}
+    if (again && dialog.open) { seen.delete(pages[current]); turnTo(current); }
+  }
+  if (bioWords.pt) {
+    let saved = null;
+    try { saved = localStorage.getItem('bio-lang'); } catch {}
+    bioLang(saved === 'pt' || saved === 'en' ? saved : (/^pt/i.test(navigator.language || '') ? 'pt' : 'en'));
+    tongues.forEach(b => b.addEventListener('click', () => { chime('next'); bioLang(b.dataset.lang, true); }));
+  }
+
   document.querySelector('.who').addEventListener('click', () => {
     chime('who');
     seen.clear();
@@ -277,7 +305,7 @@
   });
   next.addEventListener('click', () => { chime('next'); turnTo(current + 1); });
   back.addEventListener('click', () => { chime('back'); turnTo(current - 1); });
-  dialog.querySelectorAll('.pages a').forEach(a => a.addEventListener('click', () => chime('go')));
+  dialog.addEventListener('click', e => { if (e.target.closest('.pages a')) chime('go'); });  // in either language
   // Both boxes. Where a press starts, and with what: a text selection dragged past the edge is not a tap outside,
   // and a mouse click on the text is left for selecting words, so only a finger turns the page by tapping it.
   // The browser counts the clicks of a double click (detail 2 and up): those are ignored too.

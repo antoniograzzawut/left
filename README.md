@@ -29,6 +29,11 @@ twice, once in `index.html` and once in `studio.html`: change both. The live
 page follows within a few minutes, but a phone that opened it in the last 10
 minutes can still show the old version for a while.
 
+**"Who am I?" in Portuguese.** On the 8-bit page the bio box has PT and EN tabs on its
+top edge; it opens in the visitor's language (Portuguese on a phone set to Portuguese) and
+remembers the choice. The Portuguese pages are in `index.html` too, right under the English
+ones, inside `<template class="bio-pt">`: when the bio changes, change both.
+
 **The bio PDF.** Press "Add file", then "Upload files", drop in the new PDF
 named exactly `antonio-graca-bio.pdf`, then press "Commit changes" at the bottom
 of the page. Android phones show it through `bio.html`, which reads the same file,
