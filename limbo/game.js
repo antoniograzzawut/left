@@ -90,6 +90,60 @@
   };
   const PHONE = '<svg class="phone" viewBox="0 0 12 10" shape-rendering="crispEdges" aria-hidden="true"><path fill="currentColor" fill-rule="evenodd" d="M1 0h10v1h1v3H9V2H3v2H0V1h1zM3 5h6v1h1v1h1v3H1V7h1V6h1zM5 7v1h2V7z"/></svg>';
 
+  // ---- A small 8-bit picture for each song, moving in a few frames, for when nothing is being sung. Drawn from rows
+  // of letters, each a colour; classes a/b, f1/f2/f3 are frames, the others moves (in index.html) ----
+  function px(rows, key) {
+    const d = {};
+    rows.forEach((row, y) => [...row].forEach((ch, x) => { if (key[ch]) (d[ch] = d[ch] || []).push(`M${x} ${y}h1v1h-1z`); }));
+    return Object.entries(d).map(([ch, path]) => `<path style="fill:${key[ch]}" d="${path.join('')}"/>`).join('');
+  }
+  const art = inner => `<svg class="art" viewBox="0 0 16 16" shape-rendering="crispEdges" aria-hidden="true">${inner}</svg>`;
+  const grid = (fn, h = 16, w = 16) => Array.from({ length: h }, (_, y) => Array.from({ length: w }, (_, x) => fn(x, y)).join(''));
+  const BALL = ['......XXXX......', '.....XXXXXX.....', '....XXXXXXXX....', '....XXXXXXXX....', '....XXXXXXXX....', '....XXXXXXXX....', '.....XXXXXX.....', '......XXXX......'];
+  const ball = flip => grid((x, y) => (y >= 3 && y <= 10 && BALL[y - 3][x] === 'X' ? (((x + y) % 2) ^ flip ? 't' : 'T') : '.'));
+  const drops = k => grid((x, y) => ([3, 6, 9, 12].some((c, i) => x === c && (y - 9 - ((i * 2 + k * 2) % 6) + 12) % 6 < 2 && y >= 9 && y <= 14) ? 'D' : '.'));
+  const ART = {
+    // the Intro: a coin spinning, like the one the game asks for
+    night: art(`<g class="spin">${px(['', '......YYYY......', '....YYYYYYYY....', '...YYwYYYYYYy...', '..YYwYYYYYYYYy..', '..YwYYyYYYYYYy..', '.YYYYYyYYYYYYYy.', '.YYYYYyYYYYYYYy.', '.YYYYYyYYYYYYYy.', '.YYYYYyyyyYYYYy.', '..YYYYYYYYYYYy..', '..YYYYYYYYYYyy..', '...YYYYYYYYyy...', '....yYYYYYyy....', '......yyyy......'], { Y: '#F7C948', y: '#B8862B', w: '#FFF6D8' })}</g>`),
+    // Siga: the sun, its rays turning
+    sunrise: art(px(['', '', '', '', '......YYYY......', '.....YYYYYY.....', '....YYYYYYYY....', '....YYYYYYYY....', '....YYYYYYYY....', '....YYYYYYYY....', '.....YYYYYY.....', '......YYYY......'], { Y: '#FFC46B' }) +
+      `<g class="a">${px(['', '.......OO.......', '.......OO.......', '', '', '', '', '.OO..........OO.', '.OO..........OO.', '', '', '', '', '.......OO.......', '.......OO.......'], { O: '#FF9A4D' })}</g>` +
+      `<g class="b">${px(['', '', '..O.........O...', '...O.......O....', '', '', '', '', '', '', '', '', '...O.......O....', '..O.........O...'], { O: '#FF9A4D' })}</g>`),
+    // Violento: a bomb, its fuse sparking
+    riot: art(px(['', '', '', '', '...........F....', '..........F.....', '......BBBF......', '....BBBBBBB.....', '...BWBBBBBBB....', '...BWBBBBBBB....', '...BBBBBBBBB....', '...BBBBBBBBB....', '...BBBBBBBBB....', '....BBBBBBB.....', '......BBB.......'], { B: 'var(--red)', W: '#FFE8E3', F: '#C9A27E' }) +
+      `<g class="a">${px(['', '............S...', '...........SSS..', '............S...'], { S: '#FFD84A' })}</g><g class="b">${px(['', '...........S.S..', '............S...', '...........S.S..'], { S: '#FFF2A8' })}</g>`),
+    // Pulso: the heart, beating
+    heart: art(`<g class="beat">${px(['', '', '', '...HHH....HHH...', '..HHHHH..HHHHH..', '.HHWWHHHHHHHHHH.', '.HHWHHHHHHHHHHH.', '.HHHHHHHHHHHHHH.', '..HHHHHHHHHHHH..', '...HHHHHHHHHH...', '....HHHHHHHH....', '.....HHHHHH.....', '......HHHH......', '.......HH.......'], { H: '#FF4F98', W: '#FFE4F1' })}</g>`),
+    // Volto a ti: an hourglass, the years running through it
+    sepia: art(px(['', '...FFFFFFFFFF...', '....G......G....', '....G......G....', '.....G....G.....', '......G..G......', '.......GG.......', '.......GG.......', '......G..G......', '.....G....G.....', '....G......G....', '....G......G....', '...FFFFFFFFFF...'], { F: '#D3A576', G: '#F4E5CB' }) +
+      `<g class="f1">${px(['', '', '.....SSSSSS.....', '.....SSSSSS.....', '......SSSS......', '.......SS.......'], { S: '#E8875A' })}</g>` +
+      `<g class="f2">${px(['', '', '', '', '......SSSS......', '.......SS.......', '', '', '.......S........', '.......S........', '......SSSS......', '.....SSSSSS.....'], { S: '#E8875A' })}</g>` +
+      `<g class="f3">${px(['', '', '', '', '', '', '', '', '.......SS.......', '......SSSS......', '.....SSSSSS.....', '.....SSSSSS.....'], { S: '#E8875A' })}</g>`),
+    // A1 Norte: the car on the motorway, the lines rushing past
+    road: art(`<g class="bob">${px(['', '', '', '', '', '', '......RRRR......', '.....RBBBBR.....', '..RRRRRRRRRRRR..', '..RRRRRRRRRRRRY.', '..RRRRRRRRRRRR..'], { R: 'var(--red)', B: '#7FB0FF', Y: '#FFF7D6' })}</g>` +
+      `<g class="a">${px(['', '', '', '', '', '', '', '', '', '', '', '....WW....WW....', '....WW....WW....'], { W: '#E8F0FF' })}</g><g class="b">${px(['', '', '', '', '', '', '', '', '', '', '', '....W.....W.....', '.....W.....W....'], { W: '#E8F0FF' })}</g>` +
+      `<g class="dash">${px(['', '', '', '', '', '', '', '', '', '', '', '', '', '', 'DD..DD..DD..DD..DD..'], { D: '#E8F0FF' })}</g>`),
+    // Dançar: the mirror ball, its tiles flashing
+    club: art(px(['.......S........', '.......S........', '.......S........'], { S: '#FFF0DB' }) +
+      `<g class="a">${px(ball(0), { T: '#FFF0DB', t: '#57E4FF' })}${px(['', '', '', '', '..P.............', '.PPP............', '..P.............', '', '', '.............P..', '............PPP.', '.............P..'], { P: '#FF58B2' })}</g>` +
+      `<g class="b">${px(ball(1), { T: '#FFF0DB', t: '#57E4FF' })}${px(['', '', '.............P..', '............PPP.', '.............P..', '', '', '', '', '', '..P.............', '.PPP............', '..P.............'], { P: '#FF58B2' })}</g>`),
+    // Quero mais: a diamond, glinting
+    gold: art(`<g class="bob">${px(['', '', '', '.....GGGGGG.....', '....GGGGGGGG....', '...GGWGGGGGGG...', '...gggggggggg...', '....gggggggg....', '.....gggggg.....', '......gggg......', '.......gg.......'], { G: '#FFD866', g: '#E9BE52', W: '#FFFBEA' })}</g>` +
+      `<g class="a">${px(['', '............W...', '...........WWW..', '............W...'], { W: '#FFFBEA' })}</g><g class="b">${px(['', '', '', '', '', '', '', '', '..W.............', '.WWW............', '..W.............'], { W: '#FFFBEA' })}</g>`),
+    // Silêncio: a candle, barely moving
+    quiet: art(px(['', '', '', '', '', '', '.......w........', '.....CCCCC......', '.....CCCCC......', '.....CCCCC......', '.....CCCCC......', '.....CCCCC......', '.....CCCCC......', '.....CCCCC......', '....BBBBBBB.....'], { w: '#4A4A4A', C: '#969696', B: '#6E6E6E' }) +
+      `<g class="a">${px(['', '', '.......f........', '......fFf.......', '......fFf.......', '.......F........'], { F: '#EDEDED', f: '#BDBDBD' })}</g><g class="b">${px(['', '', '........f.......', '.......fFf......', '......fFf.......', '.......F........'], { F: '#EDEDED', f: '#BDBDBD' })}</g>`),
+    // Não estou bem: a cloud that won't stop raining
+    overcast: art(px(['', '', '.....CCCC.......', '...CCCCCCCC.....', '..CCCCCCCCCCC...', '.CCCCCCCCCCCCC..', '.CCCCCCCCCCCCC..', '..ccccccccccc...'], { C: '#9AAABA', c: '#6F7F8F' }) +
+      `<g class="f1">${px(drops(0), { D: '#DAE2EA' })}</g><g class="f2">${px(drops(1), { D: '#DAE2EA' })}</g><g class="f3">${px(drops(2), { D: '#DAE2EA' })}</g>`),
+    // Chora: an eye, crying ("dentro de um olho afogado")
+    tears: art(px(['', '', '', '', '.....LLLLLL.....', '...LL......LL...', '..L....II....L..', '.L...IIPPII...L.', '.L...IIPPII...L.', '..L....II....L..', '...LL......LL...', '.....LLLLLL.....'], { L: '#E3F0FF', I: '#4FAEFF', P: '#061226' }) +
+      `<g class="f1">${px(['', '', '', '', '', '', '', '', '', '', '', '', '...........T....', '...........T....'], { T: '#7DC2FF' })}</g>` +
+      `<g class="f2">${px(['', '', '', '', '', '', '', '', '', '', '', '', '....T...........', '....T......T....', '...........T....'], { T: '#7DC2FF' })}</g>` +
+      `<g class="f3">${px(['', '', '', '', '', '', '', '', '', '', '', '', '', '....T...........', '....T...........', '...........T....'], { T: '#7DC2FF' })}</g>`),
+  };
+  const idleHTML = t => (ART[t.vibe] ? `<div class="idle">${ART[t.vibe]}</div>` : '');
+
   function verses(words) {
     return words.trim().split(/\n\s*\n/).map(block => block.split('\n').map(line => {
       const [pt, en = ''] = line.split(' | ');
@@ -144,6 +198,7 @@
     clearInterval(overTimer);
     buzz(false);
     stage = null;
+    convo = null;
     screen = name;
     body.dataset.screen = name;
     setVibe(vibe);
@@ -326,13 +381,15 @@
   const newRun = () => ({ score: 0, combo: 0, caught: 0, keys: 0 });
   const mult = () => Math.min(4, 1 + Math.floor(run.combo / 5));
   let stage = null;  // the song on screen: { t, box, lines, now, done, hush, noisy }
+  let convo = null;  // the call on screen: { chat, typing, said, choices }
 
   function startStage(t) {
     const box = game.querySelector('.stage');
     if (!box) return;
     const lines = linesOf(t);
     if (!lines) { box.innerHTML = wordsHTML(t); return; }
-    stage = { t, box, lines, now: -2, done: {}, hush: !!t.hush, noisy: false };
+    box.innerHTML = idleHTML(t);
+    stage = { t, box, lines, now: -1, done: {}, hush: !!t.hush, noisy: false };
   }
   function paintStage() {
     if (!stage || !stage.box.isConnected || missing) return;
@@ -344,7 +401,7 @@
     settle(stage.now);
     stage.now = shown;
     stage.noisy = false;
-    if (shown < 0) { stage.box.innerHTML = ''; return; }
+    if (shown < 0) { stage.box.innerHTML = idleHTML(stage.t); return; }
     stage.box.innerHTML = lineHTML(stage.lines[shown], shown);
     const key = stage.box.querySelector('.key');
     if (key && stage.done[shown]) key.classList.add(stage.done[shown] === 'caught' ? 'caught' : 'gone');
@@ -653,14 +710,20 @@
   function call(n) {
     const t = byN.get(n);
     at = n;
+    // a call without its chat yet: its question, as a message from the start, and the choice when it ends
+    const chat = t.chat || { at: 0, choose: null, words: `${t.question[0]} | ${t.question[1]}` };
+    const msgs = chat.words.trim().split('\n').map(l => l.split(' | ').map(x => (x || '').trim()));
     render('call', `
       <p class="line-who">${say('onLine')}</p>
       <h2 class="caller">${callerHTML(t)}</h2>
       <div class="box">
         ${deckHTML(false)}
         <div class="voice" aria-hidden="true">${'<i></i>'.repeat(9)}</div>
+        <div class="chat" aria-live="polite">
+          <p class="typing" hidden aria-hidden="true"><i></i><i></i><i></i></p>
+          ${msgs.map(([pt, en]) => `<p class="bubble" hidden>${tr(pt, en)}</p>`).join('')}
+        </div>
         <div class="choices" hidden>
-          <p class="said">${tr(`“${t.question[0]}”`, `“${t.question[1]}”`)}</p>
           <p class="choose-label">${say('choose')}</p>
           ${clockOn() ? `<div class="clock" style="--left: 1">
             <span class="secs" aria-hidden="true">${CHOOSE_IN}</span>
@@ -671,8 +734,11 @@
         ${creditsHTML(t)}
       </div>`, null, 'lcd');
     hookDeck();
+    convo = { chat, typing: false, said: false, choices: false };
     game.querySelectorAll('.pick').forEach(button => button.addEventListener('click', () => {
       const to = Number(button.dataset.to), fated = button.dataset.fated === '1';
+      onEnd = null;
+      audio.pause();  // the call may still be playing: picking ends it
       sfx.pick();
       path.push(to);
       ready(to, () => song(to));
@@ -687,17 +753,41 @@
       hold.disabled = true;
       game.querySelector('.pick')?.focus({ preventScroll: true });
     });
-    listen(n, showChoices);
+    listen(n, () => {
+      showChat();
+      showChoices();
+      game.querySelector('.voice')?.classList.add('done');
+      const box = game.querySelector('.choices');
+      if (box) startClock(box);  // the clock only once the call is over
+    });
   }
-
+  // The call's moments, by the track's time: "typing..." just before its messages, then they show, then the choice
+  function callTick() {
+    if (screen !== 'call' || !convo || missing) return;
+    const pos = audio.currentTime;
+    if (!convo.said && !convo.typing && pos >= convo.chat.at - 0.9) {
+      convo.typing = true;
+      const dots = game.querySelector('.typing');
+      if (dots) dots.hidden = false;
+    }
+    if (!convo.said && pos >= convo.chat.at) showChat();
+    if (!convo.choices && convo.chat.choose != null && pos >= convo.chat.choose) showChoices();
+  }
+  audio.addEventListener('timeupdate', callTick);
+  audio.addEventListener('seeked', callTick);
+  function showChat() {
+    if (!convo || convo.said) return;
+    convo.said = true;
+    const dots = game.querySelector('.typing');
+    if (dots) dots.hidden = true;
+    [...game.querySelectorAll('.bubble')].forEach((b, i) => setTimeout(() => { b.hidden = false; }, calm ? 0 : i * 700));
+  }
   function showChoices() {
     const box = game.querySelector('.choices');
     if (!box || !box.hidden) return;
+    if (convo) convo.choices = true;
     box.hidden = false;
-    game.querySelector('.voice')?.classList.add('done');
-    startClock(box);
-    const t = byN.get(at);
-    announce(`${t.question[lang === 'en' ? 1 : 0]} ${TEXT[lang].choose}`);
+    announce(TEXT[lang].choose);
     box.querySelector('.pick').focus({ preventScroll: true });
     box.scrollIntoView({ block: 'nearest', behavior: calm ? 'auto' : 'smooth' });
   }
@@ -722,7 +812,7 @@
         </section>
         <section class="recap">
           <p class="line-who">${say('recap')}</p>
-          <ol>${path.map((to, i) => recapHTML(calls[i], to)).join('')}</ol>
+          <ol>${path.map((to, i) => recapHTML(calls[i], to, i)).join('')}</ol>
         </section>
         <div class="card">
           <p class="line-who">${say('yourEnd')}</p>
@@ -744,14 +834,22 @@
     listen(LAST, null);
   }
   // One choice in the recap: who called, what they asked, what you picked, and how many souls did the same
-  function recapHTML(c, to) {
+  function recapHTML(c, to, i) {
     const o = c.options.find(x => x.to === to);
+    const song = byN.get(to);
     const pct = (album.souls || {})[to];
     return `<li>
-      <p class="who">${callerHTML(c)}</p>
-      <p class="q">${tr(`“${c.question[0]}”`, `“${c.question[1]}”`)}</p>
-      <p class="a">${tr(o.pt, o.en)}<span class="to">${esc(plainTitle(byN.get(to)))}</span></p>
-      ${pct ? `<p class="pct"><b>${pct}%</b> ${say('souls')}</p>` : ''}
+      <div class="band" data-look="${esc(song.vibe)}">
+        <span class="num">${i + 1}</span>
+        <span class="who">${callerHTML(c)}</span>
+        <span class="song">${esc(plainTitle(song))}</span>
+        ${ART[song.vibe] || ''}
+      </div>
+      <div class="then">
+        <p class="q">${tr(`“${c.question[0]}”`, `“${c.question[1]}”`)}</p>
+        <p class="a">${tr(o.pt, o.en)}</p>
+        ${pct ? `<p class="pct"><b>${pct}%</b> ${say('souls')}</p>` : ''}
+      </div>
     </li>`;
   }
   // The share of souls that took this whole path: the five choices' shares multiplied
